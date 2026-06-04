@@ -110,16 +110,14 @@
   }
 
   .page-shell {
-    width: min(100%, 2000px);
+    width: 100%;
     min-width: 0;
     margin: 0 auto;
-    border-inline: 1px solid var(--border);
     background: var(--background);
-    box-shadow: 0 0 80px rgba(0, 0, 0, .28);
   }
 
   .wrap {
-    width: min(100% - 64px, 1280px);
+    width: min(calc(100% - clamp(32px, 5vw, 128px)), 1440px);
     margin: 0 auto;
   }
 
@@ -205,6 +203,13 @@
     }
   }
 
+  @media (min-width: 1280px) {
+    .lg\:text-6xl {
+      font-size: 4.25rem;
+      line-height: .98;
+    }
+  }
+
   .section-head p,
   .body-copy {
     margin: 0;
@@ -246,7 +251,7 @@
   }
 
   .site-nav .wrap {
-    width: min(100% - 64px, 1680px);
+    width: min(calc(100% - clamp(32px, 6vw, 160px)), 1840px);
     margin: 0 auto;
   }
 
@@ -374,7 +379,7 @@
   #hero {
     position: relative;
     min-height: 100vh;
-    max-height: 900px;
+    min-height: max(760px, 100svh);
     display: flex;
     align-items: center;
     overflow: hidden;
@@ -484,7 +489,7 @@
     position: absolute;
     top: clamp(168px, 24vh, 260px);
     right: clamp(130px, 11vw, 260px);
-    width: clamp(520px, 38vw, 820px);
+    width: clamp(520px, 38vw, 1040px);
     height: auto;
     aspect-ratio: 16 / 9;
     max-width: none;
@@ -523,18 +528,18 @@
     position: relative;
     z-index: 3;
     width: 100%;
-    max-width: min(100% - 2rem, 980px);
-    min-height: 100vh;
+    max-width: min(calc(100% - clamp(2rem, 8vw, 11rem)), 1440px);
+    min-height: inherit;
     margin: 0 auto;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: clamp(7.5rem, 17vh, 12rem) 1rem clamp(3.5rem, 9vh, 7rem);
+    padding: clamp(7.25rem, 14svh, 11rem) clamp(1rem, 4vw, 4rem) clamp(3.25rem, 8svh, 6rem);
   }
 
   #hero > nav + div > div {
     width: 100%;
-    max-width: 860px;
+    max-width: 64rem;
     margin: 0 auto;
     text-align: center;
   }
@@ -544,7 +549,7 @@
     align-items: center;
     justify-content: center;
     gap: .5rem;
-    margin-bottom: .75rem;
+    margin-bottom: .9rem;
     opacity: 1;
     transform: none;
   }
@@ -582,16 +587,16 @@
 
   #hero-heading + p {
     max-width: 66ch;
-    margin: 1rem auto 0;
+    margin: 1.05rem auto 0;
     color: var(--muted-foreground);
-    font-size: clamp(.92rem, 1.15vw, 1rem);
+    font-size: 1rem;
     line-height: 1.75;
   }
 
   .setup-command-box {
     position: relative;
-    width: min(100%, 30rem);
-    margin: 1.25rem auto 0;
+    width: min(100%, 34rem);
+    margin: 1.35rem auto 0;
     display: flex;
     min-width: 0;
     align-items: stretch;
@@ -698,7 +703,7 @@
   .vfs-stats {
     width: min(100%, 36rem);
     max-width: 36rem;
-    margin: 1.55rem auto 0;
+    margin: 1.65rem auto 0;
     border-width: 1px 0;
     border-style: solid;
     border-color: color-mix(in srgb, var(--foreground) 8%, transparent);
@@ -768,13 +773,13 @@
     align-items: center;
     justify-content: center;
     gap: .75rem;
-    margin-top: 1.5rem;
+    margin-top: 1.6rem;
     opacity: 1;
     transform: none;
   }
 
   #hero .hero-actions[data-reference-structure="navbar-hero"] {
-    margin-top: 1.5rem;
+    margin-top: 1.6rem;
   }
 
   .hero-btn {
@@ -873,6 +878,277 @@
 
   #hero .hero-actions [data-slot="button"]:active {
     transform: translateY(1px);
+  }
+
+  @media (min-width: 1720px) {
+    .site-nav {
+      --nav-h: 76px;
+      padding-top: 24px;
+    }
+
+    .site-nav .brand {
+      gap: 14px;
+    }
+
+    .site-nav .brand::before,
+    .site-nav .brand::after {
+      font-size: .9rem;
+    }
+
+    .site-nav .brand-logo {
+      width: 26px;
+      height: 26px;
+    }
+
+    .site-nav .brand-name {
+      font-size: .96rem;
+    }
+
+    .site-nav .brand-version {
+      font-size: .74rem;
+    }
+
+    .site-nav .nav-right {
+      gap: 18px;
+    }
+
+    .site-nav .github-link {
+      gap: 10px;
+      font-size: .92rem;
+    }
+
+    .site-nav .github-logo,
+    .site-nav .icon-btn .theme-icon {
+      width: 19px;
+      height: 19px;
+    }
+
+    .site-nav .github-count {
+      font-size: .78rem;
+    }
+
+    .site-nav .icon-btn {
+      width: 38px;
+      height: 38px;
+      font-size: .86rem;
+    }
+
+    .lg\:text-6xl {
+      font-size: 5rem;
+      line-height: .96;
+    }
+
+    #hero video {
+      top: clamp(190px, 22vh, 320px);
+      right: clamp(180px, 12vw, 340px);
+    }
+
+    #hero > nav + div {
+      max-width: min(calc(100% - clamp(8rem, 10vw, 15rem)), 1680px);
+      padding-top: clamp(8.25rem, 15svh, 13rem);
+      padding-bottom: clamp(4rem, 8svh, 7rem);
+    }
+
+    #hero > nav + div > div {
+      max-width: 74rem;
+    }
+
+    .hero-eyebrow {
+      margin-bottom: 1.05rem;
+    }
+
+    .hero-eyebrow span {
+      gap: .45rem;
+      padding: .36rem .74rem;
+      font-size: .82rem;
+    }
+
+    .hero-eyebrow svg {
+      width: .86rem;
+      height: .86rem;
+    }
+
+    #hero-heading + p {
+      margin-top: 1.2rem;
+      font-size: 1.08rem;
+    }
+
+    .setup-command-box {
+      width: min(100%, 40rem);
+      margin-top: 1.55rem;
+    }
+
+    .setup-command-code {
+      padding: .72rem 1.2rem;
+      font-size: .86rem;
+    }
+
+    .setup-copy-btn {
+      min-height: 2.55rem;
+      padding-inline: 1rem;
+    }
+
+    .setup-copy-btn svg {
+      width: 1.08rem;
+      height: 1.08rem;
+    }
+
+    .try-me-mark {
+      right: -11.8rem;
+      top: -1.85rem;
+      width: 162px;
+    }
+
+    .vfs-stats {
+      width: min(100%, 42rem);
+      max-width: 42rem;
+      margin-top: 1.85rem;
+    }
+
+    .vfs-stat-cell {
+      min-height: 56px;
+      padding: 11px 12px 9px;
+    }
+
+    .vfs-stat-number {
+      font-size: .88rem;
+    }
+
+    .vfs-stat-title {
+      margin-left: .32rem;
+      font-size: .66rem;
+    }
+
+    .vfs-stat-detail {
+      margin-top: .36rem;
+      font-size: .6rem;
+    }
+
+    .hero-actions,
+    #hero .hero-actions[data-reference-structure="navbar-hero"] {
+      gap: .9rem;
+      margin-top: 1.85rem;
+    }
+
+    .hero-btn,
+    #hero .hero-actions [data-slot="button"] {
+      min-height: 2.4rem;
+      gap: .45rem;
+      padding-inline: 1rem;
+      font-size: .86rem;
+    }
+
+    .hero-btn svg,
+    #hero .hero-actions [data-slot="button"] svg {
+      width: 1.06rem;
+      height: 1.06rem;
+    }
+  }
+
+  @media (min-width: 2240px) {
+    .wrap {
+      width: min(calc(100% - 176px), 1560px);
+    }
+
+    .site-nav .wrap {
+      width: min(calc(100% - 220px), 2040px);
+    }
+
+    .site-nav {
+      --nav-h: 84px;
+      padding-top: 28px;
+    }
+
+    .lg\:text-6xl {
+      font-size: 5.7rem;
+      line-height: .95;
+    }
+
+    #hero video {
+      top: clamp(220px, 21vh, 360px);
+      right: clamp(230px, 12vw, 420px);
+      width: clamp(840px, 40vw, 1180px);
+    }
+
+    #hero > nav + div {
+      max-width: min(calc(100% - 16rem), 1840px);
+      padding-top: clamp(9rem, 15svh, 14rem);
+      padding-bottom: clamp(4.5rem, 8svh, 7.5rem);
+    }
+
+    #hero > nav + div > div {
+      max-width: 82rem;
+    }
+
+    .hero-eyebrow {
+      margin-bottom: 1.15rem;
+    }
+
+    .hero-eyebrow span {
+      padding: .4rem .82rem;
+      font-size: .86rem;
+    }
+
+    #hero-heading + p {
+      margin-top: 1.35rem;
+      font-size: 1.14rem;
+    }
+
+    .setup-command-box {
+      width: min(100%, 44rem);
+      margin-top: 1.75rem;
+    }
+
+    .setup-command-code {
+      padding: .82rem 1.3rem;
+      font-size: .92rem;
+    }
+
+    .setup-copy-btn {
+      min-height: 2.8rem;
+      padding-inline: 1.12rem;
+    }
+
+    .try-me-mark {
+      right: -12.6rem;
+      width: 176px;
+    }
+
+    .vfs-stats {
+      width: min(100%, 46rem);
+      max-width: 46rem;
+      margin-top: 2.05rem;
+    }
+
+    .vfs-stat-cell {
+      min-height: 62px;
+      padding: 13px 14px 10px;
+    }
+
+    .vfs-stat-number {
+      font-size: .94rem;
+    }
+
+    .vfs-stat-title {
+      font-size: .7rem;
+    }
+
+    .vfs-stat-detail {
+      font-size: .64rem;
+    }
+
+    .hero-actions,
+    #hero .hero-actions[data-reference-structure="navbar-hero"] {
+      gap: 1rem;
+      margin-top: 2.05rem;
+    }
+
+    .hero-btn,
+    #hero .hero-actions [data-slot="button"] {
+      min-height: 2.6rem;
+      padding-inline: 1.1rem;
+      font-size: .9rem;
+    }
   }
 
   /* ===== Product sections based on the locked hero language ===== */
@@ -1944,6 +2220,18 @@
     .foot-cols {
       grid-template-columns: 1fr;
       gap: 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #hero > nav + div {
+      padding-inline: .75rem;
+    }
+
+    #hero-heading {
+      max-width: 100%;
+      font-size: 2rem;
+      line-height: 1.12;
     }
   }
 
