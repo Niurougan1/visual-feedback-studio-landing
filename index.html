@@ -1,0 +1,3087 @@
+<!DOCTYPE html>
+<html lang="en" class="dark" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Visual Feedback Studio - Browser edits. Agent ships source.</title>
+<meta name="description" content="A browser visual-review workspace for Codex and Claude. Style, copy, and notes mapped back to real source." />
+<link rel="preload" href="assets/GeistPixel-Circle.woff2" as="font" type="font/woff2" crossorigin />
+<style>
+  @font-face {
+    font-family: "Geist Pixel Circle";
+    src: url("assets/GeistPixel-Circle.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root,
+  html[data-theme="dark"] {
+    color-scheme: dark;
+    --vfs-accent: #7D9E20;
+    --vfs-accent-hover: #8fad29;
+    --background: #090908;
+    --foreground: #F4F4F4;
+    --card: #100f0e;
+    --card-foreground: #F4F4F4;
+    --primary: #7D9E20;
+    --primary-foreground: #F7F8EF;
+    --secondary: rgba(244, 244, 244, 0.055);
+    --muted: rgba(244, 244, 244, 0.08);
+    --muted-foreground: rgba(244, 244, 244, 0.66);
+    --border: rgba(244, 244, 244, 0.16);
+    --input: rgba(244, 244, 244, 0.18);
+    --ring: rgba(125, 158, 32, 0.48);
+    --regent: #B9D9EA;
+    --danger: #D57D72;
+    --font-geist-pixel-circle: "Geist Pixel Circle";
+    --pixel: var(--font-geist-pixel-circle), "Courier New", var(--mono);
+    --mono: "Geist Mono", "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: Inter, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+    --ease: cubic-bezier(.19, 1, .22, 1);
+  }
+
+  html[data-theme="light"] {
+    color-scheme: light;
+    --vfs-accent: #6F8C19;
+    --vfs-accent-hover: #7D9E20;
+    --background: #F4F4F4;
+    --foreground: #1C1C1C;
+    --card: #FAFAF4;
+    --card-foreground: #1C1C1C;
+    --primary: #6F8C19;
+    --primary-foreground: #FBFCF4;
+    --secondary: rgba(28, 28, 28, 0.055);
+    --muted: rgba(28, 28, 28, 0.07);
+    --muted-foreground: rgba(28, 28, 28, 0.66);
+    --border: rgba(28, 28, 28, 0.18);
+    --input: rgba(28, 28, 28, 0.2);
+    --ring: rgba(111, 140, 25, 0.42);
+    --regent: #5B8191;
+    --danger: #B85B52;
+  }
+
+  * { box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 96px;
+    background: var(--background);
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    background-color: var(--background);
+    background-image: repeating-linear-gradient(45deg, var(--secondary) 0, var(--background) 1px, transparent 0, transparent 50%);
+    background-size: 10px 10px;
+    background-attachment: fixed;
+    color: var(--foreground);
+    font-family: var(--sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+    overflow-x: hidden;
+    transition: background-color .28s var(--ease), color .28s var(--ease);
+  }
+
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; }
+  strong { color: var(--foreground); font-weight: 600; }
+
+  [data-zh],
+  [data-en] { display: none; }
+  html[lang="zh"] [data-zh],
+  html[lang="en"] [data-en] { display: contents; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .page-shell {
+    width: min(100%, 2000px);
+    min-width: 0;
+    margin: 0 auto;
+    border-inline: 1px solid var(--border);
+    background: var(--background);
+    box-shadow: 0 0 80px rgba(0, 0, 0, .28);
+  }
+
+  .wrap {
+    width: min(100% - 64px, 1280px);
+    margin: 0 auto;
+  }
+
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    border: 1px solid color-mix(in srgb, var(--primary) 45%, transparent);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+    color: var(--primary);
+    padding: .42rem .62rem;
+    font-family: var(--mono);
+    font-size: .72rem;
+    line-height: 1;
+  }
+
+  .kicker::before {
+    content: "~";
+  }
+
+  .section {
+    position: relative;
+    padding: clamp(86px, 12vw, 156px) 0;
+    border-top: 1px solid var(--border);
+    background: var(--background);
+  }
+
+  .section-head {
+    display: grid;
+    grid-template-columns: minmax(0, .62fr) minmax(320px, .38fr);
+    gap: clamp(28px, 6vw, 80px);
+    align-items: end;
+    margin-bottom: clamp(34px, 5vw, 72px);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .font-pixel {
+    font-family: var(--pixel);
+    font-weight: 400;
+  }
+
+  .text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+
+  .tracking-tight {
+    letter-spacing: 0;
+  }
+
+  .vfs-title-line {
+    display: block;
+    white-space: nowrap;
+  }
+
+  .text-primary,
+  .vfs-title-accent {
+    color: var(--primary) !important;
+  }
+
+  .section-head h2,
+  .why-narr h2,
+  #cta h2 {
+    margin: 18px 0 0;
+    color: var(--foreground);
+    max-width: 16.5ch;
+  }
+
+  @media (min-width: 640px) {
+    .sm\:text-5xl {
+      font-size: 3rem;
+      line-height: 1;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .lg\:text-6xl {
+      font-size: 3.75rem;
+      line-height: 1;
+    }
+  }
+
+  .section-head p,
+  .body-copy {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: clamp(.95rem, 1.2vw, 1.08rem);
+    line-height: 1.75;
+  }
+
+  /* ===== Nav Bar: locked to latest Navbar+hero.html structure ===== */
+  .site-nav,
+  .site-nav * { box-sizing: border-box; }
+
+  .site-nav {
+    --shark: #1C1C1C;
+    --matcha: #7D9E20;
+    --regent: #B9D9EA;
+    --wild: #F4F4F4;
+    --text: #F4F4F4;
+    --muted: rgba(244, 244, 244, 0.68);
+    --accent: #7D9E20;
+    --line: rgba(244, 244, 244, 0.18);
+    --nav-h: 68px;
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    padding: 18px 0 0;
+    pointer-events: none;
+    color: var(--text);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+  }
+
+  html[data-theme="light"] .site-nav {
+    --text: #1C1C1C;
+    --muted: rgba(28, 28, 28, 0.68);
+    --line: rgba(28, 28, 28, 0.2);
+    --accent: #6F8C19;
+  }
+
+  .site-nav .wrap {
+    width: min(100% - 64px, 1680px);
+    margin: 0 auto;
+  }
+
+  .site-nav .nav-inner {
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: auto;
+  }
+
+  .site-nav .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    color: var(--text);
+  }
+
+  .site-nav .brand::before,
+  .site-nav .brand::after {
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: .82rem;
+  }
+
+  .site-nav .brand::before { content: "["; }
+  .site-nav .brand::after { content: "]"; order: 5; }
+
+  .site-nav .brand-logo {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    color: var(--accent);
+  }
+
+  .site-nav .brand-logo svg,
+  .site-nav .github-logo svg,
+  .site-nav .icon-btn svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .site-nav .brand-name {
+    font-size: .86rem;
+    font-weight: 560;
+    white-space: nowrap;
+  }
+
+  .site-nav .brand-version {
+    margin-left: 2px;
+    color: color-mix(in srgb, var(--accent) 82%, var(--text));
+    font-family: var(--mono);
+    font-size: .66rem;
+    white-space: nowrap;
+  }
+
+  .site-nav .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .site-nav .github-link,
+  .site-nav .icon-btn {
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    padding: 0;
+    box-shadow: none;
+    transition: color .24s var(--ease), outline-color .24s var(--ease);
+  }
+
+  .site-nav .github-link {
+    gap: 8px;
+    font-size: .84rem;
+  }
+
+  .site-nav .github-logo {
+    width: 17px;
+    height: 17px;
+    color: var(--accent);
+    display: inline-flex;
+  }
+
+  .site-nav .github-count {
+    color: color-mix(in srgb, var(--muted) 72%, transparent);
+    font-family: var(--mono);
+    font-size: .72rem;
+  }
+
+  .site-nav .icon-btn {
+    width: 32px;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: .78rem;
+  }
+
+  .site-nav .icon-btn .theme-icon {
+    width: 17px;
+    height: 17px;
+    display: block;
+  }
+
+  .site-nav .github-link:hover,
+  .site-nav .github-link:focus-visible,
+  .site-nav .icon-btn:hover,
+  .site-nav .icon-btn:focus-visible {
+    color: var(--text);
+    outline: 1px solid color-mix(in srgb, var(--accent) 54%, transparent);
+    outline-offset: 7px;
+  }
+
+  .site-nav .icon-btn:active,
+  .site-nav .github-link:active {
+    transform: translateY(1px) scale(.985);
+  }
+
+  /* ===== Hero: latest Navbar+hero.html structure preserved ===== */
+  #hero {
+    position: relative;
+    min-height: 100vh;
+    max-height: 900px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--background);
+    color: var(--foreground);
+  }
+
+  #hero > .sr-only:focus {
+    position: fixed;
+    top: 2rem;
+    left: 50%;
+    z-index: 100;
+    width: auto;
+    height: auto;
+    clip: auto;
+    transform: translateX(-50%);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    padding: .4rem .7rem;
+    font-size: .75rem;
+  }
+
+  #hero > div[aria-hidden="true"]:first-of-type {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    pointer-events: none;
+    user-select: none;
+    background: var(--background);
+  }
+
+  .vfs-craft-shader-layer {
+    position: absolute;
+    inset: -7%;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: .86;
+    mix-blend-mode: screen;
+    filter: saturate(1.18) contrast(1.08);
+    transform: translateZ(0);
+  }
+
+  .vfs-craft-shader-layer::before,
+  .vfs-craft-shader-layer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .vfs-craft-shader-layer::before {
+    background:
+      radial-gradient(circle at 50% 48%, transparent 0 26%, color-mix(in srgb, var(--background) 18%, transparent) 52%, color-mix(in srgb, var(--background) 72%, transparent) 100%),
+      linear-gradient(180deg, color-mix(in srgb, var(--background) 56%, transparent) 0%, transparent 24%, transparent 70%, color-mix(in srgb, var(--background) 62%, transparent) 100%);
+    z-index: 1;
+  }
+
+  .vfs-craft-shader-layer::after {
+    background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--primary) 18%, transparent) 0 1px, transparent 1px 100%);
+    background-size: 18px 18px;
+    opacity: .16;
+    mix-blend-mode: overlay;
+    z-index: 2;
+  }
+
+  html[data-theme="light"] .vfs-craft-shader-layer {
+    opacity: .7;
+    mix-blend-mode: multiply;
+    filter: saturate(1.05) contrast(1.02);
+  }
+
+  #vfs-craft-shader {
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+  }
+
+  .vfs-craft-fallback {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    display: none;
+    max-width: 16rem;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--background) 70%, transparent);
+    padding: .625rem .75rem;
+    color: var(--muted-foreground);
+    font-size: .72rem;
+    line-height: 1.35;
+    backdrop-filter: blur(12px);
+    z-index: 2;
+  }
+
+  .vfs-craft-fallback.is-visible {
+    display: block;
+  }
+
+  html.shader-static .vfs-craft-shader-layer {
+    opacity: .28;
+    mix-blend-mode: normal;
+  }
+
+  #hero video {
+    position: absolute;
+    top: clamp(168px, 24vh, 260px);
+    right: clamp(130px, 11vw, 260px);
+    width: clamp(520px, 38vw, 820px);
+    height: auto;
+    aspect-ratio: 16 / 9;
+    max-width: none;
+    max-height: none;
+    display: none;
+    object-fit: contain;
+    object-position: center center;
+    opacity: .82;
+    filter: brightness(.76) contrast(1.08) saturate(.92);
+  }
+
+  .vfs-hero-side-fade {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(circle at 50% 46%, transparent 0 34%, color-mix(in srgb, var(--background) 30%, transparent) 68%, color-mix(in srgb, var(--background) 82%, transparent) 100%);
+  }
+
+  .vfs-hero-bottom-fade {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 2;
+    height: 42vh;
+    background: linear-gradient(to top, var(--background), color-mix(in srgb, var(--background) 72%, transparent), transparent);
+  }
+
+  #hero > div[aria-hidden="true"]:nth-of-type(2) {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--background) 60%, transparent);
+    pointer-events: none;
+  }
+
+  #hero > nav + div {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: min(100% - 2rem, 980px);
+    min-height: 100vh;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: clamp(7.5rem, 17vh, 12rem) 1rem clamp(3.5rem, 9vh, 7rem);
+  }
+
+  #hero > nav + div > div {
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    margin-bottom: .75rem;
+    opacity: 1;
+    transform: none;
+  }
+
+  .hero-eyebrow span {
+    display: inline-flex;
+    align-items: center;
+    gap: .375rem;
+    border: 1px solid rgba(125, 158, 32, 0.45);
+    background: rgba(125, 158, 32, 0.08);
+    color: #7D9E20;
+    padding: .28rem .62rem;
+    font-family: var(--mono);
+    font-size: .75rem;
+  }
+
+  .hero-eyebrow svg {
+    width: .75rem;
+    height: .75rem;
+  }
+
+  #hero-heading {
+    max-width: 16.5ch;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--foreground) !important;
+    text-wrap: balance;
+  }
+
+  #hero-heading .vfs-title-accent,
+  #hero-heading span[style],
+  h2 span[style] {
+    color: var(--primary) !important;
+  }
+
+  #hero-heading + p {
+    max-width: 66ch;
+    margin: 1rem auto 0;
+    color: var(--muted-foreground);
+    font-size: clamp(.92rem, 1.15vw, 1rem);
+    line-height: 1.75;
+  }
+
+  .setup-command-box {
+    position: relative;
+    width: min(100%, 30rem);
+    margin: 1.25rem auto 0;
+    display: flex;
+    min-width: 0;
+    align-items: stretch;
+    gap: 0;
+    border: 1px solid color-mix(in srgb, var(--primary) 48%, transparent);
+    background: color-mix(in srgb, var(--primary) 7%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 10%, transparent);
+    backdrop-filter: blur(10px);
+    opacity: 1;
+    transform: none;
+  }
+
+  .setup-command-code {
+    min-width: 0;
+    flex: 1;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: .56rem 1rem;
+    color: var(--primary);
+    font-family: var(--mono);
+    font-size: .76rem;
+  }
+
+  .setup-command-code .command-prompt {
+    color: var(--foreground);
+    margin-right: .45rem;
+  }
+
+  .setup-copy-btn {
+    min-height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-left: 2px solid color-mix(in srgb, var(--primary) 48%, transparent);
+    background: color-mix(in srgb, var(--primary) 14%, transparent);
+    color: var(--primary);
+    padding: 0 .75rem;
+    cursor: pointer;
+    transition: background .24s var(--ease), color .24s var(--ease), transform .18s var(--ease);
+  }
+
+  .setup-copy-btn:hover,
+  .setup-copy-btn:focus-visible {
+    background: color-mix(in srgb, var(--primary) 22%, transparent);
+    color: var(--vfs-accent-hover);
+  }
+
+  .setup-copy-btn svg {
+    width: 1rem;
+    height: 1rem;
+    display: block;
+  }
+
+  .try-me-mark {
+    --mark-color: var(--foreground);
+    --cycle: 5.4s;
+    position: absolute;
+    right: -10.5rem;
+    top: -1.65rem;
+    width: 142px;
+    aspect-ratio: 11 / 5;
+    height: auto;
+    display: block;
+    overflow: visible;
+    color: var(--mark-color);
+    filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.45));
+    animation: try-me-mark-float var(--cycle) cubic-bezier(0.32, 0.72, 0, 1) infinite;
+    will-change: transform, opacity, filter;
+  }
+
+  .try-me-mark path,
+  .try-me-mark text {
+    fill: currentColor;
+  }
+
+  .try-me-mark .try-arrow-line,
+  .try-me-mark .try-arrow-head {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 5;
+    stroke-dasharray: 190;
+    stroke-dashoffset: 190;
+    animation: try-me-arrow-cycle var(--cycle) cubic-bezier(0.32, 0.72, 0, 1) infinite;
+  }
+
+  .try-me-mark .try-arrow-head {
+    stroke-dasharray: 72;
+    stroke-dashoffset: 72;
+    animation-delay: 180ms;
+  }
+
+  .try-me-mark .try-me-text {
+    fill-opacity: 0;
+    font-family: "Comic Sans MS", "Bradley Hand", "Segoe Print", cursive;
+    font-size: 34px;
+    font-weight: 700;
+    animation: try-me-ink-cycle var(--cycle) cubic-bezier(0.32, 0.72, 0, 1) infinite;
+    animation-delay: 120ms;
+  }
+
+  .vfs-stats {
+    width: min(100%, 36rem);
+    max-width: 36rem;
+    margin: 1.55rem auto 0;
+    border-width: 1px 0;
+    border-style: solid;
+    border-color: color-mix(in srgb, var(--foreground) 8%, transparent);
+    background: color-mix(in srgb, var(--background) 12%, transparent);
+    backdrop-filter: blur(6px);
+    opacity: 1;
+    transform: none;
+  }
+
+  .vfs-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: center;
+    margin: 0;
+  }
+
+  .vfs-stat-cell {
+    min-height: 46px;
+    padding: 8px 10px 7px;
+    text-align: center;
+    border-right: 1px solid color-mix(in srgb, var(--foreground) 7%, transparent);
+  }
+
+  .vfs-stat-cell:last-child {
+    border-right: 0;
+  }
+
+  .vfs-stat-number {
+    display: inline-block;
+    margin: 0;
+    color: color-mix(in srgb, var(--primary) 52%, var(--foreground));
+    font-family: var(--mono);
+    font-size: .78rem;
+    line-height: 1;
+    font-weight: 600;
+    opacity: .74;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .vfs-stat-plus {
+    color: inherit;
+    opacity: .82;
+  }
+
+  .vfs-stat-title {
+    display: inline-block;
+    margin-left: .26rem;
+    color: color-mix(in srgb, var(--foreground) 62%, transparent);
+    font-size: .59rem;
+    font-weight: 500;
+    white-space: nowrap;
+    vertical-align: .04em;
+  }
+
+  .vfs-stat-detail {
+    display: block;
+    margin-top: .3rem;
+    color: color-mix(in srgb, var(--muted-foreground) 68%, transparent);
+    font-size: .53rem;
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: .75rem;
+    margin-top: 1.5rem;
+    opacity: 1;
+    transform: none;
+  }
+
+  #hero .hero-actions[data-reference-structure="navbar-hero"] {
+    margin-top: 1.5rem;
+  }
+
+  .hero-btn {
+    min-height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .375rem;
+    border: 1px solid transparent;
+    border-radius: 0;
+    padding: 0 .75rem;
+    font-size: .78rem;
+    font-weight: 560;
+    white-space: nowrap;
+    outline: none;
+    transition: background .24s var(--ease), color .24s var(--ease), border-color .24s var(--ease), transform .18s var(--ease);
+  }
+
+  .hero-btn svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .hero-btn-primary {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .hero-btn-primary:hover,
+  .hero-btn-primary:focus-visible {
+    background: var(--vfs-accent-hover);
+  }
+
+  .hero-btn-outline {
+    border-color: var(--border);
+    background: color-mix(in srgb, var(--background) 72%, var(--foreground) 4%);
+    color: var(--foreground);
+  }
+
+  .hero-btn-outline:hover,
+  .hero-btn-outline:focus-visible {
+    background: color-mix(in srgb, var(--foreground) 8%, transparent);
+  }
+
+  .hero-btn:active,
+  .setup-copy-btn:active {
+    transform: translateY(1px);
+  }
+
+  #hero .hero-actions [data-slot="button"] {
+    min-height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .375rem;
+    border: 1px solid transparent;
+    border-radius: 0;
+    padding: 0 .75rem;
+    color: inherit;
+    font-size: .78rem;
+    font-weight: 560;
+    line-height: 1;
+    white-space: nowrap;
+    outline: none;
+    transition: background .24s var(--ease), color .24s var(--ease), border-color .24s var(--ease), transform .18s var(--ease);
+  }
+
+  #hero .hero-actions [data-slot="button"] svg {
+    width: 1rem;
+    height: 1rem;
+    display: block;
+  }
+
+  #hero .hero-actions [data-variant="default"] {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  #hero .hero-actions [data-variant="default"]:hover,
+  #hero .hero-actions [data-variant="default"]:focus-visible {
+    background: var(--vfs-accent-hover);
+    color: var(--primary-foreground);
+  }
+
+  #hero .hero-actions [data-variant="outline"] {
+    border-color: var(--border);
+    background: color-mix(in srgb, var(--background) 72%, var(--foreground) 4%);
+    color: var(--foreground);
+  }
+
+  #hero .hero-actions [data-variant="outline"]:hover,
+  #hero .hero-actions [data-variant="outline"]:focus-visible {
+    background: color-mix(in srgb, var(--foreground) 8%, transparent);
+    color: var(--foreground);
+  }
+
+  #hero .hero-actions [data-slot="button"]:active {
+    transform: translateY(1px);
+  }
+
+  /* ===== Product sections based on the locked hero language ===== */
+  .section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--primary) 18%, transparent) 0 1px, transparent 1px 100%),
+      linear-gradient(to right, color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px),
+      repeating-linear-gradient(180deg, transparent 0 16px, color-mix(in srgb, var(--primary) 4%, transparent) 16px 17px);
+    background-size: 18px 18px, 40px 40px, 40px 40px, auto;
+    mask-image: linear-gradient(180deg, transparent 0, #000 16%, #000 84%, transparent 100%);
+    opacity: .62;
+  }
+
+  .section::after {
+    content: "01010111 01000110 01010011";
+    position: absolute;
+    left: max(1rem, calc((100% - 1280px) / 2));
+    bottom: 1.1rem;
+    pointer-events: none;
+    color: color-mix(in srgb, var(--primary) 34%, transparent);
+    font-family: var(--mono);
+    font-size: .62rem;
+    letter-spacing: .02em;
+  }
+
+  .section > .wrap {
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-head {
+    position: relative;
+  }
+
+  .section-head::after {
+    content: "[ VFS / LOOP ]";
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: color-mix(in srgb, var(--primary) 56%, transparent);
+    font-family: var(--mono);
+    font-size: .66rem;
+    letter-spacing: .02em;
+  }
+
+  .section-command {
+    position: relative;
+    width: min(100%, 36rem);
+    margin: 0 0 clamp(1.5rem, 4vw, 2.75rem);
+  }
+
+  .section-command.is-right {
+    margin-left: auto;
+  }
+
+  .section-command .setup-copy-btn {
+    min-width: 4.8rem;
+    cursor: default;
+    pointer-events: none;
+    font-family: var(--mono);
+    font-size: .66rem;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+  }
+
+  .section-command .setup-command-code {
+    color: color-mix(in srgb, var(--foreground) 78%, var(--primary));
+  }
+
+  .section-mini-stats.vfs-stats {
+    width: min(100%, 46rem);
+    max-width: 46rem;
+    margin: clamp(1.4rem, 3vw, 2rem) 0 0;
+  }
+
+  .section-mini-stats .vfs-stat-title {
+    text-transform: uppercase;
+  }
+
+  .studio {
+    position: relative;
+    border: 1px solid var(--border);
+    background:
+      repeating-linear-gradient(90deg, transparent 0 18px, color-mix(in srgb, var(--foreground) 4%, transparent) 18px 19px),
+      color-mix(in srgb, var(--card) 62%, transparent);
+    backdrop-filter: blur(10px);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 8%, transparent);
+  }
+
+  .studio::before {
+    content: "ASCII_CAPTURE_STREAM";
+    position: absolute;
+    right: .9rem;
+    top: -1.55rem;
+    color: color-mix(in srgb, var(--primary) 56%, transparent);
+    font-family: var(--mono);
+    font-size: .66rem;
+    letter-spacing: .02em;
+  }
+
+  .studio::after {
+    content: "001101 010010 011001";
+    position: absolute;
+    left: .9rem;
+    bottom: -1.45rem;
+    color: color-mix(in srgb, var(--primary) 42%, transparent);
+    font-family: var(--mono);
+    font-size: .62rem;
+    letter-spacing: .02em;
+  }
+
+  .studio-bar,
+  .studio-foot {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .75rem .9rem;
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--foreground) 4%, transparent);
+  }
+
+  .studio-foot {
+    border-top: 1px solid var(--border);
+    border-bottom: 0;
+  }
+
+  .studio-bar .left {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    min-width: 0;
+  }
+
+  .dots {
+    display: inline-flex;
+    gap: .35rem;
+  }
+
+  .dots i {
+    width: .48rem;
+    height: .48rem;
+    display: block;
+    border-radius: 0;
+    background: color-mix(in srgb, var(--primary) 44%, var(--foreground));
+  }
+
+  .url,
+  .rail-hint,
+  .studio-foot .hint {
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: .72rem;
+  }
+
+  .url {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .agent-switch,
+  .tabs {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--background) 70%, transparent);
+  }
+
+  .agent-switch button,
+  .tabs button,
+  .mode,
+  .save-btn,
+  .reset-btn,
+  .schema summary,
+  .copy-secondary {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: .74rem;
+    transition: background .24s var(--ease), color .24s var(--ease), border-color .24s var(--ease), transform .18s var(--ease);
+  }
+
+  .agent-switch button,
+  .tabs button {
+    min-height: 2rem;
+    padding: 0 .75rem;
+  }
+
+  .agent-switch button.on,
+  .tabs button.on,
+  .mode.on {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .studio-grid {
+    display: grid;
+    grid-template-columns: 160px minmax(360px, 1fr) 390px;
+    min-height: 560px;
+  }
+
+  .rail {
+    padding: .8rem;
+    border-right: 1px solid var(--border);
+    background: color-mix(in srgb, var(--foreground) 3%, transparent);
+  }
+
+  .rail .lab,
+  .model-lab,
+  .micro-label {
+    color: var(--primary);
+    font-family: var(--mono);
+    font-size: .68rem;
+    letter-spacing: .02em;
+  }
+
+  .mode {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    margin-top: .45rem;
+    padding: .65rem .6rem;
+    border: 1px solid transparent;
+    text-align: left;
+  }
+
+  .mode:hover,
+  .mode:focus-visible,
+  .tabs button:hover,
+  .tabs button:focus-visible,
+  .agent-switch button:hover,
+  .agent-switch button:focus-visible,
+  .schema summary:hover,
+  .schema summary:focus-visible {
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    color: var(--foreground);
+  }
+
+  .rail-hint {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    line-height: 1.55;
+  }
+
+  .canvas {
+    position: relative;
+    display: grid;
+    place-items: center;
+    padding: clamp(1.4rem, 4vw, 3rem);
+    background:
+      linear-gradient(to right, color-mix(in srgb, var(--foreground) 5%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--foreground) 5%, transparent) 1px, transparent 1px),
+      radial-gradient(circle at 28% 18%, color-mix(in srgb, var(--primary) 16%, transparent), transparent 32%),
+      color-mix(in srgb, var(--background) 36%, transparent);
+    background-size: 28px 28px, 28px 28px, auto, auto;
+  }
+
+  .canvas::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(180deg, transparent 0 8px, color-mix(in srgb, var(--primary) 5%, transparent) 8px 9px);
+    opacity: .55;
+    mix-blend-mode: screen;
+  }
+
+  .canvas-hint {
+    position: absolute;
+    top: .85rem;
+    left: .85rem;
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: .68rem;
+  }
+
+  .demo-card {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 350px);
+    border: 1px solid var(--border);
+    background: var(--card);
+    box-shadow:
+      18px 18px 0 color-mix(in srgb, var(--primary) 16%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--foreground) 5%, transparent);
+  }
+
+  .demo-card::before {
+    content: "[ SELECT_TARGET ]";
+    position: absolute;
+    left: .75rem;
+    top: -.78rem;
+    padding-inline: .35rem;
+    background: var(--background);
+    color: var(--primary);
+    font-family: var(--mono);
+    font-size: .62rem;
+  }
+
+  .demo-card .media {
+    position: relative;
+    overflow: hidden;
+    height: 150px;
+    background:
+      radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--primary) 36%, transparent) 0 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--regent) 22%, transparent) 0 1px, transparent 1px 12px),
+      var(--background);
+    background-size: 14px 14px, 12px 100%, auto;
+  }
+
+  .demo-card .media::after {
+    content: "LIVE PAGE";
+    position: absolute;
+    right: .75rem;
+    bottom: .65rem;
+    color: color-mix(in srgb, var(--foreground) 64%, transparent);
+    font-family: var(--mono);
+    font-size: .66rem;
+  }
+
+  .demo-card .pad {
+    padding: 1rem;
+  }
+
+  .editable {
+    cursor: pointer;
+    transition: background .2s var(--ease), outline-color .2s var(--ease), color .2s var(--ease), box-shadow .2s var(--ease);
+  }
+
+  .editable:hover,
+  .editable.sel {
+    outline: 1px solid var(--primary);
+    background: color-mix(in srgb, var(--primary) 15%, transparent);
+  }
+
+  .editable.sel::after {
+    content: attr(data-tag);
+    display: inline-flex;
+    margin-left: .45rem;
+    padding: .12rem .3rem;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-family: var(--mono);
+    font-size: .58rem;
+    vertical-align: middle;
+  }
+
+  .dc-badge {
+    display: inline-flex;
+    margin-bottom: .8rem;
+    padding: .18rem .4rem;
+    border: 1px solid var(--primary);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-family: var(--mono);
+    font-size: .68rem;
+  }
+
+  .dc-title {
+    color: var(--foreground);
+    font-size: 1.35rem;
+    font-weight: 650;
+    line-height: 1.12;
+  }
+
+  .dc-desc {
+    margin-top: .65rem;
+    color: var(--muted-foreground);
+    font-size: .92rem;
+    line-height: 1.62;
+  }
+
+  .dc-btn {
+    width: max-content;
+    margin-top: 1rem;
+    padding: .55rem .75rem;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-size: .82rem;
+  }
+
+  .panel-col {
+    min-width: 0;
+    border-left: 1px solid var(--border);
+    background: color-mix(in srgb, var(--foreground) 3%, transparent);
+  }
+
+  .tabs {
+    width: 100%;
+    border-width: 0 0 1px;
+  }
+
+  .tabs button {
+    flex: 1;
+  }
+
+  .tabs .badge {
+    margin-left: .35rem;
+    color: inherit;
+  }
+
+  .panel-body {
+    min-height: 508px;
+    padding: .9rem;
+    overflow: auto;
+  }
+
+  .empty,
+  .fb,
+  pre.json,
+  pre.diff,
+  .diff-status,
+  .diff-file {
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--background) 55%, transparent);
+  }
+
+  .empty {
+    min-height: 180px;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    color: var(--muted-foreground);
+    text-align: center;
+    font-size: .86rem;
+  }
+
+  .fb {
+    padding: .75rem;
+    margin-bottom: .65rem;
+  }
+
+  .fb .row1 {
+    display: flex;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-bottom: .55rem;
+  }
+
+  .fb .type,
+  .field .fk,
+  .schema .stype {
+    color: var(--regent);
+    font-family: var(--mono);
+    font-size: .72rem;
+  }
+
+  .fb .sel,
+  .field .fv,
+  .schema .sdesc {
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: .72rem;
+  }
+
+  .fb .detail {
+    color: var(--foreground);
+    font-size: .84rem;
+    line-height: 1.55;
+  }
+
+  code,
+  pre {
+    font-family: var(--mono);
+  }
+
+  pre.json,
+  pre.diff {
+    margin: 0;
+    padding: .85rem;
+    overflow: auto;
+    color: var(--foreground);
+    font-size: .72rem;
+    line-height: 1.58;
+  }
+
+  .json .k { color: var(--regent); }
+  .json .s { color: color-mix(in srgb, var(--primary) 72%, var(--foreground)); }
+  .json .p { color: var(--muted-foreground); }
+
+  .diff-status,
+  .diff-file {
+    margin-bottom: .55rem;
+    padding: .55rem .7rem;
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: .72rem;
+  }
+
+  .diff .ln {
+    display: block;
+    white-space: pre;
+  }
+
+  .diff .add { color: color-mix(in srgb, var(--primary) 78%, var(--foreground)); }
+  .diff .del { color: var(--danger); }
+  .diff .ctx { color: var(--muted-foreground); }
+
+  .studio-foot .actions {
+    display: flex;
+    gap: .6rem;
+  }
+
+  .reset-btn,
+  .save-btn,
+  .copy-secondary {
+    min-height: 2rem;
+    padding: 0 .75rem;
+    border: 1px solid var(--border);
+  }
+
+  .save-btn,
+  .copy-secondary.primary {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .save-btn:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+  }
+
+  .principle-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-width: 1px 0;
+    border-style: solid;
+    border-color: color-mix(in srgb, var(--foreground) 8%, transparent);
+    background:
+      repeating-linear-gradient(90deg, transparent 0 18px, color-mix(in srgb, var(--foreground) 4%, transparent) 18px 19px),
+      color-mix(in srgb, var(--background) 12%, transparent);
+    backdrop-filter: blur(6px);
+  }
+
+  .principle-grid::before {
+    content: "00 01 10 11";
+    position: absolute;
+    right: .9rem;
+    top: -1.45rem;
+    color: color-mix(in srgb, var(--primary) 56%, transparent);
+    font-family: var(--mono);
+    font-size: .66rem;
+    letter-spacing: .02em;
+  }
+
+  .principle {
+    position: relative;
+    min-height: 300px;
+    padding: clamp(1.25rem, 2.2vw, 1.9rem);
+    border-right: 1px solid color-mix(in srgb, var(--foreground) 7%, transparent);
+  }
+
+  .principle::before {
+    content: "";
+    position: absolute;
+    left: clamp(1.25rem, 2.2vw, 1.9rem);
+    right: clamp(1.25rem, 2.2vw, 1.9rem);
+    top: 3.15rem;
+    height: 1px;
+    background: linear-gradient(90deg, var(--primary), transparent);
+    opacity: .58;
+  }
+
+  .principle:last-child {
+    border-right: 0;
+  }
+
+  .principle .num {
+    color: var(--primary);
+    font-family: var(--mono);
+    font-size: .75rem;
+  }
+
+  .principle h3 {
+    margin: 3.4rem 0 0;
+    color: var(--foreground);
+    font-size: 1.15rem;
+    line-height: 1.2;
+  }
+
+  .principle p {
+    margin: 1rem 0 0;
+    color: var(--muted-foreground);
+    font-size: .92rem;
+    line-height: 1.7;
+  }
+
+  .why-grid {
+    display: grid;
+    grid-template-columns: minmax(320px, .72fr) minmax(440px, 1fr);
+    gap: clamp(44px, 8vw, 112px);
+    align-items: start;
+    min-width: 0;
+  }
+
+  .why-narr {
+    position: sticky;
+    top: 128px;
+    padding-left: 1.3rem;
+    border-left: 1px solid color-mix(in srgb, var(--primary) 44%, transparent);
+    min-width: 0;
+  }
+
+  .why-narr h2 {
+    max-width: 10.5ch;
+    margin: 1rem 0 1.4rem;
+    color: var(--foreground);
+    font-size: clamp(2.6rem, 4.35vw, 4.85rem);
+    line-height: .98;
+  }
+
+  .why-model {
+    position: relative;
+    min-width: 0;
+  }
+
+  .why-model::before {
+    content: "SCHEMA_TRACE // V3.1";
+    display: block;
+    margin-bottom: .85rem;
+    color: color-mix(in srgb, var(--primary) 56%, transparent);
+    font-family: var(--mono);
+    font-size: .66rem;
+    letter-spacing: .02em;
+    text-align: right;
+  }
+
+  .why-narr p {
+    color: var(--muted-foreground);
+    line-height: 1.75;
+  }
+
+  .why-narr .lead {
+    color: var(--foreground);
+  }
+
+  .schema {
+    margin-bottom: .75rem;
+    border: 1px solid var(--border);
+    background:
+      linear-gradient(to right, color-mix(in srgb, var(--primary) 8%, transparent), transparent 42%),
+      color-mix(in srgb, var(--foreground) 3%, transparent);
+  }
+
+  .schema[open] {
+    border-color: color-mix(in srgb, var(--primary) 42%, transparent);
+  }
+
+  .schema summary {
+    display: grid;
+    grid-template-columns: minmax(96px, auto) 1fr 20px;
+    gap: 1rem;
+    align-items: center;
+    list-style: none;
+    padding: 1rem 1.1rem;
+  }
+
+  .schema summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .fields {
+    border-top: 1px solid var(--border);
+  }
+
+  .field {
+    display: grid;
+    grid-template-columns: minmax(160px, .45fr) 1fr;
+    gap: 1rem;
+    padding: .8rem 1.1rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
+    min-width: 0;
+  }
+
+  .field:last-child {
+    border-bottom: 0;
+  }
+
+  #cta .wrap {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 2.4rem;
+    border-block: 1px solid var(--border);
+    padding-block: clamp(2rem, 5vw, 4rem);
+  }
+
+  #cta .wrap::before {
+    content: "[ READY_STATE ]";
+    position: absolute;
+    top: -.72rem;
+    right: 0;
+    background: var(--background);
+    color: var(--primary);
+    font-family: var(--mono);
+    font-size: .66rem;
+    letter-spacing: .02em;
+    padding-left: .5rem;
+  }
+
+  .cta-copy {
+    max-width: 58ch;
+    color: var(--muted-foreground);
+    line-height: 1.75;
+  }
+
+  .cta-actions {
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .cta-stack {
+    min-width: min(100%, 34rem);
+  }
+
+  .cta-command {
+    width: min(100%, 34rem);
+    margin: 0 0 1rem;
+  }
+
+  .cta-links {
+    margin-top: 0;
+    justify-content: flex-start;
+  }
+
+  footer {
+    padding: 4rem 0 2.4rem;
+    border-top: 1px solid var(--border);
+    background: color-mix(in srgb, var(--background) 88%, var(--foreground) 3%);
+  }
+
+  .foot-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4rem;
+  }
+
+  .foot-brand .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: .7rem;
+    color: var(--foreground);
+  }
+
+  .foot-brand .brand::before,
+  .foot-brand .brand::after {
+    color: var(--primary);
+    font-family: var(--mono);
+    font-size: .82rem;
+  }
+
+  .foot-brand .brand::before { content: "["; }
+  .foot-brand .brand::after { content: "]"; }
+
+  .foot-brand .logo {
+    width: 22px;
+    height: 22px;
+    color: var(--primary);
+  }
+
+  .foot-brand p {
+    max-width: 36rem;
+    color: var(--muted-foreground);
+  }
+
+  .foot-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+    gap: 3rem;
+  }
+
+  .foot-col h4 {
+    margin: 0 0 .9rem;
+    color: var(--foreground);
+    font-size: .8rem;
+  }
+
+  .foot-col a {
+    display: block;
+    margin: .45rem 0;
+    color: var(--muted-foreground);
+    font-size: .9rem;
+  }
+
+  .foot-col a:hover {
+    color: var(--primary);
+  }
+
+  .foot-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: .72rem;
+  }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 1.4rem;
+    z-index: 90;
+    transform: translateX(-50%) translateY(16px);
+    opacity: 0;
+    pointer-events: none;
+    border: 1px solid color-mix(in srgb, var(--foreground) 24%, transparent);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    padding: .65rem .8rem;
+    font-family: var(--mono);
+    font-size: .78rem;
+    transition: opacity .24s var(--ease), transform .24s var(--ease);
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    filter: blur(7px);
+    transition: opacity .72s var(--ease), transform .72s var(--ease), filter .72s var(--ease);
+  }
+
+  .reveal.in {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+
+  @keyframes try-me-arrow-cycle {
+    0%, 8% { opacity: 0; stroke-dashoffset: 190; filter: blur(3px); }
+    20%, 66% { opacity: 1; stroke-dashoffset: 0; filter: blur(0); }
+    78%, 100% { opacity: 0; stroke-dashoffset: -42; filter: blur(2px); }
+  }
+
+  @keyframes try-me-ink-cycle {
+    0%, 8% { fill-opacity: 0; transform: translateY(4px) scale(0.985); filter: blur(4px); }
+    20%, 66% { fill-opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    78%, 100% { fill-opacity: 0; transform: translateY(-4px) scale(0.992); filter: blur(3px); }
+  }
+
+  @keyframes try-me-mark-float {
+    0% { opacity: 0; transform: translate3d(0, 8px, 0) rotate(0deg); }
+    16% { opacity: 1; }
+    48% { transform: translate3d(0, 0, 0) rotate(-0.7deg); }
+    70% { opacity: 1; }
+    88%, 100% { opacity: 0; transform: translate3d(0, -8px, 0) rotate(-1deg); }
+  }
+
+  @media (max-width: 1100px) {
+    .section-head,
+    .why-grid,
+    #cta .wrap {
+      grid-template-columns: 1fr;
+    }
+
+    .studio-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .rail {
+      display: flex;
+      gap: .4rem;
+      overflow-x: auto;
+      border-right: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .rail .lab,
+    .rail-hint {
+      display: none;
+    }
+
+    .mode {
+      width: auto;
+      white-space: nowrap;
+      margin-top: 0;
+    }
+
+    .panel-col {
+      border-left: 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .principle-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .principle:nth-child(2) {
+      border-right: 0;
+    }
+
+    .principle:nth-child(1),
+    .principle:nth-child(2) {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .why-narr {
+      position: static;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .wrap,
+    .site-nav .wrap {
+      width: min(100% - 32px, 430px);
+    }
+
+    .page-shell {
+      border-inline: 0;
+    }
+
+    .site-nav {
+      padding-top: 10px;
+    }
+
+    .site-nav .nav-inner {
+      min-height: 52px;
+      height: auto;
+      gap: 10px;
+    }
+
+    .site-nav .brand-name {
+      max-width: 170px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .site-nav .brand-version,
+    .site-nav .github-count {
+      display: none;
+    }
+
+    .site-nav .nav-right {
+      gap: 10px;
+    }
+
+    #hero {
+      max-height: none;
+      min-height: 100svh;
+    }
+
+    #hero > nav + div {
+      max-width: min(100% - 1.25rem, 640px);
+      padding-top: 6.5rem;
+      padding-bottom: 3rem;
+    }
+
+    #hero-heading {
+      max-width: 12ch;
+    }
+
+    #hero-heading + p {
+      font-size: .94rem;
+    }
+
+    .setup-command-box {
+      flex-direction: column;
+    }
+
+    .setup-copy-btn {
+      width: 100%;
+      border-left: 0;
+      border-top: 1px solid color-mix(in srgb, var(--primary) 48%, transparent);
+    }
+
+    .try-me-mark {
+      animation: none;
+      opacity: 0;
+      display: none;
+    }
+
+    .vfs-stats-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .vfs-stat-cell:nth-child(2n) {
+      border-right: 0;
+    }
+
+    .vfs-stat-cell:nth-child(-n + 2) {
+      border-bottom: 1px solid color-mix(in srgb, var(--foreground) 7%, transparent);
+    }
+
+    .hero-actions,
+    .cta-actions,
+    .studio-foot,
+    .foot-grid,
+    .foot-bottom {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    .hero-btn,
+    #hero .hero-actions [data-slot="button"],
+    .copy-secondary,
+    .reset-btn,
+    .save-btn {
+      width: 100%;
+    }
+
+    .studio-foot .actions {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    .principle-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .principle,
+    .principle:nth-child(2) {
+      border-right: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .principle:last-child {
+      border-bottom: 0;
+    }
+
+    .field,
+    .schema summary {
+      grid-template-columns: 1fr;
+    }
+
+    .why-grid,
+    .why-grid > *,
+    .why-narr,
+    .why-model,
+    .schema,
+    .fields,
+    .field,
+    .model-lab,
+    .section-command {
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    .schema .stype,
+    .schema .sdesc,
+    .field .fk,
+    .field .fv {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .foot-cols {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+    }
+
+    .reveal,
+    .reveal.in {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="page-shell">
+<main id="main-content">
+<section id="hero" aria-labelledby="hero-heading" class="relative flex max-h-225 min-h-screen items-center overflow-hidden sm:h-screen sm:min-h-auto">
+  <a class="sr-only" href="#main-content">Skip to main content</a>
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0 w-full select-none">
+    <div class="vfs-craft-shader-layer" aria-hidden="true"><canvas id="vfs-craft-shader"></canvas></div>
+    <div class="vfs-craft-fallback" id="vfs-craft-fallback">WebGL was unavailable or software-rendered, so the shader layer was skipped.</div>
+    <video autoplay class="hidden h-full w-full object-cover md:block dark:invert" loop muted playsinline preload="auto" src="assets/recorder-video.mp4">
+      <source src="assets/recorder-video.mp4" type="video/mp4" />
+    </video>
+    <div class="vfs-hero-side-fade absolute inset-0 bg-linear-to-r from-background via-background/90 to-transparent"></div>
+    <div class="vfs-hero-bottom-fade absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-background to-transparent"></div>
+  </div>
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-background/60 lg:hidden"></div>
+
+  <nav class="site-nav" id="nav" aria-label="Primary navigation">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#hero" aria-label="Visual Feedback Studio">
+        <span class="brand-logo" aria-hidden="true">
+          <svg viewBox="240 240 544 544" width="24" height="24" focusable="false">
+            <path fill="currentColor" d="M 697.59 644.79 L 697.84 645.33 A 0.88 0.88 0.0 0 0 698.84 645.80 Q 702.07 644.99 703.00 645.00 Q 734.25 645.25 764.99 644.75 C 768.09 644.70 768.48 646.68 768.44 649.46 Q 768.11 671.91 768.44 693.72 A 1.84 1.84 0.0 0 1 766.41 695.58 Q 760.96 695.01 754.50 694.95 Q 733.44 694.78 712.50 695.10 Q 706.93 695.18 698.73 694.79 A 2.00 2.00 0.0 0 0 696.66 696.57 Q 696.30 699.86 696.27 704.00 Q 696.00 734.52 696.28 765.25 Q 696.30 767.20 694.73 768.29 A 1.32 1.27 -57.8 0 1 693.84 768.51 Q 692.76 768.37 691.75 768.35 Q 682.70 768.14 656.06 768.15 C 653.85 768.15 650.03 769.13 646.94 767.84 A 1.35 1.34 -79.0 0 1 646.10 766.59 L 646.10 379.61 A 0.61 0.61 0.0 0 0 645.71 379.04 Q 642.43 377.80 639.00 378.02 Q 628.23 378.71 619.69 378.48 Q 611.44 378.25 604.31 378.25 Q 461.41 378.26 443.50 378.22 C 411.12 378.15 393.56 378.60 359.50 378.54 Q 354.73 378.53 331.51 378.68 C 310.06 378.82 280.43 377.87 262.00 378.46 Q 260.34 378.51 258.42 378.81 A 2.13 2.13 0.0 0 1 255.96 376.77 Q 255.54 363.65 255.44 334.75 Q 255.43 332.70 256.07 329.72 A 1.75 1.75 0.0 0 1 257.78 328.33 L 321.14 328.42 A 0.87 0.78 48.2 0 1 321.32 328.44 Q 324.36 328.99 326.60 328.84 A 0.79 0.78 2.2 0 0 327.33 328.17 Q 327.72 325.46 327.57 324.40 Q 327.25 322.15 327.25 320.59 Q 327.40 289.06 327.29 258.50 Q 327.28 257.41 329.04 256.15 A 1.53 1.51 -62.6 0 1 329.93 255.86 Q 331.27 255.86 332.49 255.90 C 334.75 255.99 336.90 255.35 338.98 255.48 Q 341.84 255.65 343.02 255.64 Q 361.32 255.39 366.92 255.47 C 369.93 255.51 372.46 254.87 375.41 255.52 A 2.61 2.61 0.0 0 1 377.46 258.08 L 377.17 325.89 A 2.23 2.13 -53.1 0 0 377.23 326.40 L 377.49 327.54 A 1.00 1.00 0.0 0 0 378.47 328.33 L 694.94 328.33 A 1.44 1.44 0.0 0 1 696.38 329.75 C 696.48 337.77 696.18 344.57 696.18 351.10 Q 696.24 603.55 696.26 630.50 Q 696.27 638.54 696.16 642.74 Q 696.14 643.24 697.21 644.27 A 1.89 1.72 11.4 0 1 697.59 644.79 Z"/>
+            <path fill="currentColor" d="M 377.20 394.37 Q 377.30 396.67 377.31 398.52 Q 377.45 430.99 377.09 494.86 C 377.07 499.33 377.29 504.57 377.69 509.30 A 1.98 1.97 77.5 0 1 376.41 511.31 C 373.01 512.57 370.98 511.56 367.80 511.64 Q 348.04 512.12 333.08 511.85 A 4.12 3.74 35.7 0 0 332.03 511.97 L 330.57 512.31 A 2.65 2.65 0.0 0 1 327.32 509.69 Q 327.43 501.64 327.13 473.75 Q 326.90 452.08 327.01 429.59 Q 327.03 426.71 327.15 425.92 C 327.40 424.27 327.01 422.96 327.01 421.03 Q 327.01 408.30 327.20 396.79 Q 327.21 395.66 328.89 393.57 A 1.13 1.13 0.0 0 1 329.74 393.16 Q 346.32 393.00 368.98 393.15 Q 374.92 393.19 376.67 393.69 A 0.74 0.74 0.0 0 1 377.20 394.37 Z"/>
+            <path fill="currentColor" d="M 631.69 647.17 Q 631.20 648.76 631.19 649.48 Q 631.01 676.83 631.22 694.61 A 1.19 1.19 0.0 0 1 629.97 695.82 C 627.43 695.67 624.48 695.31 622.34 695.28 Q 574.34 694.58 519.64 695.14 C 517.49 695.16 515.70 695.64 514.24 695.74 A 1.38 1.38 0.0 0 1 513.00 695.12 Q 511.69 693.15 511.64 690.81 Q 511.46 682.02 511.55 650.40 C 511.56 647.80 510.90 645.84 514.02 644.77 A 1.89 1.83 -48.7 0 1 514.89 644.70 Q 517.02 645.04 519.25 645.05 Q 534.59 645.08 613.50 645.05 Q 616.12 645.04 629.07 644.59 Q 630.40 644.54 631.55 646.24 A 1.10 1.09 -53.8 0 1 631.69 647.17 Z"/>
+          </svg>
+        </span>
+        <span class="brand-name">Visual Feedback Studio</span>
+        <span class="brand-version">v3.1 · Dual Agent</span>
+      </a>
+      <div class="nav-right">
+        <a class="github-link" id="ghLink" href="https://github.com/Niurougan1/visual-feedback-studio" target="_blank" rel="noopener">
+          <span class="github-logo" aria-hidden="true">
+            <svg viewBox="0 0 16 16" width="16" height="16" focusable="false">
+              <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59c.4.07.55-.17.55-.38c0-.19-.01-.82-.01-1.49c-2.01.37-2.53-.49-2.69-.94c-.09-.23-.48-.94-.82-1.13c-.28-.15-.68-.52-.01-.53c.63-.01 1.08.58 1.23.82c.72 1.21 1.87.87 2.33.66c.07-.52.28-.87.51-1.07c-1.78-.2-3.64-.89-3.64-3.95c0-.87.31-1.59.82-2.15c-.08-.2-.36-1.02.08-2.12c0 0 .67-.21 2.2.82c.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82c.44 1.1.16 1.92.08 2.12c.51.56.82 1.27.82 2.15c0 3.07-1.87 3.75-3.65 3.95c.29.25.54.73.54 1.48c0 1.07-.01 1.93-.01 2.2c0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+            </svg>
+          </span>
+          <span>GitHub</span>
+          <span class="github-count">★ —</span>
+        </a>
+        <button class="icon-btn" id="langBtn" type="button" title="中 / EN" aria-label="Switch language">中</button>
+        <button class="icon-btn" id="themeBtn" type="button" title="Theme" aria-label="Switch theme"></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="relative mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 px-4 py-24 sm:px-6 lg:grid-cols-2 lg:gap-12 lg:py-32">
+    <div class="mx-auto w-full max-w-xl text-center lg:text-left">
+      <div class="hero-eyebrow">
+        <span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12h-2c-.894 0-1.662-.857-1.761-2c-.296-3.45-.749-6-2.749-6s-2.5 3.582-2.5 8s-.5 8-2.5 8s-2.452-2.547-2.749-6c-.1-1.147-.867-2-1.763-2h-2"/></svg>
+          V3.1.Dual Agent
+        </span>
+      </div>
+      <h1 id="hero-heading" class="text-balance font-pixel text-4xl tracking-tight sm:text-5xl lg:text-6xl" style="opacity: 1; transform: none;">
+        <span class="vfs-title-line">Browser edits.</span>
+        <span class="vfs-title-line">Agent ships <span class="text-primary vfs-title-accent" style="color: #7D9E20;">source.</span></span>
+      </h1>
+      <p class="mt-4 text-muted-foreground text-sm/relaxed sm:text-base/relaxed">
+        <span data-en>A browser visual-review workspace for <strong>Codex &amp; Claude</strong>. <strong>One codebase.</strong> Style, copy, and notes — mapped back to <strong>real source</strong>.</span>
+        <span data-zh>面向 <strong>Codex 与 Claude</strong> 的浏览器视觉审稿工作台。<strong>一套代码库。</strong>样式、文案、备注反馈，结构化映射回<strong>真实源码</strong>。</span>
+      </p>
+      <div class="setup-command-box">
+        <code class="setup-command-code"><span class="command-prompt">$</span> python3 scripts/setup.py .</code>
+        <button data-slot="button" data-variant="ghost" data-size="default" class="setup-copy-btn group/button inline-flex shrink-0 items-center justify-center border bg-clip-padding text-xs font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-1 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 w-full touch-manipulation rounded-none border-primary/30 border-t bg-primary/10 text-primary hover:bg-primary/20 sm:w-auto sm:border-l-2" id="copySkill" type="button" aria-label="Copy setup command">
+          <div style="opacity:1;transform:none">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="hugeicons hugeicons-copy-02 size-4" aria-hidden="true">
+              <path d="M16.9637 8.98209C16.9613 6.03194 16.9167 4.50384 16.0578 3.45753C15.892 3.25546 15.7067 3.07019 15.5047 2.90436C14.4008 1.99854 12.7609 1.99854 9.48087 1.99854C6.20089 1.99854 4.5609 1.99854 3.45708 2.90436C3.255 3.07018 3.06971 3.25546 2.90387 3.45753C1.99799 4.56128 1.99799 6.20116 1.99799 9.48091C1.99799 12.7607 1.99799 14.4005 2.90387 15.5043C3.0697 15.7063 3.255 15.8916 3.45708 16.0574C4.50346 16.9162 6.03167 16.9608 8.98201 16.9632" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+              <path d="M14.0283 9.02455L16.994 8.98193M14.0143 22.0013L16.9799 21.9586M21.9716 14.0221L21.9436 16.9818M9.01033 14.0357L8.98236 16.9953M11.4873 9.02455C10.6545 9.17371 9.31781 9.32713 9.01033 11.0488M19.4946 21.9586C20.3296 21.8223 21.6685 21.6894 22.0025 19.9726M19.4946 9.02455C20.3274 9.17371 21.6641 9.32713 21.9716 11.0488M11.5 21.9573C10.6672 21.8086 9.33039 21.6559 9.02197 19.9344" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+            </svg>
+          </div>
+        </button>
+        <svg class="try-me-mark pointer-events-none absolute -right-14 -bottom-14 opacity-0 lg:block lg:opacity-100" aria-label="try me arrow animation" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+          <g transform="translate(0,200) scale(0.1,-0.1)">
+            <path d="M2242 1800 c-92 -24 -92 -24 -92 -65 0 -28 13 -47 82 -120 90 -96 115 -114 124 -91 3 8 -17 45 -45 84 l-50 70 72 -19 c106 -30 157 -55 205 -102 172 -166 160 -503 -26 -747 -50 -65 -157 -172 -222 -222 -27 -20 -32 -29 -23 -38 17 -18 80 0 150 42 66 39 175 153 222 232 77 129 113 302 91 448 -34 235 -136 362 -350 434 l-55 18 51 7 c56 7 105 27 111 45 2 7 -3 19 -12 28 -23 22 -139 20 -233 -4z"></path>
+          </g>
+        </svg>
+      </div>
+      <div class="vfs-stats">
+        <dl class="vfs-stats-grid">
+          <div class="vfs-stat-cell"><dt class="sr-only">edit modes</dt><dd class="vfs-stat-number">3</dd><span class="vfs-stat-title"><span data-en>Edit modes</span><span data-zh>编辑模式</span></span><span class="vfs-stat-detail"><span data-en>Style · Copy · Notes</span><span data-zh>样式 · 文案 · 备注</span></span></div>
+          <div class="vfs-stat-cell"><dt class="sr-only">frameworks</dt><dd class="vfs-stat-number">7<span class="vfs-stat-plus">+</span></dd><span class="vfs-stat-title"><span data-en>Frameworks</span><span data-zh>支持框架</span></span><span class="vfs-stat-detail">HTML → Astro</span></div>
+          <div class="vfs-stat-cell"><dt class="sr-only">agents</dt><dd class="vfs-stat-number">2</dd><span class="vfs-stat-title">Agents</span><span class="vfs-stat-detail">Codex · Claude</span></div>
+          <div class="vfs-stat-cell"><dt class="sr-only">codebase</dt><dd class="vfs-stat-number">1</dd><span class="vfs-stat-title"><span data-en>Codebase</span><span data-zh>代码库</span></span><span class="vfs-stat-detail"><span data-en>One source</span><span data-zh>单一源</span></span></div>
+        </dl>
+      </div>
+      <div class="hero-actions" data-reference-structure="navbar-hero">
+        <a rel="noopener noreferrer" target="_blank" data-slot="button" data-variant="default" data-size="default" class="group/button inline-flex shrink-0 items-center justify-center rounded-none border border-transparent bg-clip-padding text-xs font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-1 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground [a]:hover:bg-primary/80 h-8 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 w-full gap-1.5 sm:w-auto" id="ghCta" href="https://github.com/Niurougan1/visual-feedback-studio">
+          <span data-en>Get Started</span><span data-zh>开始使用</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 18l6-6"></path><path d="M13 6l6 6"></path></svg>
+        </a>
+        <a data-slot="button" data-variant="outline" data-size="default" class="group/button inline-flex shrink-0 items-center justify-center rounded-none border bg-clip-padding text-xs font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-1 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 w-full gap-1.5 sm:w-auto" href="#showcase"><span data-en>See It in Action</span><span data-zh>查看演示</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="showcase">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <span class="kicker"><span data-en>Live workspace</span><span data-zh>现场工作台</span></span>
+        <h2 class="text-balance font-pixel text-4xl tracking-tight sm:text-5xl lg:text-6xl" style="opacity: 1; transform: none;">
+          <span class="vfs-title-line">Click page.</span>
+          <span class="vfs-title-line"><span class="text-primary vfs-title-accent" style="color: #7D9E20;">Source</span> intent.</span>
+        </h2>
+      </div>
+      <p><span data-en>The showcase keeps the real feedback loop: browser selection, structured JSON, source anchors, agent switch, and a simulated diff. It now uses the same square controls, compact mono states, and matcha focus language as the locked hero.</span><span data-zh>演示保留真实闭环：浏览器选中、结构化 JSON、source anchors、agent 切换与模拟 diff。视觉上统一为新版首屏的方形控件、紧凑 mono 状态与 matcha 焦点语言。</span></p>
+    </div>
+    <div class="setup-command-box section-command reveal">
+      <code class="setup-command-code"><span class="command-prompt">$</span> localhost → feedback.json → source diff</code>
+      <button class="setup-copy-btn" type="button" tabindex="-1">loop</button>
+    </div>
+    <div class="studio reveal">
+      <div class="studio-bar">
+        <div class="left">
+          <span class="dots"><i></i><i></i><i></i></span>
+          <span class="url">localhost:5173 · ProductCard.tsx · feedback.json</span>
+        </div>
+        <div class="agent-switch" id="agentSwitch">
+          <button type="button" data-agent="codex" class="on">Codex</button>
+          <button type="button" data-agent="claude">Claude</button>
+        </div>
+      </div>
+      <div class="studio-grid">
+        <div class="rail">
+          <div class="lab"><span data-en>Mode</span><span data-zh>模式</span></div>
+          <button type="button" class="mode on" data-mode="style"><span>style</span></button>
+          <button type="button" class="mode" data-mode="text"><span>copy</span></button>
+          <button type="button" class="mode" data-mode="note"><span>note</span></button>
+          <div class="rail-hint" id="railHint"></div>
+        </div>
+        <div class="canvas">
+          <span class="canvas-hint"><span data-en>select any element</span><span data-zh>选择任意元素</span></span>
+          <div class="demo-card">
+            <div class="media"></div>
+            <div class="pad">
+              <span class="dc-badge editable" data-el="badge" data-tag=".badge">NEW</span>
+              <div class="dc-title editable" data-el="title" data-tag="h3.title" data-txt-en="Review smarter, ship faster" data-txt-zh="智能审稿，一步到位">Review smarter, ship faster</div>
+              <div class="dc-desc editable" data-el="desc" data-tag="p.desc" data-txt-en="Annotate right in the browser and let changes flow back to source." data-txt-zh="在浏览器里直接标注，让改动自动回到源码。">Annotate right in the browser and let changes flow back to source.</div>
+              <div class="dc-btn editable" data-el="cta" data-tag="button.cta" data-txt-en="Try it now" data-txt-zh="立即体验"><span class="dc-btn-label">Try it now</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-col">
+          <div class="tabs" id="tabs">
+            <button type="button" data-tab="fb" class="on"><span data-en>Feedback</span><span data-zh>反馈</span> <span class="badge" id="fbCount">0</span></button>
+            <button type="button" data-tab="json">JSON</button>
+            <button type="button" data-tab="diff"><span data-en>Source diff</span><span data-zh>源码 diff</span></button>
+          </div>
+          <div class="panel-body" id="panelBody"></div>
+        </div>
+      </div>
+      <div class="studio-foot">
+        <span class="hint" id="studioHint"></span>
+        <div class="actions">
+          <button type="button" class="reset-btn" id="resetBtn"><span data-en>Reset</span><span data-zh>重置</span></button>
+          <button type="button" class="save-btn" id="saveBtn" disabled><span data-en>Save &amp; map to source</span><span data-zh>保存并映射回源码</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="principles">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <span class="kicker"><span data-en>Operating principles</span><span data-zh>运行原则</span></span>
+        <h2 class="text-balance font-pixel text-4xl tracking-tight sm:text-5xl lg:text-6xl" style="opacity: 1; transform: none;">
+          <span class="vfs-title-line"><span class="text-primary vfs-title-accent" style="color: #7D9E20;">Trust</span> comes</span>
+          <span class="vfs-title-line">from restraint.</span>
+        </h2>
+      </div>
+      <p><span data-en>Visual Feedback Studio does not pretend a browser click is a safe code edit. It preserves the separation: browser captures intent, receiver stores facts, the agent changes source only when the mapping is reliable.</span><span data-zh>Visual Feedback Studio 不会把浏览器点击伪装成安全代码修改。它保持分层：浏览器捕捉意图，receiver 存储事实，agent 只在映射可靠时修改源码。</span></p>
+    </div>
+    <div class="vfs-stats section-mini-stats reveal">
+      <dl class="vfs-stats-grid">
+        <div class="vfs-stat-cell"><dt class="sr-only">collect</dt><dd class="vfs-stat-number">01</dd><span class="vfs-stat-title"><span data-en>Collect</span><span data-zh>采集</span></span><span class="vfs-stat-detail"><span data-en>Browser facts</span><span data-zh>浏览器事实</span></span></div>
+        <div class="vfs-stat-cell"><dt class="sr-only">separate</dt><dd class="vfs-stat-number">02</dd><span class="vfs-stat-title"><span data-en>Separate</span><span data-zh>分层</span></span><span class="vfs-stat-detail">Extension · Receiver · Agent</span></div>
+        <div class="vfs-stat-cell"><dt class="sr-only">locate</dt><dd class="vfs-stat-number">03</dd><span class="vfs-stat-title"><span data-en>Locate</span><span data-zh>定位</span></span><span class="vfs-stat-detail">source_anchors</span></div>
+        <div class="vfs-stat-cell"><dt class="sr-only">apply</dt><dd class="vfs-stat-number">04</dd><span class="vfs-stat-title"><span data-en>Apply</span><span data-zh>落地</span></span><span class="vfs-stat-detail"><span data-en>Only reliable</span><span data-zh>可靠才改</span></span></div>
+      </dl>
+    </div>
+    <div class="principle-grid reveal">
+      <article class="principle"><span class="num">01</span><h3><span data-en>Collect, never overwrite</span><span data-zh>只采集，不覆盖</span></h3><p><span data-en>The extension records visual review data. It never writes into your project directly.</span><span data-zh>插件只记录视觉审稿数据，从不直接写入你的项目。</span></p></article>
+      <article class="principle"><span class="num">02</span><h3><span data-en>Keep concerns separate</span><span data-zh>保持职责分离</span></h3><p><span data-en>Extension, receiver, and agent remain separate layers with narrow responsibilities.</span><span data-zh>插件、receiver 与 agent 保持三层解耦，每层只做自己的事。</span></p></article>
+      <article class="principle"><span class="num">03</span><h3><span data-en>Apply only when reliable</span><span data-zh>可靠才落地</span></h3><p><span data-en>Copy can auto-apply on unique matches. Style and notes require source-aware reasoning.</span><span data-zh>文案唯一匹配时可自动应用；样式与备注需要结合源码结构判断。</span></p></article>
+      <article class="principle"><span class="num">04</span><h3><span data-en>Never guess blindly</span><span data-zh>不强行猜改</span></h3><p><span data-en>Low-confidence feedback stays visible for human review instead of becoming a risky patch.</span><span data-zh>低置信度反馈保留给人工判断，不会冒险生成补丁。</span></p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="why">
+  <div class="wrap why-grid">
+    <div class="why-narr reveal">
+      <span class="kicker"><span data-en>Why it exists</span><span data-zh>为什么需要它</span></span>
+      <h2 class="text-balance font-pixel text-4xl tracking-tight sm:text-5xl lg:text-6xl" style="opacity: 1; transform: none;">
+        <span class="vfs-title-line">Last mile of</span>
+        <span class="vfs-title-line"><span class="text-primary vfs-title-accent" style="color: #7D9E20;">visual</span> review.</span>
+      </h2>
+      <p class="lead"><span data-en>Design has comments. Code has pull requests.</span><span data-zh>设计稿有评论，代码有 PR。</span></p>
+      <p><span data-en>The broken part is the running page: seeing what feels wrong, adjusting it in context, and getting that intent back into source without screenshots, vague chat messages, or manual transcription.</span><span data-zh>断掉的是跑起来的页面：看到哪里不对，在真实上下文里调整，然后把意图回到源码，而不是截图、群聊描述、手动整理。</span></p>
+      <div class="setup-command-box section-command">
+        <code class="setup-command-code"><span class="command-prompt">$</span> source_anchors + locate_confidence + intent_guess</code>
+        <button class="setup-copy-btn" type="button" tabindex="-1">schema</button>
+      </div>
+    </div>
+    <div class="why-model reveal">
+      <div class="model-lab"><span data-en>Feedback schema</span><span data-zh>反馈数据模型</span></div>
+      <details class="schema" open>
+        <summary><span class="stype">text_edit</span><span class="sdesc"><span data-en>Copy change</span><span data-zh>文案修改</span></span><span>+</span></summary>
+        <div class="fields">
+          <div class="field"><span class="fk">selector</span><span class="fv">element locator path</span></div>
+          <div class="field"><span class="fk">original → modified</span><span class="fv">original and new text</span></div>
+          <div class="field"><span class="fk">source_anchors</span><span class="fv">testId / source location / text fingerprint</span></div>
+          <div class="field"><span class="fk">locate_confidence</span><span class="fv">auto-apply only on unique match</span></div>
+        </div>
+      </details>
+      <details class="schema">
+        <summary><span class="stype">style_edit</span><span class="sdesc"><span data-en>Style change</span><span data-zh>样式调整</span></span><span>+</span></summary>
+        <div class="fields">
+          <div class="field"><span class="fk">properties</span><span class="fv">per-property original → modified</span></div>
+          <div class="field"><span class="fk">computed_before / after</span><span class="fv">browser-computed style snapshots</span></div>
+          <div class="field"><span class="fk">source_anchors</span><span class="fv">className / rule / component hints</span></div>
+          <div class="field"><span class="fk">batch</span><span class="fv">similar element suggestion</span></div>
+        </div>
+      </details>
+      <details class="schema">
+        <summary><span class="stype">annotation</span><span class="sdesc"><span data-en>Natural-language note</span><span data-zh>自然语言备注</span></span><span>+</span></summary>
+        <div class="fields">
+          <div class="field"><span class="fk">note</span><span class="fv">"too cramped", "contrast too low"</span></div>
+          <div class="field"><span class="fk">intent_guess</span><span class="fv">deterministic suggested action</span></div>
+          <div class="field"><span class="fk">anchors</span><span class="fv">optional element or viewport region</span></div>
+          <div class="field"><span class="fk">status</span><span class="fv">reviewed before patching</span></div>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="cta">
+  <div class="wrap">
+    <div>
+      <span class="kicker"><span data-en>Ship the review loop</span><span data-zh>接入审稿闭环</span></span>
+      <h2 class="text-balance font-pixel text-4xl tracking-tight sm:text-5xl lg:text-6xl" style="opacity: 1; transform: none;">
+        <span class="vfs-title-line">Open browser.</span>
+        <span class="vfs-title-line">Ship <span class="text-primary vfs-title-accent" style="color: #7D9E20;">source.</span></span>
+      </h2>
+      <p class="cta-copy"><span data-en>One command installs the skill, starts the receiver, and prints the extension path. The rest is a visual review workflow your agent can actually understand.</span><span data-zh>一条命令安装 skill、启动 receiver、输出扩展路径。之后就是 agent 真正能理解的浏览器视觉审稿流程。</span></p>
+    </div>
+    <div class="cta-stack">
+      <div class="setup-command-box cta-command">
+        <code class="setup-command-code"><span class="command-prompt">$</span> python3 scripts/setup.py .</code>
+        <button class="setup-copy-btn" id="copySkill2" type="button"><span data-en>copy</span><span data-zh>复制</span></button>
+      </div>
+      <div class="hero-actions cta-links" data-reference-structure="navbar-hero">
+        <a class="hero-btn hero-btn-primary" href="https://github.com/Niurougan1/visual-feedback-studio" target="_blank" rel="noopener">GitHub</a>
+        <a class="hero-btn hero-btn-outline" href="https://github.com/Niurougan1/visual-feedback-studio/blob/main/README.md" target="_blank" rel="noopener"><span data-en>Read docs</span><span data-zh>读文档</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer id="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#hero"><span class="logo"><svg viewBox="240 240 544 544" width="24" height="24" focusable="false"><path fill="currentColor" d="M 697.59 644.79 L 697.84 645.33 A 0.88 0.88 0.0 0 0 698.84 645.80 Q 702.07 644.99 703.00 645.00 Q 734.25 645.25 764.99 644.75 C 768.09 644.70 768.48 646.68 768.44 649.46 Q 768.11 671.91 768.44 693.72 A 1.84 1.84 0.0 0 1 766.41 695.58 Q 760.96 695.01 754.50 694.95 Q 733.44 694.78 712.50 695.10 Q 706.93 695.18 698.73 694.79 A 2.00 2.00 0.0 0 0 696.66 696.57 Q 696.30 699.86 696.27 704.00 Q 696.00 734.52 696.28 765.25 Q 696.30 767.20 694.73 768.29 A 1.32 1.27 -57.8 0 1 693.84 768.51 Q 692.76 768.37 691.75 768.35 Q 682.70 768.14 656.06 768.15 C 653.85 768.15 650.03 769.13 646.94 767.84 A 1.35 1.34 -79.0 0 1 646.10 766.59 L 646.10 379.61 A 0.61 0.61 0.0 0 0 645.71 379.04 Q 642.43 377.80 639.00 378.02 Q 628.23 378.71 619.69 378.48 Q 611.44 378.25 604.31 378.25 Q 461.41 378.26 443.50 378.22 C 411.12 378.15 393.56 378.60 359.50 378.54 Q 354.73 378.53 331.51 378.68 C 310.06 378.82 280.43 377.87 262.00 378.46 Q 260.34 378.51 258.42 378.81 A 2.13 2.13 0.0 0 1 255.96 376.77 Q 255.54 363.65 255.44 334.75 Q 255.43 332.70 256.07 329.72 A 1.75 1.75 0.0 0 1 257.78 328.33 L 321.14 328.42 A 0.87 0.78 48.2 0 1 321.32 328.44 Q 324.36 328.99 326.60 328.84 A 0.79 0.78 2.2 0 0 327.33 328.17 Q 327.72 325.46 327.57 324.40 Q 327.25 322.15 327.25 320.59 Q 327.40 289.06 327.29 258.50 Q 327.28 257.41 329.04 256.15 A 1.53 1.51 -62.6 0 1 329.93 255.86 Q 331.27 255.86 332.49 255.90 C 334.75 255.99 336.90 255.35 338.98 255.48 Q 341.84 255.65 343.02 255.64 Q 361.32 255.39 366.92 255.47 C 369.93 255.51 372.46 254.87 375.41 255.52 A 2.61 2.61 0.0 0 1 377.46 258.08 L 377.17 325.89 A 2.23 2.13 -53.1 0 0 377.23 326.40 L 377.49 327.54 A 1.00 1.00 0.0 0 0 378.47 328.33 L 694.94 328.33 A 1.44 1.44 0.0 0 1 696.38 329.75 C 696.48 337.77 696.18 344.57 696.18 351.10 Q 696.24 603.55 696.26 630.50 Q 696.27 638.54 696.16 642.74 Q 696.14 643.24 697.21 644.27 A 1.89 1.72 11.4 0 1 697.59 644.79 Z"/></svg></span><strong>Visual Feedback Studio</strong></a>
+        <p><span data-en>Edit in the browser, ship in the source. A visual-review workspace for Codex and Claude.</span><span data-zh>浏览器里改稿，源码里落地。面向 Codex 与 Claude 的视觉审稿工作台。</span></p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4><span data-en>Resources</span><span data-zh>资源</span></h4>
+          <a href="https://github.com/Niurougan1/visual-feedback-studio/blob/main/README.md" target="_blank" rel="noopener">README</a>
+          <a href="https://github.com/Niurougan1/visual-feedback-studio/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG</a>
+          <a href="https://github.com/Niurougan1/visual-feedback-studio/blob/main/SKILL.md" target="_blank" rel="noopener">SKILL.md</a>
+          <a href="https://github.com/Niurougan1/visual-feedback-studio/blob/main/docs/optimization-roadmap.md" target="_blank" rel="noopener"><span data-en>Roadmap</span><span data-zh>优化路线图</span></a>
+        </div>
+        <div class="foot-col">
+          <h4><span data-en>Capabilities</span><span data-zh>能力</span></h4>
+          <a href="#showcase"><span data-en>Live demo</span><span data-zh>现场演示</span></a>
+          <a href="#principles"><span data-en>Principles</span><span data-zh>运行原则</span></a>
+          <a href="#why"><span data-en>Data model</span><span data-zh>数据模型</span></a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span id="year"></span> Visual Feedback Studio</span>
+      <span><span data-en>v3.1 · one codebase, dual agent</span><span data-zh>v3.1 · 单代码库双 agent</span></span>
+    </div>
+  </div>
+</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var root = document.documentElement;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var CMD = "python3 scripts/setup.py .";
+  var GH_URL = "https://github.com/Niurougan1/visual-feedback-studio";
+
+  $("#year").textContent = new Date().getFullYear();
+  $("#ghLink").href = GH_URL;
+  $("#ghCta").href = GH_URL;
+
+  var toastEl = $("#toast");
+  var toastTimer = null;
+  function toast(zh, en) {
+    toastEl.textContent = root.lang === "zh" ? zh : en;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 1900);
+  }
+
+  var moonIcon = '<svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21.5 14.078A8.557 8.557 0 0 1 9.922 2.5C5.668 3.497 2.5 7.315 2.5 11.873a9.627 9.627 0 0 0 9.627 9.627c4.558 0 8.376-3.168 9.373-7.422"/></svg>';
+  var sunIcon = '<svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 12a5 5 0 1 1-10 0a5 5 0 0 1 10 0M12 2v1.5m0 17V22m7.07-2.929l-1.06-1.06M5.99 5.989L4.928 4.93M22 12h-1.5m-17 0H2m17.071-7.071l-1.06 1.06M5.99 18.011l-1.06 1.06"/></svg>';
+  var themeBtn = $("#themeBtn");
+  var langBtn = $("#langBtn");
+
+  function setTheme(theme) {
+    var next = theme === "light" ? "light" : "dark";
+    root.dataset.theme = next;
+    root.classList.toggle("dark", next === "dark");
+    themeBtn.innerHTML = next === "dark" ? moonIcon : sunIcon;
+    themeBtn.title = next === "dark" ? "Dark mode" : "Light mode";
+    themeBtn.setAttribute("aria-label", next === "dark" ? "Current theme: dark" : "Current theme: light");
+    try { localStorage.setItem("vfs-theme", next); } catch (_) {}
+  }
+
+  function setLang(lang) {
+    var next = lang === "zh" ? "zh" : "en";
+    root.lang = next;
+    langBtn.textContent = next === "zh" ? "EN" : "中";
+    if (state && state.feedback) {
+      syncCanvasLang();
+      renderRailHint();
+      renderStudioHint();
+      renderPanel();
+    }
+    try { localStorage.setItem("vfs-lang", next); } catch (_) {}
+  }
+
+  var storedTheme = null;
+  var storedLang = null;
+  try { storedTheme = localStorage.getItem("vfs-theme"); storedLang = localStorage.getItem("vfs-lang"); } catch (_) {}
+  setTheme(storedTheme || root.dataset.theme || "dark");
+  setLang(storedLang || root.lang || "en");
+
+  langBtn.addEventListener("click", function () { setLang(root.lang === "zh" ? "en" : "zh"); });
+  themeBtn.addEventListener("click", function () { setTheme(root.dataset.theme === "dark" ? "light" : "dark"); });
+
+  function copySkill() {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(CMD).then(function () {
+        toast("已复制接入命令", "Setup command copied");
+      }, function () {
+        toast("已复制接入命令", "Setup command copied");
+      });
+    } else {
+      toast("已复制接入命令", "Setup command copied");
+    }
+  }
+  $("#copySkill").addEventListener("click", copySkill);
+  $("#copySkill2").addEventListener("click", copySkill);
+
+  (function initTryMeMark() {
+    var mark = $(".try-me-mark");
+    if (!mark || mark.dataset.vfsArrow === "left") return;
+    mark.dataset.vfsArrow = "left";
+    mark.setAttribute("viewBox", "0 0 260 118");
+    mark.innerHTML = '<path class="try-arrow-line" d="M108 52 C83 42 54 44 24 60"></path><path class="try-arrow-head" d="M36 43 L20 61 L42 70"></path><text class="try-me-text" x="122" y="68" transform="rotate(-5 166 58)">try me</text>';
+  })();
+
+  (function initShader() {
+    var canvas = $("#vfs-craft-shader");
+    if (!canvas) return;
+    var fallback = $("#vfs-craft-fallback");
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var gl = canvas.getContext("webgl2", {
+      alpha: true,
+      antialias: false,
+      depth: false,
+      stencil: false,
+      premultipliedAlpha: true,
+      preserveDrawingBuffer: false
+    });
+
+    function showFallback() {
+      canvas.style.display = "none";
+      root.classList.add("shader-static");
+      if (fallback) fallback.classList.add("is-visible");
+    }
+
+    if (!gl) {
+      showFallback();
+      return;
+    }
+
+    try {
+      gl.getExtension("WEBGL_debug_renderer_info");
+    } catch (_) {}
+
+    var vertexShaderSource = `#version 300 es
+      precision mediump float;
+
+      layout(location = 0) in vec2 a_position;
+
+      void main() {
+        gl_Position = vec4(a_position, 0.0, 1.0);
+      }
+    `;
+
+    var fragmentShaderSource = `#version 300 es
+      precision mediump float;
+
+      uniform float u_time;
+
+      uniform vec2 u_resolution;
+      uniform float u_pixelRatio;
+      uniform float u_originX;
+      uniform float u_originY;
+      uniform float u_worldWidth;
+      uniform float u_worldHeight;
+      uniform float u_fit;
+      uniform float u_scale;
+      uniform float u_rotation;
+      uniform float u_offsetX;
+      uniform float u_offsetY;
+
+      uniform float u_pxSize;
+      uniform vec4 u_colorBack;
+      uniform vec4 u_colorFront;
+      uniform float u_shape;
+      uniform float u_type;
+
+      out vec4 fragColor;
+
+      #define TWO_PI 6.28318530718
+      #define PI 3.14159265358979323846
+
+      vec3 permute(vec3 x) {
+        return mod(((x * 34.0) + 1.0) * x, 289.0);
+      }
+
+      float snoise(vec2 v) {
+        const vec4 C = vec4(
+          0.211324865405187,
+          0.366025403784439,
+          -0.577350269189626,
+          0.024390243902439
+        );
+        vec2 i = floor(v + dot(v, C.yy));
+        vec2 x0 = v - i + dot(i, C.xx);
+        vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+        vec4 x12 = x0.xyxy + C.xxzz;
+        x12.xy -= i1;
+        i = mod(i, 289.0);
+        vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+        vec3 m = max(
+          0.5 - vec3(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)),
+          0.0
+        );
+        m = m * m;
+        m = m * m;
+        vec3 x = 2.0 * fract(p * C.www) - 1.0;
+        vec3 h = abs(x) - 0.5;
+        vec3 ox = floor(x + 0.5);
+        vec3 a0 = x - ox;
+        m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);
+        vec3 g;
+        g.x = a0.x * x0.x + h.x * x0.y;
+        g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+        return 130.0 * dot(m, g);
+      }
+
+      float hash11(float p) {
+        p = fract(p * 0.3183099) + 0.1;
+        p *= p + 19.19;
+        return fract(p * p);
+      }
+
+      float hash21(vec2 p) {
+        p = fract(p * vec2(0.3183099, 0.3678794)) + 0.1;
+        p += dot(p, p + 19.19);
+        return fract(p.x * p.y);
+      }
+
+      float getSimplexNoise(vec2 uv, float t) {
+        float noise = .5 * snoise(uv - vec2(0., .3 * t));
+        noise += .5 * snoise(2. * uv + vec2(0., .32 * t));
+        return noise;
+      }
+
+      const int bayer2x2[4] = int[4](0, 2, 3, 1);
+      const int bayer4x4[16] = int[16](
+        0, 8, 2, 10,
+        12, 4, 14, 6,
+        3, 11, 1, 9,
+        15, 7, 13, 5
+      );
+
+      const int bayer8x8[64] = int[64](
+        0, 32, 8, 40, 2, 34, 10, 42,
+        48, 16, 56, 24, 50, 18, 58, 26,
+        12, 44, 4, 36, 14, 46, 6, 38,
+        60, 28, 52, 20, 62, 30, 54, 22,
+        3, 35, 11, 43, 1, 33, 9, 41,
+        51, 19, 59, 27, 49, 17, 57, 25,
+        15, 47, 7, 39, 13, 45, 5, 37,
+        63, 31, 55, 23, 61, 29, 53, 21
+      );
+
+      float getBayerValue(vec2 uv, int size) {
+        ivec2 pos = ivec2(fract(uv / float(size)) * float(size));
+        int index = pos.y * size + pos.x;
+
+        if (size == 2) {
+          return float(bayer2x2[index]) / 4.0;
+        } else if (size == 4) {
+          return float(bayer4x4[index]) / 16.0;
+        } else if (size == 8) {
+          return float(bayer8x8[index]) / 64.0;
+        }
+        return 0.0;
+      }
+
+      void main() {
+        float t = .5 * u_time;
+
+        float pxSize = u_pxSize * u_pixelRatio;
+        vec2 pxSizeUV = gl_FragCoord.xy - .5 * u_resolution;
+        pxSizeUV /= pxSize;
+        vec2 canvasPixelizedUV = (floor(pxSizeUV) + .5) * pxSize;
+        vec2 normalizedUV = canvasPixelizedUV / u_resolution;
+
+        vec2 ditheringNoiseUV = canvasPixelizedUV;
+        vec2 shapeUV = normalizedUV;
+
+        vec2 boxOrigin = vec2(.5 - u_originX, u_originY - .5);
+        vec2 givenBoxSize = vec2(u_worldWidth, u_worldHeight);
+        givenBoxSize = max(givenBoxSize, vec2(1.)) * u_pixelRatio;
+        float r = u_rotation * PI / 180.;
+        mat2 graphicRotation = mat2(cos(r), sin(r), -sin(r), cos(r));
+
+        float patternBoxRatio = givenBoxSize.x / givenBoxSize.y;
+        vec2 boxSize = vec2(
+          (u_worldWidth == 0.) ? u_resolution.x : givenBoxSize.x,
+          (u_worldHeight == 0.) ? u_resolution.y : givenBoxSize.y
+        );
+
+        if (u_shape > 3.5) {
+          vec2 objectBoxSize = vec2(0.);
+          objectBoxSize.x = min(boxSize.x, boxSize.y);
+          if (u_fit == 1.) {
+            objectBoxSize.x = min(u_resolution.x, u_resolution.y);
+          } else if (u_fit == 2.) {
+            objectBoxSize.x = max(u_resolution.x, u_resolution.y);
+          }
+          objectBoxSize.y = objectBoxSize.x;
+          vec2 objectWorldScale = u_resolution.xy / objectBoxSize;
+
+          shapeUV *= objectWorldScale;
+          shapeUV += boxOrigin * (objectWorldScale - 1.);
+          shapeUV += vec2(-u_offsetX, u_offsetY);
+          shapeUV /= u_scale;
+          shapeUV = graphicRotation * shapeUV;
+        } else {
+          vec2 patternBoxSize = vec2(0.);
+          patternBoxSize.x = patternBoxRatio * min(boxSize.x / patternBoxRatio, boxSize.y);
+          float patternWorldNoFitBoxWidth = patternBoxSize.x;
+          if (u_fit == 1.) {
+            patternBoxSize.x = patternBoxRatio * min(u_resolution.x / patternBoxRatio, u_resolution.y);
+          } else if (u_fit == 2.) {
+            patternBoxSize.x = patternBoxRatio * max(u_resolution.x / patternBoxRatio, u_resolution.y);
+          }
+          patternBoxSize.y = patternBoxSize.x / patternBoxRatio;
+          vec2 patternWorldScale = u_resolution.xy / patternBoxSize;
+
+          shapeUV += vec2(-u_offsetX, u_offsetY) / patternWorldScale;
+          shapeUV += boxOrigin;
+          shapeUV -= boxOrigin / patternWorldScale;
+          shapeUV *= u_resolution.xy;
+          shapeUV /= u_pixelRatio;
+          if (u_fit > 0.) {
+            shapeUV *= (patternWorldNoFitBoxWidth / patternBoxSize.x);
+          }
+          shapeUV /= u_scale;
+          shapeUV = graphicRotation * shapeUV;
+          shapeUV += boxOrigin / patternWorldScale;
+          shapeUV -= boxOrigin;
+          shapeUV += .5;
+        }
+
+        float shape = 0.;
+        if (u_shape < 1.5) {
+          shapeUV *= .001;
+          shape = .5 + .5 * getSimplexNoise(shapeUV, t);
+          shape = smoothstep(.3, .9, shape);
+        } else if (u_shape < 2.5) {
+          shapeUV *= .003;
+          for (float i = 1.0; i < 6.0; i++) {
+            shapeUV.x += .6 / i * cos(i * 2.5 * shapeUV.y + t);
+            shapeUV.y += .6 / i * cos(i * 1.5 * shapeUV.x + t);
+          }
+          shape = .15 / max(.001, abs(sin(t - shapeUV.y - shapeUV.x)));
+          shape = smoothstep(.02, 1., shape);
+        } else if (u_shape < 3.5) {
+          shapeUV *= .05;
+          float stripeIdx = floor(2. * shapeUV.x / TWO_PI);
+          float rand = hash11(stripeIdx * 10.);
+          rand = sign(rand - .5) * pow(.1 + abs(rand), .4);
+          shape = sin(shapeUV.x) * cos(shapeUV.y - 5. * rand * t);
+          shape = pow(abs(shape), 6.);
+        } else if (u_shape < 4.5) {
+          shapeUV *= 4.;
+          float wave = cos(.5 * shapeUV.x - 2. * t) * sin(1.5 * shapeUV.x + t) * (.75 + .25 * cos(3. * t));
+          shape = 1. - smoothstep(-1., 1., shapeUV.y + wave);
+        } else if (u_shape < 5.5) {
+          float dist = length(shapeUV);
+          float waves = sin(pow(dist, 1.7) * 7. - 3. * t) * .5 + .5;
+          shape = waves;
+        } else if (u_shape < 6.5) {
+          float l = length(shapeUV);
+          float angle = 6. * atan(shapeUV.y, shapeUV.x) + 4. * t;
+          float twist = 1.2;
+          float offset = 1. / pow(max(l, 1e-6), twist) + angle / TWO_PI;
+          float mid = smoothstep(0., 1., pow(l, twist));
+          shape = mix(0., fract(offset), mid);
+        } else {
+          shapeUV *= 2.;
+          float d = 1. - pow(length(shapeUV), 2.);
+          vec3 pos = vec3(shapeUV, sqrt(max(0., d)));
+          vec3 lightPos = normalize(vec3(cos(1.5 * t), .8, sin(1.25 * t)));
+          shape = .5 + .5 * dot(lightPos, pos);
+          shape *= step(0., d);
+        }
+
+        int type = int(floor(u_type));
+        float dithering = 0.0;
+
+        switch (type) {
+          case 1: {
+            dithering = step(hash21(ditheringNoiseUV), shape);
+          } break;
+          case 2:
+            dithering = getBayerValue(pxSizeUV, 2);
+            break;
+          case 3:
+            dithering = getBayerValue(pxSizeUV, 4);
+            break;
+          default:
+            dithering = getBayerValue(pxSizeUV, 8);
+            break;
+        }
+
+        dithering -= .5;
+        float res = step(.5, shape + dithering);
+
+        vec3 fgColor = u_colorFront.rgb * u_colorFront.a;
+        float fgOpacity = u_colorFront.a;
+        vec3 bgColor = u_colorBack.rgb * u_colorBack.a;
+        float bgOpacity = u_colorBack.a;
+
+        vec3 color = fgColor * res;
+        float opacity = fgOpacity * res;
+
+        color += bgColor * (1. - opacity);
+        opacity += bgOpacity * (1. - opacity);
+
+        fragColor = vec4(color, opacity);
+      }
+    `;
+
+    function compileShader(type, source) {
+      var shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        var message = gl.getShaderInfoLog(shader);
+        gl.deleteShader(shader);
+        throw new Error(message || "Shader compilation failed");
+      }
+      return shader;
+    }
+
+    function createProgram(vertexSource, fragmentSource) {
+      var vertexShader = compileShader(gl.VERTEX_SHADER, vertexSource);
+      var fragmentShader = compileShader(gl.FRAGMENT_SHADER, fragmentSource);
+      var program = gl.createProgram();
+      gl.attachShader(program, vertexShader);
+      gl.attachShader(program, fragmentShader);
+      gl.linkProgram(program);
+      gl.deleteShader(vertexShader);
+      gl.deleteShader(fragmentShader);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        var message = gl.getProgramInfoLog(program);
+        gl.deleteProgram(program);
+        throw new Error(message || "Program link failed");
+      }
+      return program;
+    }
+
+    function hexToRgba(hex) {
+      var value = hex.replace("#", "");
+      var expanded = value.length === 3
+        ? value.split("").map(function (part) { return part + part; }).join("")
+        : value;
+      var full = expanded.length === 6 ? expanded + "ff" : expanded;
+      return [
+        parseInt(full.slice(0, 2), 16) / 255,
+        parseInt(full.slice(2, 4), 16) / 255,
+        parseInt(full.slice(4, 6), 16) / 255,
+        parseInt(full.slice(6, 8), 16) / 255
+      ];
+    }
+
+    function getShaderColors() {
+      var isLight = root.dataset.theme === "light";
+      return {
+        back: hexToRgba("#00000000"),
+        front: hexToRgba(isLight ? "#6F8C1974" : "#7D9E2092")
+      };
+    }
+
+    var program;
+    try {
+      program = createProgram(vertexShaderSource, fragmentShaderSource);
+    } catch (error) {
+      console.error(error);
+      showFallback();
+      return;
+    }
+
+    var positions = new Float32Array([
+      -1, -1,
+       1, -1,
+      -1,  1,
+      -1,  1,
+       1, -1,
+       1,  1
+    ]);
+
+    var vao = gl.createVertexArray();
+    var positionBuffer = gl.createBuffer();
+    gl.bindVertexArray(vao);
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+    var uniforms = {
+      time: gl.getUniformLocation(program, "u_time"),
+      resolution: gl.getUniformLocation(program, "u_resolution"),
+      pixelRatio: gl.getUniformLocation(program, "u_pixelRatio"),
+      originX: gl.getUniformLocation(program, "u_originX"),
+      originY: gl.getUniformLocation(program, "u_originY"),
+      worldWidth: gl.getUniformLocation(program, "u_worldWidth"),
+      worldHeight: gl.getUniformLocation(program, "u_worldHeight"),
+      fit: gl.getUniformLocation(program, "u_fit"),
+      scale: gl.getUniformLocation(program, "u_scale"),
+      rotation: gl.getUniformLocation(program, "u_rotation"),
+      offsetX: gl.getUniformLocation(program, "u_offsetX"),
+      offsetY: gl.getUniformLocation(program, "u_offsetY"),
+      pxSize: gl.getUniformLocation(program, "u_pxSize"),
+      colorBack: gl.getUniformLocation(program, "u_colorBack"),
+      colorFront: gl.getUniformLocation(program, "u_colorFront"),
+      shape: gl.getUniformLocation(program, "u_shape"),
+      type: gl.getUniformLocation(program, "u_type")
+    };
+
+    var start = performance.now();
+    var frameId = 0;
+
+    function resize() {
+      var ratio = Math.min(window.devicePixelRatio || 1, 2);
+      var rect = canvas.getBoundingClientRect();
+      var width = Math.max(1, Math.floor(rect.width * ratio));
+      var height = Math.max(1, Math.floor(rect.height * ratio));
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+        gl.viewport(0, 0, width, height);
+      }
+      return ratio;
+    }
+
+    function render(now) {
+      var ratio = resize();
+      var time = ((now - start) / 1000) * (reduce ? 0.04 : 0.4);
+      var colors = getShaderColors();
+
+      gl.useProgram(program);
+      gl.bindVertexArray(vao);
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+
+      gl.uniform1f(uniforms.time, time);
+      gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
+      gl.uniform1f(uniforms.pixelRatio, ratio);
+      gl.uniform1f(uniforms.originX, 0.5);
+      gl.uniform1f(uniforms.originY, 0.5);
+      gl.uniform1f(uniforms.worldWidth, 0);
+      gl.uniform1f(uniforms.worldHeight, 0);
+      gl.uniform1f(uniforms.fit, 0);
+      gl.uniform1f(uniforms.scale, 1);
+      gl.uniform1f(uniforms.rotation, 0);
+      gl.uniform1f(uniforms.offsetX, 0);
+      gl.uniform1f(uniforms.offsetY, 0);
+      gl.uniform1f(uniforms.pxSize, reduce ? 3 : 2);
+      gl.uniform4fv(uniforms.colorBack, colors.back);
+      gl.uniform4fv(uniforms.colorFront, colors.front);
+      gl.uniform1f(uniforms.shape, 6);
+      gl.uniform1f(uniforms.type, 4);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+      if (!reduce) frameId = requestAnimationFrame(render);
+    }
+
+    window.addEventListener("resize", resize, { passive: true });
+    frameId = requestAnimationFrame(render);
+    window.addEventListener("pagehide", function () {
+      cancelAnimationFrame(frameId);
+    });
+  })();
+
+  var reduceDiffMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var state = { mode: "style", agent: "codex", feedback: [], tab: "fb", saved: false, selected: null };
+  var EL_META = {
+    badge: { tag: ".badge", file: "ProductCard.tsx", line: 14 },
+    title: { tag: "h3.title", file: "ProductCard.tsx", line: 17 },
+    desc: { tag: "p.desc", file: "ProductCard.tsx", line: 21 },
+    cta: { tag: "button.cta", file: "ProductCard.tsx", line: 25 }
+  };
+
+  function presetFor(el, mode) {
+    var L = root.lang;
+    if (mode === "style") {
+      var map = {
+        title: { prop: "font-size", from: "21px", to: "24px", apply: function (node) { node.style.fontSize = "24px"; } },
+        desc: { prop: "color", from: "muted", to: "foreground", apply: function (node) { node.style.color = "var(--foreground)"; } },
+        cta: { prop: "box-shadow", from: "none", to: "inset ring", apply: function (node) { node.style.boxShadow = "0 0 0 1px var(--regent) inset"; } },
+        badge: { prop: "letter-spacing", from: "0.02em", to: "0.12em", apply: function (node) { node.style.letterSpacing = "0.12em"; } }
+      };
+      return map[el] || map.title;
+    }
+    if (mode === "text") {
+      var tmap = {
+        title: { from: L === "zh" ? "智能审稿，一步到位" : "Review smarter, ship faster", to: L === "zh" ? "浏览器审稿，源码落地" : "Review in browser. Ship source." },
+        desc: { from: L === "zh" ? "在浏览器里直接标注，让改动自动回到源码。" : "Annotate right in the browser and let changes flow back to source.", to: L === "zh" ? "在真实页面改稿，让 agent 映射回源码。" : "Edit on the live page and let the agent map it back." },
+        cta: { from: L === "zh" ? "立即体验" : "Try it now", to: L === "zh" ? "开始审稿" : "Start review" },
+        badge: { from: "NEW", to: "v3.1" }
+      };
+      return tmap[el] || tmap.title;
+    }
+    var nmap = {
+      title: { note: L === "zh" ? "标题层级再强一点。" : "Title hierarchy needs stronger emphasis.", intent: "emphasis" },
+      desc: { note: L === "zh" ? "描述和标题之间有点挤。" : "Description feels cramped under the title.", intent: "spacing" },
+      cta: { note: L === "zh" ? "按钮的可点击感再明确一点。" : "Button affordance should be clearer.", intent: "affordance" },
+      badge: { note: L === "zh" ? "徽章对比度略低。" : "Badge contrast is slightly low.", intent: "contrast" }
+    };
+    return nmap[el] || nmap.title;
+  }
+
+  function nodeFor(el) { return $('.editable[data-el="' + el + '"]'); }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  function syncCanvasLang(force) {
+    $$(".editable").forEach(function (node) {
+      var el = node.getAttribute("data-el");
+      if (el === "badge") return;
+      if (!force && state.feedback.some(function (f) { return f.el === el && f.type === "text_edit"; })) return;
+      var txt = root.lang === "zh" ? node.getAttribute("data-txt-zh") : node.getAttribute("data-txt-en");
+      if (el === "cta") $(".dc-btn-label", node).textContent = txt;
+      else node.textContent = txt;
+    });
+  }
+
+  function renderRailHint() {
+    var L = root.lang;
+    var hints = {
+      style: { en: "Select an element; VFS records computed style before and after.", zh: "选择元素；VFS 会记录修改前后的 computed style。" },
+      text: { en: "Select an element; copy becomes a text_edit with source anchors.", zh: "选择元素；文案会生成带 source anchors 的 text_edit。" },
+      note: { en: "Select an element; notes become intent_guess hints for the agent.", zh: "选择元素；备注会变成 agent 可理解的 intent_guess。" }
+    };
+    $("#railHint").textContent = hints[state.mode][L];
+  }
+
+  function renderStudioHint() {
+    var n = state.feedback.length;
+    var L = root.lang;
+    var text = n === 0
+      ? (L === "zh" ? "选一个模式，然后点击画布里的元素。" : "Pick a mode, then click an element on the canvas.")
+      : state.saved
+        ? (L === "zh" ? "已映射回源码。切换 Codex / Claude 查看署名变化。" : "Mapped to source. Switch Codex / Claude to compare attribution.")
+        : (L === "zh" ? "已收集 " + n + " 条反馈，保存后映射回源码。" : n + " item(s) collected. Save to map back to source.");
+    $("#studioHint").textContent = text;
+  }
+
+  function setTab(t) {
+    state.tab = t;
+    $$("#tabs button").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-tab") === t); });
+  }
+
+  function updateSave() {
+    $("#saveBtn").disabled = state.feedback.length === 0 || state.saved;
+    renderStudioHint();
+  }
+
+  function applyEdit(el) {
+    var node = nodeFor(el);
+    var preset = presetFor(el, state.mode);
+    var meta = EL_META[el];
+    var item = { id: Date.now() + "-" + Math.random().toString(36).slice(2, 6), type: null, el: el, selector: meta.tag, file: meta.file, line: meta.line };
+    if (state.mode === "style") {
+      preset.apply(node);
+      item.type = "style_edit";
+      item.prop = preset.prop;
+      item.from = preset.from;
+      item.to = preset.to;
+    } else if (state.mode === "text") {
+      var target = el === "cta" ? $(".dc-btn-label", node) : node;
+      target.textContent = preset.to;
+      item.type = "text_edit";
+      item.from = preset.from;
+      item.to = preset.to;
+    } else {
+      item.type = "annotation";
+      item.note = preset.note;
+      item.intent = preset.intent;
+    }
+    var idx = state.feedback.findIndex(function (f) { return f.el === el && f.type === item.type; });
+    if (idx >= 0) state.feedback[idx] = item; else state.feedback.push(item);
+    state.saved = false;
+    setTab("fb");
+    renderPanel();
+    updateSave();
+  }
+
+  var TYPE_CLASS = { style_edit: "style", text_edit: "text", annotation: "note" };
+  function renderPanel() {
+    var body = $("#panelBody");
+    var L = root.lang;
+    $("#fbCount").textContent = state.feedback.length;
+    if (state.feedback.length === 0) {
+      body.innerHTML = '<div class="empty">' + (L === "zh" ? "点击画布里的元素，开始收集反馈。" : "Click an element on the canvas to start collecting feedback.") + "</div>";
+      return;
+    }
+    if (state.tab === "fb") {
+      body.innerHTML = state.feedback.map(function (f) {
+        var detail = "";
+        if (f.type === "style_edit") detail = '<div class="detail"><code>' + esc(f.prop) + '</code> <span>' + esc(f.from) + '</span> → <span>' + esc(f.to) + '</span></div>';
+        else if (f.type === "text_edit") detail = '<div class="detail"><span>' + esc(f.from) + '</span> → <span>' + esc(f.to) + '</span></div>';
+        else detail = '<div class="detail">"' + esc(f.note) + '" <code>intent: ' + esc(f.intent) + '</code></div>';
+        return '<div class="fb"><div class="row1"><span class="type ' + TYPE_CLASS[f.type] + '">' + f.type + '</span><span class="sel">' + esc(f.selector) + '</span></div>' + detail + '</div>';
+      }).join("");
+      return;
+    }
+    if (state.tab === "json") {
+      var session = {
+        version: "3.1",
+        agent: state.agent,
+        feedback: state.feedback.map(function (f) {
+          var o = { type: f.type, selector: f.selector, source_anchors: { sourceLoc: f.file + ":" + f.line } };
+          if (f.type === "style_edit") { o.properties = {}; o.properties[f.prop] = { original: f.from, modified: f.to }; o.computed_before = "snapshot"; o.computed_after = "snapshot"; }
+          else if (f.type === "text_edit") { o.original = f.from; o.modified = f.to; o.locate_confidence = "high"; }
+          else { o.note = f.note; o.intent_guess = f.intent + "_adjust"; }
+          return o;
+        })
+      };
+      body.innerHTML = '<pre class="json">' + colorJson(JSON.stringify(session, null, 2)) + '</pre>';
+      return;
+    }
+    renderDiff();
+  }
+
+  function colorJson(s) {
+    return esc(s)
+      .replace(/&quot;([\w-]+)&quot;(\s*:)/g, '<span class="k">&quot;$1&quot;</span>$2')
+      .replace(/: &quot;([^&]*)&quot;/g, ': <span class="s">&quot;$1&quot;</span>')
+      .replace(/([{}\[\],])/g, '<span class="p">$1</span>');
+  }
+
+  var diffTimer = null;
+  function renderDiff() {
+    var body = $("#panelBody");
+    var agentName = state.agent === "codex" ? "Codex" : "Claude";
+    if (!state.saved) {
+      body.innerHTML = '<div class="empty">' + (root.lang === "zh" ? "点击「保存并映射回源码」查看 diff。" : 'Click "Save & map to source" to see the diff.') + "</div>";
+      return;
+    }
+    var lines = [];
+    lines.push({ k: "ctx", t: "  export function ProductCard() {" });
+    lines.push({ k: "ctx", t: "    return (" });
+    state.feedback.forEach(function (f) {
+      if (f.type === "style_edit") {
+        lines.push({ k: "del", t: "-     " + f.selector + " { " + f.prop + ": " + f.from + " }" });
+        lines.push({ k: "add", t: "+     " + f.selector + " { " + f.prop + ": " + f.to + " }" });
+      } else if (f.type === "text_edit") {
+        lines.push({ k: "del", t: "-     " + f.from });
+        lines.push({ k: "add", t: "+     " + f.to });
+      } else {
+        lines.push({ k: "ctx", t: "      {/* " + agentName + ": " + f.note + " */}" });
+        lines.push({ k: "add", t: "+     /* intent: " + f.intent + "_adjust */" });
+      }
+    });
+    lines.push({ k: "ctx", t: "    )" });
+    lines.push({ k: "ctx", t: "  }" });
+    var statusTxt = root.lang === "zh" ? agentName + " 已把 " + state.feedback.length + " 条反馈映射回源码" : agentName + " mapped " + state.feedback.length + " item(s) to source";
+    body.innerHTML = '<div class="diff-status"><span id="diffStatus"></span></div><div class="diff-file">ProductCard.tsx</div><pre class="diff" id="diffPre"></pre>';
+    var pre = $("#diffPre");
+    var i = 0;
+    clearInterval(diffTimer);
+    function append(ln) {
+      var span = document.createElement("span");
+      span.className = "ln " + ln.k;
+      span.textContent = ln.t;
+      pre.appendChild(span);
+    }
+    if (reduceDiffMotion) {
+      lines.forEach(append);
+      $("#diffStatus").textContent = statusTxt;
+      return;
+    }
+    function step() {
+      if (i >= lines.length) {
+        clearInterval(diffTimer);
+        $("#diffStatus").textContent = statusTxt;
+        return;
+      }
+      append(lines[i++]);
+      $("#diffStatus").textContent = root.lang === "zh" ? agentName + " 正在回写..." : agentName + " is writing...";
+    }
+    diffTimer = setInterval(step, 120);
+    step();
+  }
+
+  $$(".mode").forEach(function (m) {
+    m.addEventListener("click", function () {
+      $$(".mode").forEach(function (x) { x.classList.remove("on"); });
+      m.classList.add("on");
+      state.mode = m.getAttribute("data-mode");
+      renderRailHint();
+    });
+  });
+
+  $$("#agentSwitch button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      $$("#agentSwitch button").forEach(function (x) { x.classList.remove("on"); });
+      b.classList.add("on");
+      state.agent = b.getAttribute("data-agent");
+      if (state.tab === "diff") renderPanel();
+    });
+  });
+
+  $$(".editable").forEach(function (node) {
+    node.addEventListener("click", function () {
+      $$(".editable").forEach(function (x) { x.classList.remove("sel"); });
+      node.classList.add("sel");
+      state.selected = node.getAttribute("data-el");
+      applyEdit(state.selected);
+    });
+  });
+
+  $$("#tabs button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      setTab(b.getAttribute("data-tab"));
+      renderPanel();
+    });
+  });
+
+  $("#saveBtn").addEventListener("click", function () {
+    if (state.feedback.length === 0) return;
+    state.saved = true;
+    setTab("diff");
+    renderPanel();
+    updateSave();
+    toast("已保存并映射回源码", "Saved and mapped to source");
+  });
+
+  $("#resetBtn").addEventListener("click", function () {
+    state.feedback = [];
+    state.saved = false;
+    state.selected = null;
+    clearInterval(diffTimer);
+    $$(".editable").forEach(function (x) { x.classList.remove("sel"); x.removeAttribute("style"); });
+    nodeFor("badge").textContent = "NEW";
+    syncCanvasLang(true);
+    setTab("fb");
+    renderPanel();
+    updateSave();
+  });
+
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in");
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: .12 });
+    $$(".reveal").forEach(function (el) { io.observe(el); });
+  } else {
+    $$(".reveal").forEach(function (el) { el.classList.add("in"); });
+  }
+
+  renderRailHint();
+  renderStudioHint();
+  renderPanel();
+})();
+</script>
+</body>
+</html>
