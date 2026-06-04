@@ -607,6 +607,24 @@
     backdrop-filter: blur(10px);
     opacity: 1;
     transform: none;
+    transition: border-color .24s var(--ease), background .24s var(--ease), box-shadow .24s var(--ease);
+  }
+
+  .setup-command-box:focus-within {
+    border-color: color-mix(in srgb, var(--primary) 72%, transparent);
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--primary) 13%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--primary) 14%, transparent);
+  }
+
+  .setup-command-box.is-copied {
+    border-color: color-mix(in srgb, var(--primary) 76%, transparent);
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+  }
+
+  .setup-command-box.is-copied .setup-copy-btn {
+    background: var(--primary);
+    color: var(--primary-foreground);
   }
 
   .setup-command-code {
@@ -643,6 +661,11 @@
   .setup-copy-btn:focus-visible {
     background: color-mix(in srgb, var(--primary) 22%, transparent);
     color: var(--vfs-accent-hover);
+  }
+
+  .setup-copy-btn:focus-visible {
+    outline: 1px solid color-mix(in srgb, var(--primary) 70%, transparent);
+    outline-offset: 3px;
   }
 
   .setup-copy-btn svg {
@@ -1205,22 +1228,51 @@
     margin: 0 0 clamp(1.5rem, 4vw, 2.75rem);
   }
 
+  .section-command:hover {
+    border-color: color-mix(in srgb, var(--primary) 62%, transparent);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+
   .section-command.is-right {
     margin-left: auto;
   }
 
   .section-command .setup-copy-btn {
     min-width: 4.8rem;
-    cursor: default;
-    pointer-events: none;
     font-family: var(--mono);
     font-size: .66rem;
     letter-spacing: .02em;
     text-transform: uppercase;
   }
 
+  .section-command .setup-copy-btn::after {
+    content: "COPY";
+    display: inline-block;
+  }
+
+  .section-command .setup-copy-btn > span {
+    display: none;
+  }
+
+  .section-command.is-copied .setup-copy-btn::after {
+    content: "COPIED";
+  }
+
   .section-command .setup-command-code {
     color: color-mix(in srgb, var(--foreground) 78%, var(--primary));
+  }
+
+  .setup-command-box[data-copy-command] .setup-command-code {
+    cursor: copy;
+  }
+
+  .setup-command-box[data-copy-command] .setup-command-code:focus-visible {
+    outline: 0;
+  }
+
+  .section-command .setup-command-code::selection {
+    background: color-mix(in srgb, var(--primary) 34%, transparent);
+    color: var(--foreground);
   }
 
   .section-mini-stats.vfs-stats {
@@ -1357,12 +1409,15 @@
     display: grid;
     grid-template-columns: 160px minmax(360px, 1fr) 390px;
     min-height: 560px;
+    height: min(74vh, 680px);
+    max-height: 680px;
   }
 
   .rail {
     padding: .8rem;
     border-right: 1px solid var(--border);
     background: color-mix(in srgb, var(--foreground) 3%, transparent);
+    min-height: 0;
   }
 
   .rail .lab,
@@ -1409,6 +1464,7 @@
     display: grid;
     place-items: center;
     padding: clamp(1.4rem, 4vw, 3rem);
+    min-height: 0;
     background:
       linear-gradient(to right, color-mix(in srgb, var(--foreground) 5%, transparent) 1px, transparent 1px),
       linear-gradient(to bottom, color-mix(in srgb, var(--foreground) 5%, transparent) 1px, transparent 1px),
@@ -1543,6 +1599,9 @@
 
   .panel-col {
     min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
     border-left: 1px solid var(--border);
     background: color-mix(in srgb, var(--foreground) 3%, transparent);
   }
@@ -1562,9 +1621,17 @@
   }
 
   .panel-body {
-    min-height: 508px;
+    min-height: 0;
+    height: 100%;
     padding: .9rem;
     overflow: auto;
+    scrollbar-color: color-mix(in srgb, var(--primary) 52%, transparent) color-mix(in srgb, var(--background) 72%, transparent);
+  }
+
+  .panel-body.is-code {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+    overflow: hidden;
   }
 
   .empty,
@@ -1630,14 +1697,26 @@
   pre.diff {
     margin: 0;
     padding: .85rem;
+    max-height: 100%;
     overflow: auto;
     color: var(--foreground);
     font-size: .72rem;
     line-height: 1.58;
   }
 
-  .json .k { color: var(--regent); }
-  .json .s { color: color-mix(in srgb, var(--primary) 72%, var(--foreground)); }
+  pre.json {
+    height: 100%;
+    min-height: 100%;
+    max-height: none;
+    tab-size: 2;
+    overscroll-behavior: contain;
+  }
+
+  .json .k { color: color-mix(in srgb, var(--regent) 82%, var(--foreground)); }
+  .json .s { color: color-mix(in srgb, var(--primary) 78%, var(--foreground)); }
+  .json .n { color: color-mix(in srgb, var(--danger) 68%, var(--foreground)); }
+  .json .b { color: color-mix(in srgb, var(--regent) 68%, var(--primary)); }
+  .json .null { color: color-mix(in srgb, var(--muted-foreground) 78%, transparent); }
   .json .p { color: var(--muted-foreground); }
 
   .diff-status,
@@ -2029,6 +2108,8 @@
 
     .studio-grid {
       grid-template-columns: 1fr;
+      height: auto;
+      max-height: none;
     }
 
     .rail {
@@ -2053,6 +2134,7 @@
     .panel-col {
       border-left: 0;
       border-top: 1px solid var(--border);
+      min-height: 420px;
     }
 
     .principle-grid {
@@ -2363,9 +2445,9 @@
       </div>
       <p><span data-en>The showcase keeps the real feedback loop: browser selection, structured JSON, source anchors, agent switch, and a simulated diff. It now uses the same square controls, compact mono states, and matcha focus language as the locked hero.</span><span data-zh>演示保留真实闭环：浏览器选中、结构化 JSON、source anchors、agent 切换与模拟 diff。视觉上统一为新版首屏的方形控件、紧凑 mono 状态与 matcha 焦点语言。</span></p>
     </div>
-    <div class="setup-command-box section-command reveal">
+    <div class="setup-command-box section-command reveal" data-copy-command="localhost → feedback.json → source diff">
       <code class="setup-command-code"><span class="command-prompt">$</span> localhost → feedback.json → source diff</code>
-      <button class="setup-copy-btn" type="button" tabindex="-1">loop</button>
+      <button class="setup-copy-btn" type="button" aria-label="Copy live workspace command"><span>loop</span></button>
     </div>
     <div class="studio reveal">
       <div class="studio-bar">
@@ -2457,9 +2539,9 @@
       </h2>
       <p class="lead"><span data-en>Design has comments. Code has pull requests.</span><span data-zh>设计稿有评论，代码有 PR。</span></p>
       <p><span data-en>The broken part is the running page: seeing what feels wrong, adjusting it in context, and getting that intent back into source without screenshots, vague chat messages, or manual transcription.</span><span data-zh>断掉的是跑起来的页面：看到哪里不对，在真实上下文里调整，然后把意图回到源码，而不是截图、群聊描述、手动整理。</span></p>
-      <div class="setup-command-box section-command">
+      <div class="setup-command-box section-command" data-copy-command="source_anchors + locate_confidence + intent_guess">
         <code class="setup-command-code"><span class="command-prompt">$</span> source_anchors + locate_confidence + intent_guess</code>
-        <button class="setup-copy-btn" type="button" tabindex="-1">schema</button>
+        <button class="setup-copy-btn" type="button" aria-label="Copy schema command"><span>schema</span></button>
       </div>
     </div>
     <div class="why-model reveal">
@@ -2575,6 +2657,32 @@
     toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 1900);
   }
 
+  function writeClipboard(text, done) {
+    function finish() {
+      if (done) done();
+    }
+
+    function fallbackCopy() {
+      var area = document.createElement("textarea");
+      area.value = text;
+      area.setAttribute("readonly", "");
+      area.style.position = "fixed";
+      area.style.left = "-9999px";
+      area.style.top = "0";
+      document.body.appendChild(area);
+      area.select();
+      try { document.execCommand("copy"); } catch (_) {}
+      document.body.removeChild(area);
+      finish();
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(finish, fallbackCopy);
+      return;
+    }
+    fallbackCopy();
+  }
+
   var moonIcon = '<svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21.5 14.078A8.557 8.557 0 0 1 9.922 2.5C5.668 3.497 2.5 7.315 2.5 11.873a9.627 9.627 0 0 0 9.627 9.627c4.558 0 8.376-3.168 9.373-7.422"/></svg>';
   var sunIcon = '<svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 12a5 5 0 1 1-10 0a5 5 0 0 1 10 0M12 2v1.5m0 17V22m7.07-2.929l-1.06-1.06M5.99 5.989L4.928 4.93M22 12h-1.5m-17 0H2m17.071-7.071l-1.06 1.06M5.99 18.011l-1.06 1.06"/></svg>';
   var themeBtn = $("#themeBtn");
@@ -2612,19 +2720,54 @@
   langBtn.addEventListener("click", function () { setLang(root.lang === "zh" ? "en" : "zh"); });
   themeBtn.addEventListener("click", function () { setTheme(root.dataset.theme === "dark" ? "light" : "dark"); });
 
-  function copySkill() {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(CMD).then(function () {
-        toast("已复制接入命令", "Setup command copied");
-      }, function () {
-        toast("已复制接入命令", "Setup command copied");
-      });
-    } else {
-      toast("已复制接入命令", "Setup command copied");
-    }
+  function markCopied(box) {
+    if (!box) return;
+    box.classList.add("is-copied");
+    clearTimeout(box._vfsCopiedTimer);
+    box._vfsCopiedTimer = setTimeout(function () { box.classList.remove("is-copied"); }, 1500);
   }
-  $("#copySkill").addEventListener("click", copySkill);
-  $("#copySkill2").addEventListener("click", copySkill);
+
+  function copyCommand(text, box, kind) {
+    var zhLabel = kind === "setup" ? "接入命令" : "命令";
+    var enLabel = kind === "setup" ? "Setup command" : "Command";
+    markCopied(box);
+    toast("已复制" + zhLabel, enLabel + " copied");
+    writeClipboard(text);
+  }
+
+  function copySkill() {
+    copyCommand(CMD, this && this.closest ? this.closest(".setup-command-box") : null, "setup");
+  }
+
+  function bindCommandCopies() {
+    $$(".setup-command-box[data-copy-command]").forEach(function (box) {
+      var btn = $(".setup-copy-btn", box);
+      var code = $(".setup-command-code", box);
+      var text = box.getAttribute("data-copy-command") || "";
+      if (!btn) return;
+      btn.addEventListener("click", function () {
+        copyCommand(text, box, "command");
+      });
+      if (!code) return;
+      code.setAttribute("role", "button");
+      code.setAttribute("tabindex", "0");
+      code.setAttribute("aria-label", "Copy command");
+      code.addEventListener("click", function () {
+        copyCommand(text, box, "command");
+      });
+      code.addEventListener("keydown", function (event) {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        copyCommand(text, box, "command");
+      });
+    });
+  }
+
+  bindCommandCopies();
+  var heroCopyBtn = $("#copySkill");
+  var ctaCopyBtn = $("#copySkill2");
+  if (heroCopyBtn) heroCopyBtn.addEventListener("click", copySkill);
+  if (ctaCopyBtn) ctaCopyBtn.addEventListener("click", copySkill);
 
   (function initTryMeMark() {
     var mark = $(".try-me-mark");
@@ -3206,6 +3349,7 @@
     var body = $("#panelBody");
     var L = root.lang;
     $("#fbCount").textContent = state.feedback.length;
+    body.classList.toggle("is-code", state.feedback.length > 0 && state.tab === "json");
     if (state.feedback.length === 0) {
       body.innerHTML = '<div class="empty">' + (L === "zh" ? "点击画布里的元素，开始收集反馈。" : "Click an element on the canvas to start collecting feedback.") + "</div>";
       return;
@@ -3224,6 +3368,10 @@
       var session = {
         version: "3.1",
         agent: state.agent,
+        meta: {
+          feedback_count: state.feedback.length,
+          saved: state.saved
+        },
         feedback: state.feedback.map(function (f) {
           var o = { type: f.type, selector: f.selector, source_anchors: { sourceLoc: f.file + ":" + f.line } };
           if (f.type === "style_edit") { o.properties = {}; o.properties[f.prop] = { original: f.from, modified: f.to }; o.computed_before = "snapshot"; o.computed_after = "snapshot"; }
@@ -3239,10 +3387,18 @@
   }
 
   function colorJson(s) {
-    return esc(s)
-      .replace(/&quot;([\w-]+)&quot;(\s*:)/g, '<span class="k">&quot;$1&quot;</span>$2')
-      .replace(/: &quot;([^&]*)&quot;/g, ': <span class="s">&quot;$1&quot;</span>')
-      .replace(/([{}\[\],])/g, '<span class="p">$1</span>');
+    return esc(s).replace(
+      /("(?:\\.|[^\\])*?")(\s*:)?|\b(true|false)\b|\bnull\b|-?\b\d+(?:\.\d+)?(?:e[+-]?\d+)?\b|([{}\[\],])/gi,
+      function (match, quoted, colon, bool) {
+        if (quoted) {
+          return colon ? '<span class="k">' + quoted + "</span>" + colon : '<span class="s">' + quoted + "</span>";
+        }
+        if (bool) return '<span class="b">' + match + "</span>";
+        if (match === "null") return '<span class="null">null</span>';
+        if (/^-?\d/.test(match)) return '<span class="n">' + match + "</span>";
+        return '<span class="p">' + match + "</span>";
+      }
+    );
   }
 
   var diffTimer = null;
@@ -3373,6 +3529,6 @@
   renderStudioHint();
   renderPanel();
 })();
-<script defer src="/_vercel/insights/script.js"></script>
+</script>
 </body>
 </html>
