@@ -441,9 +441,23 @@
   }
 
   .site-nav .github-count {
+    min-width: 3.25ch;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
     color: color-mix(in srgb, var(--muted) 72%, transparent);
     font-family: var(--mono);
 	    font-size: var(--type-meta);
+    font-variant-numeric: tabular-nums;
+    transition: color .24s var(--ease), opacity .24s var(--ease);
+  }
+
+  .site-nav .github-count.is-loading {
+    opacity: .68;
+  }
+
+  .site-nav .github-count.is-loaded {
+    color: color-mix(in srgb, var(--text) 76%, var(--accent));
   }
 
   .site-nav .icon-btn {
@@ -2582,7 +2596,7 @@
             </svg>
           </span>
           <span>GitHub</span>
-          <span class="github-count">★ —</span>
+          <span class="github-count is-loading" id="ghStars" aria-live="polite">★ —</span>
         </a>
         <button class="icon-btn" id="langBtn" type="button" title="中 / EN" aria-label="Switch language">中</button>
         <button class="icon-btn" id="themeBtn" type="button" title="Theme" aria-label="Switch theme"></button>
@@ -2870,11 +2884,114 @@
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var CMD = "python3 scripts/setup.py .";
-  var GH_URL = "https://github.com/Niurougan1/visual-feedback-studio";
+  var GH_REPO = "Niurougan1/visual-feedback-studio";
+  var GH_URL = "https://github.com/" + GH_REPO;
+  var GH_API = "https://api.github.com/repos/" + GH_REPO;
+  var GH_SHIELDS_API = "https://img.shields.io/github/stars/" + GH_REPO + ".json?cacheSeconds=1800";
+  var GH_STAR_CACHE_KEY = "vfs-gh-stars:" + GH_REPO;
+  var GH_STAR_CACHE_TTL = 30 * 60 * 1000;
+  var ghLink = $("#ghLink");
+  var ghCta = $("#ghCta");
+  var ghStars = $("#ghStars");
+  var ghStarCount = null;
 
   $("#year").textContent = new Date().getFullYear();
-  $("#ghLink").href = GH_URL;
-  $("#ghCta").href = GH_URL;
+  if (ghLink) ghLink.href = GH_URL;
+  if (ghCta) ghCta.href = GH_URL;
+
+  function formatStarCount(count) {
+    if (!Number.isFinite(count)) return "—";
+    if (count < 1000) return String(count);
+    if (count < 10000) return (count / 1000).toFixed(1).replace(/\.0$/, "") + "k";
+    if (count < 1000000) return Math.round(count / 1000) + "k";
+    return (count / 1000000).toFixed(1).replace(/\.0$/, "") + "m";
+  }
+
+  function parseStarCount(value) {
+    if (typeof value === "number") return value;
+    var text = String(value || "").trim().toLowerCase().replace(/,/g, "");
+    var match = text.match(/^(\d+(?:\.\d+)?)([km])?$/);
+    if (!match) return NaN;
+    var count = Number(match[1]);
+    if (match[2] === "k") count *= 1000;
+    if (match[2] === "m") count *= 1000000;
+    return Math.round(count);
+  }
+
+  function syncGitHubMeta() {
+    if (!ghLink) return;
+    var fullCount = Number.isFinite(ghStarCount) ? ghStarCount.toLocaleString("en-US") : null;
+    var label = root.lang === "zh" ? "在 GitHub 打开 " + GH_REPO : "Open " + GH_REPO + " on GitHub";
+    if (fullCount) {
+      label += root.lang === "zh" ? "，" + fullCount + " 个 star" : ", " + fullCount + " stars";
+    }
+    ghLink.setAttribute("aria-label", label);
+    ghLink.title = label;
+  }
+
+  function renderGitHubStars(count, source) {
+    if (!Number.isFinite(count)) return;
+    ghStarCount = count;
+    if (ghStars) {
+      ghStars.textContent = "★ " + formatStarCount(count);
+      ghStars.classList.remove("is-loading", "is-unavailable");
+      ghStars.classList.add("is-loaded");
+      ghStars.dataset.source = source || "live";
+      ghStars.setAttribute("aria-label", count.toLocaleString("en-US") + " GitHub stars");
+    }
+    syncGitHubMeta();
+  }
+
+  function readCachedGitHubStars() {
+    try {
+      var cached = JSON.parse(localStorage.getItem(GH_STAR_CACHE_KEY) || "null");
+      if (!cached || !Number.isFinite(cached.count) || !Number.isFinite(cached.time)) return;
+      if (Date.now() - cached.time > GH_STAR_CACHE_TTL) return;
+      renderGitHubStars(cached.count, "cache");
+    } catch (_) {}
+  }
+
+  function fetchGitHubStars() {
+    if (!ghStars || !window.fetch) return;
+
+    function fetchJson(url, headers) {
+      var controller = window.AbortController ? new AbortController() : null;
+      var timer = controller ? setTimeout(function () { controller.abort(); }, 6500) : null;
+      return fetch(url, {
+        credentials: "omit",
+        headers: headers,
+        signal: controller ? controller.signal : undefined
+      }).then(function (response) {
+        if (!response.ok) throw new Error(url + " " + response.status);
+        return response.json();
+      }).finally(function () {
+        if (timer) clearTimeout(timer);
+      });
+    }
+
+    fetchJson(GH_API, { Accept: "application/vnd.github+json" }).then(function (repo) {
+      return Number(repo && repo.stargazers_count);
+    }).catch(function () {
+      return fetchJson(GH_SHIELDS_API, { Accept: "application/json" }).then(function (badge) {
+        return parseStarCount((badge && (badge.value || badge.message)) || "");
+      });
+    }).then(function (count) {
+      if (!Number.isFinite(count)) throw new Error("Missing stargazers_count");
+      try {
+        localStorage.setItem(GH_STAR_CACHE_KEY, JSON.stringify({ count: count, time: Date.now() }));
+      } catch (_) {}
+      renderGitHubStars(count, "live");
+    }).catch(function () {
+      if (Number.isFinite(ghStarCount)) return;
+      ghStars.textContent = "★ —";
+      ghStars.classList.remove("is-loading", "is-loaded");
+      ghStars.classList.add("is-unavailable");
+      syncGitHubMeta();
+    });
+  }
+
+  readCachedGitHubStars();
+  fetchGitHubStars();
 
   var toastEl = $("#toast");
   var toastTimer = null;
@@ -2936,6 +3053,7 @@
       renderStudioHint();
       renderPanel();
     }
+    syncGitHubMeta();
     try { localStorage.setItem("vfs-lang", next); } catch (_) {}
   }
 
