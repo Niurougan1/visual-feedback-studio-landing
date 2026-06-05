@@ -1988,7 +1988,7 @@
   }
 
   .why-model::before {
-    content: "SCHEMA_TRACE // V3.1";
+    content: "SCHEMA_TRACE // V3.2 BETA";
     display: block;
 	    margin-bottom: var(--space-3);
     color: color-mix(in srgb, var(--primary) 56%, transparent);
@@ -2586,7 +2586,7 @@
           </svg>
         </span>
         <span class="brand-name">Visual Feedback Studio</span>
-        <span class="brand-version">v3.1 · Dual Agent</span>
+        <span class="brand-version">v3.2 beta · Verified Loop</span>
       </a>
       <div class="nav-right">
         <a class="github-link" id="ghLink" href="https://github.com/Niurougan1/visual-feedback-studio" target="_blank" rel="noopener">
@@ -2609,7 +2609,7 @@
       <div class="hero-eyebrow">
         <span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12h-2c-.894 0-1.662-.857-1.761-2c-.296-3.45-.749-6-2.749-6s-2.5 3.582-2.5 8s-.5 8-2.5 8s-2.452-2.547-2.749-6c-.1-1.147-.867-2-1.763-2h-2"/></svg>
-          V3.1.Dual Agent
+          V3.2.BETA · Token-Aware
         </span>
       </div>
       <h1 id="hero-heading" class="text-balance font-pixel text-4xl tracking-tight sm:text-5xl lg:text-6xl" style="opacity: 1; transform: none;">
@@ -2665,10 +2665,10 @@
           <span class="vfs-title-line"><span class="text-primary vfs-title-accent" style="color: #7D9E20;">Source</span> intent.</span>
         </h2>
       </div>
-      <p><span data-en>The showcase keeps the real feedback loop: browser selection, structured JSON, source anchors, agent switch, and a simulated diff. It now uses the same square controls, compact mono states, and matcha focus language as the locked hero.</span><span data-zh>演示保留真实闭环：浏览器选中、结构化 JSON、source anchors、agent 切换与模拟 diff。视觉上统一为新版首屏的方形控件、紧凑 mono 状态与 matcha 焦点语言。</span></p>
+      <p><span data-en>The showcase keeps the real feedback loop: browser selection, structured JSON, token-aware style chips, apply preview, verification summary, agent switch, and a simulated diff.</span><span data-zh>演示保留真实闭环：浏览器选中、结构化 JSON、token-aware 样式 chip、应用预览、验证摘要、agent 切换与模拟 diff。</span></p>
     </div>
-    <div class="setup-command-box section-command reveal" data-copy-command="localhost → feedback.json → source diff">
-      <code class="setup-command-code"><span class="command-prompt">$</span> localhost → feedback.json → source diff</code>
+    <div class="setup-command-box section-command reveal" data-copy-command="localhost → token-aware preview → verify summary">
+      <code class="setup-command-code"><span class="command-prompt">$</span> localhost → token-aware preview → verify summary</code>
       <button class="setup-copy-btn" type="button" aria-label="Copy live workspace command"><span>loop</span></button>
     </div>
     <div class="studio reveal">
@@ -2868,7 +2868,7 @@
     </div>
     <div class="foot-bottom">
       <span>© <span id="year"></span> Visual Feedback Studio</span>
-      <span><span data-en>v3.1 · one codebase, dual agent</span><span data-zh>v3.1 · 单代码库双 agent</span></span>
+      <span><span data-en>v3.2 beta · token-aware preview, verify summary</span><span data-zh>v3.2 beta · token-aware 预览与验证摘要</span></span>
     </div>
   </div>
 </footer>
@@ -3631,9 +3631,9 @@
   function renderRailHint() {
     var L = root.lang;
     var hints = {
-      style: { en: "Select an element; VFS records computed style before and after.", zh: "选择元素；VFS 会记录修改前后的 computed style。" },
+      style: { en: "Select an element; VFS records token-aware style chips before preview.", zh: "选择元素；VFS 会在预览前记录 token-aware 样式 chip。" },
       text: { en: "Select an element; copy becomes a text_edit with source anchors.", zh: "选择元素；文案会生成带 source anchors 的 text_edit。" },
-      note: { en: "Select an element; notes become intent_guess hints for the agent.", zh: "选择元素；备注会变成 agent 可理解的 intent_guess。" }
+      note: { en: "Select an element; notes become intent_guess hints for verify summary.", zh: "选择元素；备注会进入 verify summary 的 intent_guess。" }
     };
     $("#railHint").textContent = hints[state.mode][L];
   }
@@ -3644,8 +3644,8 @@
     var text = n === 0
       ? (L === "zh" ? "选一个模式，然后点击画布里的元素。" : "Pick a mode, then click an element on the canvas.")
       : state.saved
-        ? (L === "zh" ? "已映射回源码。切换 Codex / Claude 查看署名变化。" : "Mapped to source. Switch Codex / Claude to compare attribution.")
-        : (L === "zh" ? "已收集 " + n + " 条反馈，保存后映射回源码。" : n + " item(s) collected. Save to map back to source.");
+        ? (L === "zh" ? "已生成 apply preview 与验证摘要。切换 Codex / Claude 查看署名变化。" : "Apply preview and verification summary are ready. Switch Codex / Claude to compare attribution.")
+        : (L === "zh" ? "已收集 " + n + " 条反馈，保存后生成 apply preview。" : n + " item(s) collected. Save to generate apply preview.");
     $("#studioHint").textContent = text;
   }
 
@@ -3711,15 +3711,29 @@
     }
     if (state.tab === "json") {
       var session = {
-        version: "3.1",
+        version: "3.2-beta",
         agent: state.agent,
         meta: {
           feedback_count: state.feedback.length,
-          saved: state.saved
+          saved: state.saved,
+          capabilities: [
+            "token_aware_style_chips",
+            "apply_preview",
+            "verification_summary"
+          ]
+        },
+        apply_preview: {
+          mode: state.saved ? "ready" : "pending_save",
+          target: "ProductCard.tsx",
+          strategy: "preview_before_patch"
+        },
+        verification_summary: {
+          status: state.saved ? "passed" : "pending",
+          checks: ["selector_match", "token_scope", "source_anchor"]
         },
         feedback: state.feedback.map(function (f) {
           var o = { type: f.type, selector: f.selector, source_anchors: { sourceLoc: f.file + ":" + f.line } };
-          if (f.type === "style_edit") { o.properties = {}; o.properties[f.prop] = { original: f.from, modified: f.to }; o.computed_before = "snapshot"; o.computed_after = "snapshot"; }
+          if (f.type === "style_edit") { o.properties = {}; o.properties[f.prop] = { original: f.from, modified: f.to }; o.token_scope = "component-local"; o.preview = "apply_preview"; o.computed_before = "snapshot"; o.computed_after = "snapshot"; }
           else if (f.type === "text_edit") { o.original = f.from; o.modified = f.to; o.locate_confidence = "high"; }
           else { o.note = f.note; o.intent_guess = f.intent + "_adjust"; }
           return o;
