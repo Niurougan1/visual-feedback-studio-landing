@@ -9,6 +9,18 @@
 <link rel="shortcut icon" href="assets/favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="assets/favicon.svg" />
 <link rel="preload" href="assets/GeistPixel-Circle.woff2" as="font" type="font/woff2" crossorigin />
+<script type="importmap">
+{
+  "imports": {
+    "@vercel/analytics": "./assets/vercel-analytics.js"
+  }
+}
+</script>
+<script type="module">
+  import { inject } from "@vercel/analytics";
+
+  inject();
+</script>
 <style>
   @font-face {
     font-family: "Geist Pixel Circle";
@@ -1399,7 +1411,7 @@
   }
 
   .studio::before {
-    content: "ASCII_CAPTURE_STREAM";
+    content: "PLUGIN_REVIEW_LAYER";
     position: absolute;
 	    right: var(--space-4);
 	    top: calc(var(--space-5) * -1);
@@ -1410,7 +1422,7 @@
   }
 
   .studio::after {
-    content: "001101 010010 011001";
+    content: "style -> text -> note -> feedback";
     position: absolute;
 	    left: var(--space-4);
 	    bottom: calc(var(--space-5) * -1);
@@ -1458,8 +1470,11 @@
   }
 
   .url,
-  .rail-hint,
-  .studio-foot .hint {
+  .workflow-copy,
+  .studio-foot .hint,
+  .selection-callout,
+  .vf-muted,
+  .vf-code-meta {
     color: var(--muted-foreground);
     font-family: var(--mono);
 	    font-size: var(--type-meta);
@@ -1473,15 +1488,18 @@
   }
 
   .agent-switch,
-  .tabs {
+  .plugin-tabs,
+  .plugin-toolbar {
     display: inline-flex;
     border: 1px solid var(--border);
     background: color-mix(in srgb, var(--background) 70%, transparent);
   }
 
   .agent-switch button,
-  .tabs button,
-  .mode,
+  .plugin-tabs button,
+  .tool-btn,
+  .workflow-step,
+  .vf-action,
   .save-btn,
   .reset-btn,
   .schema-trigger,
@@ -1494,38 +1512,41 @@
     font-family: var(--mono);
 	    font-size: var(--type-meta);
 	    line-height: var(--leading-ui);
-    transition: background .24s var(--ease), color .24s var(--ease), border-color .24s var(--ease), transform .18s var(--ease);
+    transition: background .24s var(--ease), color .24s var(--ease), border-color .24s var(--ease), transform .18s var(--ease), opacity .2s var(--ease);
   }
 
   .agent-switch button,
-  .tabs button {
+  .plugin-tabs button,
+  .tool-btn {
 	    min-height: var(--control-sm);
 	    padding: 0 var(--space-3);
   }
 
   .agent-switch button.on,
-  .tabs button.on,
-  .mode.on {
+  .plugin-tabs button.on,
+  .tool-btn.on,
+  .workflow-step.is-active {
     background: var(--primary);
     color: var(--primary-foreground);
   }
 
   .studio-grid {
     display: grid;
-    grid-template-columns: 160px minmax(360px, 1fr) 390px;
-    min-height: 560px;
-    height: min(74vh, 680px);
-    max-height: 680px;
+    grid-template-columns: 218px minmax(390px, 1fr) 430px;
+    min-height: 620px;
+    height: min(78vh, 740px);
+    max-height: 740px;
   }
 
-  .rail {
+  .workflow-rail {
 	    padding: var(--space-3);
     border-right: 1px solid var(--border);
     background: color-mix(in srgb, var(--foreground) 3%, transparent);
     min-height: 0;
+    overflow: auto;
   }
 
-  .rail .lab,
+  .workflow-rail .lab,
   .model-lab,
   .micro-label {
     color: var(--primary);
@@ -1534,34 +1555,195 @@
     letter-spacing: .02em;
   }
 
-  .mode {
-    width: 100%;
-    display: flex;
-    align-items: center;
+  .workflow-list {
+    display: grid;
 	    gap: var(--space-2);
-	    margin-top: var(--space-2);
+	    margin-top: var(--space-3);
+  }
+
+  .workflow-step {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr;
+	    gap: var(--space-3);
 	    padding: var(--space-3);
-    border: 1px solid transparent;
+    border: 1px solid var(--border);
     text-align: left;
+    background: color-mix(in srgb, var(--background) 42%, transparent);
   }
 
-  .mode:hover,
-  .mode:focus-visible,
-  .tabs button:hover,
-  .tabs button:focus-visible,
-  .agent-switch button:hover,
-  .agent-switch button:focus-visible,
-  .schema-trigger:hover,
-  .schema-trigger:focus-visible {
-    background: color-mix(in srgb, var(--primary) 12%, transparent);
+  .workflow-step .num {
+    color: var(--primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .workflow-step strong {
+    display: block;
     color: var(--foreground);
+	    font-size: var(--type-ui-sm);
+	    line-height: var(--leading-ui);
   }
 
-  .rail-hint {
+  .workflow-step span:last-child {
+    display: block;
+	    margin-top: var(--space-1);
+    color: var(--muted-foreground);
+    font-size: var(--type-meta);
+    line-height: 1.35;
+  }
+
+  .workflow-step.is-active strong,
+  .workflow-step.is-active span,
+  .workflow-step.is-active .num {
+    color: var(--primary-foreground);
+  }
+
+  .workflow-step.is-done {
+    border-color: color-mix(in srgb, var(--primary) 42%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+
+  .workflow-copy {
 	    margin-top: var(--space-4);
 	    padding-top: var(--space-4);
     border-top: 1px solid var(--border);
     line-height: 1.55;
+  }
+
+  .review-task {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+    padding: var(--space-4);
+    border: 1px solid var(--border);
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--primary) 12%, transparent), transparent 46%),
+      color-mix(in srgb, var(--background) 54%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--foreground) 4%, transparent);
+  }
+
+  .review-task-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .review-label,
+  .task-phase,
+  .task-status {
+    font-family: var(--mono);
+    font-size: var(--type-meta);
+    line-height: var(--leading-ui);
+  }
+
+  .review-label {
+    color: var(--primary);
+    letter-spacing: .04em;
+  }
+
+  .task-phase {
+    min-height: 24px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 var(--space-2);
+    border: 1px solid color-mix(in srgb, var(--primary) 36%, transparent);
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+
+  .review-task h3 {
+    margin: 0;
+    color: var(--foreground);
+    font-size: clamp(1.05rem, 1.35vw, 1.25rem);
+    line-height: var(--leading-tight);
+  }
+
+  .review-task p {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: var(--type-ui);
+    line-height: 1.55;
+  }
+
+  .task-status {
+    display: inline-flex;
+    width: fit-content;
+    max-width: 100%;
+    min-height: 28px;
+    align-items: center;
+    padding: 0 var(--space-2);
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--foreground) 4%, transparent);
+    color: var(--foreground);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .task-progress {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-1);
+    margin-top: var(--space-1);
+  }
+
+  .review-task .task-progress {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .board-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-1);
+  }
+
+  .board-stat {
+    min-height: 48px;
+    display: grid;
+    place-items: center;
+    gap: var(--space-1);
+    padding: var(--space-2);
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--foreground) 4%, transparent);
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: var(--type-meta);
+    line-height: var(--leading-ui);
+    text-align: center;
+  }
+
+  .board-stat strong {
+    color: var(--foreground);
+    font-family: var(--mono);
+    font-size: var(--type-ui-sm);
+  }
+
+  .task-step {
+    min-width: 0;
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--space-2);
+    border: 1px solid var(--border);
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: var(--type-meta);
+    line-height: var(--leading-ui);
+    text-align: center;
+  }
+
+  .task-step.is-active {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .task-step.is-done {
+    border-color: color-mix(in srgb, var(--primary) 42%, transparent);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    color: var(--primary);
   }
 
   .canvas {
@@ -1570,6 +1752,7 @@
     place-items: center;
 	    padding: clamp(var(--space-5), 4vw, var(--space-7));
     min-height: 0;
+    overflow: hidden;
     background:
       linear-gradient(to right, color-mix(in srgb, var(--foreground) 5%, transparent) 1px, transparent 1px),
       linear-gradient(to bottom, color-mix(in srgb, var(--foreground) 5%, transparent) 1px, transparent 1px),
@@ -1590,17 +1773,47 @@
 
   .canvas-hint {
     position: absolute;
-	    top: var(--space-4);
 	    left: var(--space-4);
+	    bottom: var(--space-4);
+    z-index: 3;
     color: var(--muted-foreground);
     font-family: var(--mono);
 	    font-size: var(--type-meta);
   }
 
+  .plugin-toolbar {
+    position: absolute;
+	    left: var(--space-4);
+	    top: var(--space-4);
+    z-index: 4;
+    box-shadow: 0 12px 34px color-mix(in srgb, var(--background) 42%, transparent);
+  }
+
+  .tool-btn + .tool-btn,
+  .plugin-tabs button + button,
+  .agent-switch button + button {
+    border-left: 1px solid var(--border);
+  }
+
+  .selection-callout {
+    position: absolute;
+	    right: var(--space-4);
+	    top: var(--space-4);
+    z-index: 4;
+    max-width: min(70%, 24rem);
+	    padding: var(--space-2) var(--space-3);
+    border: 1px solid color-mix(in srgb, var(--primary) 38%, transparent);
+    background: color-mix(in srgb, var(--background) 78%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 8%, transparent);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .demo-card {
     position: relative;
     z-index: 1;
-    width: min(100%, 350px);
+    width: min(100%, 360px);
     border: 1px solid var(--border);
     background: var(--card);
     box-shadow:
@@ -1623,7 +1836,7 @@
   .demo-card .media {
     position: relative;
     overflow: hidden;
-    height: clamp(164px, 18vw, 190px);
+    height: clamp(164px, 18vw, 196px);
     border-bottom: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
     background: var(--background);
     isolation: isolate;
@@ -1672,13 +1885,18 @@
 
   .editable {
     cursor: pointer;
-    transition: background .2s var(--ease), outline-color .2s var(--ease), color .2s var(--ease), box-shadow .2s var(--ease);
+    transition: background .2s var(--ease), outline-color .2s var(--ease), color .2s var(--ease), box-shadow .2s var(--ease), transform .2s var(--ease);
   }
 
   .editable:hover,
   .editable.sel {
     outline: 1px solid var(--primary);
+    outline-offset: 2px;
     background: color-mix(in srgb, var(--primary) 15%, transparent);
+  }
+
+  .editable.sel {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 12%, transparent);
   }
 
   .editable.sel::after {
@@ -1736,18 +1954,34 @@
     background: color-mix(in srgb, var(--foreground) 3%, transparent);
   }
 
-  .tabs {
+  .plugin-tabs {
     width: 100%;
     border-width: 0 0 1px;
   }
 
-  .tabs button {
+  .plugin-tabs button {
     flex: 1;
   }
 
-  .tabs .badge {
+  .plugin-tabs .badge {
 	    margin-left: var(--space-1);
     color: inherit;
+  }
+
+  .plugin-tabs button:hover,
+  .plugin-tabs button:focus-visible,
+  .tool-btn:hover,
+  .tool-btn:focus-visible,
+  .workflow-step:hover,
+  .workflow-step:focus-visible,
+  .agent-switch button:hover,
+  .agent-switch button:focus-visible,
+  .schema-trigger:hover,
+  .schema-trigger:focus-visible,
+  .vf-action:hover,
+  .vf-action:focus-visible {
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    color: var(--foreground);
   }
 
   .panel-body {
@@ -1759,15 +1993,21 @@
   }
 
   .panel-body.is-code {
-    display: grid;
-    grid-template-rows: minmax(0, 1fr);
-    overflow: hidden;
+    display: block;
+    overflow: auto;
   }
 
   .empty,
+  .context-card,
+  .inspector-section,
+  .style-control,
+  .review-card,
   .fb,
+  .code-card,
+  .json-card,
   pre.json,
   pre.diff,
+  pre.code,
   .diff-status,
   .diff-file {
     border: 1px solid var(--border);
@@ -1781,7 +2021,459 @@
     padding: 1rem;
     color: var(--muted-foreground);
     text-align: center;
-    font-size: .86rem;
+    font-size: var(--type-ui);
+  }
+
+  .context-card {
+    display: grid;
+	    gap: var(--space-3);
+	    padding: var(--space-3);
+	    margin-bottom: var(--space-3);
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent), transparent 44%),
+      color-mix(in srgb, var(--background) 58%, transparent);
+  }
+
+  .context-head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+	    gap: var(--space-3);
+    align-items: start;
+    min-width: 0;
+  }
+
+  .context-title {
+    color: var(--foreground);
+	    font-size: clamp(1.05rem, 1.2vw, 1.22rem);
+    font-weight: 700;
+    line-height: var(--leading-tight);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .context-text {
+	    margin-top: var(--space-1);
+    color: var(--muted-foreground);
+    font-size: var(--type-ui-sm);
+    line-height: 1.45;
+  }
+
+  .vf-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+	    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .vf-chip {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    min-height: 24px;
+	    padding: 0 var(--space-2);
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--foreground) 4%, transparent);
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: var(--type-meta);
+    font-weight: 650;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .vf-chip.strong {
+    border-color: color-mix(in srgb, var(--primary) 42%, transparent);
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    color: var(--primary);
+  }
+
+  .inspector-section {
+	    padding: var(--space-3);
+	    margin-bottom: var(--space-3);
+  }
+
+  .inspector-section h4,
+  .review-card h4,
+  .code-card h4,
+  .json-card h4 {
+	    margin: 0 0 var(--space-3);
+    color: var(--foreground);
+    font-family: var(--mono);
+    font-size: var(--type-ui-sm);
+    line-height: var(--leading-ui);
+  }
+
+  .style-controls,
+  .review-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+	    gap: var(--space-3);
+  }
+
+  .review-target-card {
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--primary) 8%, transparent), transparent 50%),
+      color-mix(in srgb, var(--background) 58%, transparent);
+  }
+
+  .capture-list {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .capture-row {
+    display: grid;
+    grid-template-columns: minmax(88px, .36fr) minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: start;
+    min-height: 30px;
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: var(--type-meta);
+    line-height: 1.45;
+  }
+
+  .capture-row:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .capture-row strong {
+    color: var(--foreground);
+    font-family: var(--mono);
+    font-size: var(--type-ui-sm);
+    font-weight: 650;
+    overflow-wrap: anywhere;
+  }
+
+  .intent-copy,
+  .capture-summary {
+    color: var(--foreground);
+    font-size: var(--type-ui);
+    line-height: 1.55;
+  }
+
+  .intent-copy {
+    margin: 0;
+  }
+
+  .intent-copy + .vf-chip-row {
+    margin-top: var(--space-3);
+  }
+
+  .capture-summary {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border: 1px solid color-mix(in srgb, var(--primary) 38%, transparent);
+    background: color-mix(in srgb, var(--primary) 9%, transparent);
+  }
+
+  .capture-summary .summary-title {
+    color: var(--primary);
+    font-family: var(--mono);
+    font-size: var(--type-ui-sm);
+    font-weight: 700;
+  }
+
+  .source-proof {
+    display: grid;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+
+  .panel-note {
+    color: var(--muted-foreground);
+    font-size: var(--type-ui-sm);
+    line-height: 1.55;
+  }
+
+  .demo-controls {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .demo-field {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--background) 55%, transparent);
+  }
+
+	  .demo-field label,
+	  .demo-field .field-label {
+	    color: var(--muted-foreground);
+	    font-family: var(--mono);
+	    font-size: var(--type-meta);
+	    line-height: var(--leading-ui);
+	  }
+
+	  .demo-field .value-row,
+	  .feedback-section-title {
+	    display: flex;
+	    align-items: center;
+	    justify-content: space-between;
+	    gap: var(--space-2);
+	  }
+
+	  .demo-field .current-value,
+	  .feedback-section-title span {
+	    color: var(--foreground);
+	    font-family: var(--mono);
+	    font-size: var(--type-meta);
+	    line-height: var(--leading-ui);
+	  }
+
+  .demo-field input,
+  .demo-field textarea {
+    width: 100%;
+    min-height: var(--control-sm);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    background: color-mix(in srgb, var(--foreground) 4%, transparent);
+    color: var(--foreground);
+    font-family: var(--mono);
+    font-size: var(--type-code);
+    line-height: var(--leading-code);
+    outline: none;
+  }
+
+  .demo-field input:focus,
+  .demo-field textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 42%, transparent);
+  }
+
+  .demo-field input[type="number"],
+  .demo-field input[type="text"] {
+    padding: 0 var(--space-2);
+  }
+
+  .demo-field input[type="color"] {
+    min-height: 36px;
+    padding: var(--space-1);
+    cursor: pointer;
+  }
+
+  .demo-field textarea {
+    min-height: 92px;
+    resize: vertical;
+    padding: var(--space-2);
+  }
+
+  .range-control,
+  .color-control {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 86px auto;
+    gap: var(--space-2);
+    align-items: center;
+  }
+
+  .color-control {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+
+	  .range-control input[type="range"] {
+	    min-height: 28px;
+	    padding: 0;
+	    border: 0;
+	    background: transparent;
+	    accent-color: var(--primary);
+	  }
+
+  .unit-label {
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: var(--type-meta);
+  }
+
+  .intent-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .intent-chip {
+    min-height: 28px;
+    padding: 0 var(--space-2);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    background: color-mix(in srgb, var(--foreground) 4%, transparent);
+    color: var(--muted-foreground);
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: var(--type-meta);
+    line-height: var(--leading-ui);
+  }
+
+  .intent-chip.is-active {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .note-marker {
+    position: absolute;
+    z-index: 5;
+    min-height: 28px;
+    max-width: 180px;
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--primary);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-family: var(--mono);
+    font-size: var(--type-meta);
+    line-height: 1.35;
+    box-shadow: 8px 8px 0 color-mix(in srgb, var(--primary) 16%, transparent);
+    pointer-events: none;
+  }
+
+  .note-marker[hidden] {
+    display: none;
+  }
+
+	  .feedback-list {
+	    display: grid;
+	    gap: var(--space-3);
+	    margin-bottom: var(--space-3);
+	  }
+
+	  .feedback-section {
+	    display: grid;
+	    gap: var(--space-2);
+	  }
+
+	  .feedback-section-title {
+	    color: var(--foreground);
+	    font-family: var(--mono);
+	    font-size: var(--type-ui-sm);
+	    font-weight: 650;
+	    line-height: var(--leading-ui);
+	  }
+
+  .feedback-item {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--background) 55%, transparent);
+  }
+
+  .feedback-item-head {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    color: var(--foreground);
+    font-family: var(--mono);
+    font-size: var(--type-ui-sm);
+    font-weight: 650;
+  }
+
+  .feedback-item-body {
+    color: var(--muted-foreground);
+    font-size: var(--type-ui-sm);
+    line-height: 1.55;
+  }
+
+  .evidence-card {
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--background) 48%, transparent);
+    padding: var(--space-3);
+  }
+
+	  .evidence-card summary {
+	    cursor: pointer;
+	    color: var(--foreground);
+	    font-family: var(--mono);
+	    font-size: var(--type-ui-sm);
+	    line-height: var(--leading-ui);
+	  }
+
+	  .evidence-card > :not(summary) {
+	    margin-top: var(--space-3);
+	  }
+
+	  .evidence-card pre.json,
+	  .evidence-card pre.diff {
+	    height: auto;
+	    min-height: 0;
+	    max-height: 220px;
+	    overscroll-behavior: contain;
+	  }
+
+  .style-control {
+    position: relative;
+    min-height: 72px;
+	    padding: var(--space-3);
+    display: grid;
+	    gap: var(--space-2);
+  }
+
+  .style-control label {
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: var(--type-meta);
+  }
+
+  .style-control strong {
+    color: var(--foreground);
+    font-family: var(--mono);
+    font-size: var(--type-code);
+    font-weight: 650;
+    overflow-wrap: anywhere;
+  }
+
+  .vf-action-row {
+    display: flex;
+    flex-wrap: wrap;
+	    gap: var(--space-2);
+	    margin-top: var(--space-3);
+  }
+
+  .vf-action {
+    min-height: var(--control-sm);
+	    padding: 0 var(--space-3);
+    border: 1px solid var(--border);
+  }
+
+  .vf-action.primary {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .review-grid {
+	    margin-bottom: var(--space-3);
+  }
+
+  .review-card,
+  .json-card,
+  .code-card {
+	    padding: var(--space-3);
+	    margin-bottom: var(--space-3);
+  }
+
+  .review-card {
+    min-height: 132px;
+  }
+
+  .review-card .metric {
+    color: var(--foreground);
+    font-family: var(--mono);
+    font-size: clamp(1.15rem, 1.4vw, 1.35rem);
+    line-height: 1;
+  }
+
+  .review-card .caption {
+	    margin-top: var(--space-2);
+    color: var(--muted-foreground);
+    font-size: var(--type-ui-sm);
+    line-height: 1.45;
   }
 
   .fb {
@@ -1824,7 +2516,8 @@
   }
 
   pre.json,
-  pre.diff {
+  pre.diff,
+  pre.code {
     margin: 0;
 	    padding: var(--space-4);
     max-height: 100%;
@@ -1834,12 +2527,29 @@
 	    line-height: var(--leading-code);
   }
 
-  pre.json {
+  pre.json,
+  pre.code {
     height: 100%;
     min-height: 100%;
     max-height: none;
     tab-size: 2;
     overscroll-behavior: contain;
+  }
+
+  .code-card pre.json,
+  .code-card pre.code {
+    height: auto;
+    min-height: 0;
+    max-height: 220px;
+  }
+
+  .json-card {
+    display: grid;
+    grid-template-rows: auto minmax(0, 260px);
+  }
+
+  .json-card[hidden] {
+    display: none;
   }
 
   .json .k { color: color-mix(in srgb, var(--regent) 82%, var(--foreground)); }
@@ -1887,7 +2597,8 @@
     color: var(--primary-foreground);
   }
 
-  .save-btn:disabled {
+  .save-btn:disabled,
+  .vf-action:disabled {
     opacity: .45;
     cursor: not-allowed;
   }
@@ -1988,7 +2699,7 @@
   }
 
   .why-model::before {
-    content: "SCHEMA_TRACE // V3.2 BETA";
+    content: "SCHEMA_TRACE // V4.0 BETA";
     display: block;
 	    margin-bottom: var(--space-3);
     color: color-mix(in srgb, var(--primary) 56%, transparent);
@@ -2339,23 +3050,24 @@
       max-height: none;
     }
 
-    .rail {
-      display: flex;
-      gap: .4rem;
-      overflow-x: auto;
+    .workflow-rail {
+      overflow: visible;
       border-right: 0;
       border-bottom: 1px solid var(--border);
     }
 
-    .rail .lab,
-    .rail-hint {
-      display: none;
+    .workflow-rail .lab {
+      display: flex;
     }
 
-    .mode {
-      width: auto;
-      white-space: nowrap;
-      margin-top: 0;
+    .workflow-copy {
+      display: block;
+      margin-top: var(--space-3);
+      padding-top: var(--space-3);
+    }
+
+    .review-task {
+      margin-top: var(--space-2);
     }
 
     .panel-col {
@@ -2439,6 +3151,59 @@
       width: 100%;
       border-left: 0;
       border-top: 1px solid color-mix(in srgb, var(--primary) 48%, transparent);
+    }
+
+    .canvas {
+      padding: calc(var(--space-9) + var(--space-4)) var(--space-4) var(--space-8);
+    }
+
+    .plugin-toolbar {
+      left: var(--space-3);
+      right: var(--space-3);
+      top: var(--space-3);
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .tool-btn {
+      min-width: 0;
+      padding: 0 var(--space-2);
+      font-size: var(--type-meta);
+    }
+
+    .selection-callout {
+      top: calc(var(--space-3) + var(--control-sm) + var(--space-2));
+      left: var(--space-3);
+      right: var(--space-3);
+      max-width: none;
+    }
+
+    .canvas-hint {
+      left: var(--space-3);
+      right: var(--space-3);
+      white-space: normal;
+    }
+
+    .demo-card {
+      width: min(100%, 340px);
+    }
+
+    .style-controls,
+    .review-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .task-progress {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .task-status {
+      width: 100%;
+    }
+
+    .capture-row {
+      grid-template-columns: 1fr;
+      gap: var(--space-1);
     }
 
     .try-me-mark {
@@ -2586,7 +3351,7 @@
           </svg>
         </span>
         <span class="brand-name">Visual Feedback Studio</span>
-        <span class="brand-version">v3.2 beta · Verified Loop</span>
+        <span class="brand-version">v4.0 beta · Store-Safe Loop</span>
       </a>
       <div class="nav-right">
         <a class="github-link" id="ghLink" href="https://github.com/Niurougan1/visual-feedback-studio" target="_blank" rel="noopener">
@@ -2609,7 +3374,7 @@
       <div class="hero-eyebrow">
         <span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12h-2c-.894 0-1.662-.857-1.761-2c-.296-3.45-.749-6-2.749-6s-2.5 3.582-2.5 8s-.5 8-2.5 8s-2.452-2.547-2.749-6c-.1-1.147-.867-2-1.763-2h-2"/></svg>
-          V3.2.BETA · Token-Aware
+          V4.0.BETA · Local-First
         </span>
       </div>
       <h1 id="hero-heading" class="text-balance font-pixel text-4xl tracking-tight sm:text-5xl lg:text-6xl" style="opacity: 1; transform: none;">
@@ -2617,11 +3382,11 @@
         <span class="vfs-title-line">Agent ships <span class="text-primary vfs-title-accent" style="color: #7D9E20;">source.</span></span>
       </h1>
       <p class="mt-4 text-muted-foreground text-sm/relaxed sm:text-base/relaxed">
-        <span data-en>A browser visual-review workspace for <strong>Codex &amp; Claude</strong>. <strong>One codebase.</strong> Style, copy, and notes — mapped back to <strong>real source</strong>.</span>
-        <span data-zh>面向 <strong>Codex 与 Claude</strong> 的浏览器视觉审稿工作台。<strong>一套代码库。</strong>样式、文案、备注反馈，结构化映射回<strong>真实源码</strong>。</span>
+        <span data-en>A local-first visual-review workspace for <strong>Codex &amp; Claude</strong>. Minimal permissions, current-site authorization, and feedback mapped back to <strong>real source</strong>.</span>
+        <span data-zh>面向 <strong>Codex 与 Claude</strong> 的本地优先视觉审稿工作台。最小权限、当前站点授权，并把反馈结构化映射回<strong>真实源码</strong>。</span>
       </p>
       <div class="setup-command-box">
-        <code class="setup-command-code"><span class="command-prompt">$</span> python3 scripts/setup.py .</code>
+        <code class="setup-command-code"><span class="command-prompt">$</span> python3 scripts/setup.py . --channel beta</code>
         <button data-slot="button" data-variant="ghost" data-size="default" class="setup-copy-btn group/button inline-flex shrink-0 items-center justify-center border bg-clip-padding text-xs font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-1 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 w-full touch-manipulation rounded-none border-primary/30 border-t bg-primary/10 text-primary hover:bg-primary/20 sm:w-auto sm:border-l-2" id="copySkill" type="button" aria-label="Copy setup command">
           <div style="opacity:1;transform:none">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="hugeicons hugeicons-copy-02 size-4" aria-hidden="true">
@@ -2665,10 +3430,10 @@
           <span class="vfs-title-line"><span class="text-primary vfs-title-accent" style="color: #7D9E20;">Source</span> intent.</span>
         </h2>
       </div>
-      <p><span data-en>The showcase keeps the real feedback loop: browser selection, structured JSON, token-aware style chips, apply preview, verification summary, agent switch, and a simulated diff.</span><span data-zh>演示保留真实闭环：浏览器选中、结构化 JSON、token-aware 样式 chip、应用预览、验证摘要、agent 切换与模拟 diff。</span></p>
+      <p><span data-en>Click an element, adjust style, edit copy, or leave a note. The review board keeps each change ready for Codex or Claude.</span><span data-zh>点击元素，调整样式、修改文案或添加备注。审稿任务板会把每一条反馈留给 Codex 或 Claude。</span></p>
     </div>
-    <div class="setup-command-box section-command reveal" data-copy-command="localhost → token-aware preview → verify summary">
-      <code class="setup-command-code"><span class="command-prompt">$</span> localhost → token-aware preview → verify summary</code>
+    <div class="setup-command-box section-command reveal" data-copy-command="style + text + note -> feedback.json">
+      <code class="setup-command-code"><span class="command-prompt">$</span> <span data-en>style + text + note -> feedback.json</span><span data-zh>样式 + 文案 + 备注 -> feedback.json</span></code>
       <button class="setup-copy-btn" type="button" aria-label="Copy live workspace command"><span>loop</span></button>
     </div>
     <div class="studio reveal">
@@ -2683,32 +3448,51 @@
         </div>
       </div>
       <div class="studio-grid">
-        <div class="rail">
-          <div class="lab"><span data-en>Mode</span><span data-zh>模式</span></div>
-          <button type="button" class="mode on" data-mode="style"><span>style</span></button>
-          <button type="button" class="mode" data-mode="text"><span>copy</span></button>
-          <button type="button" class="mode" data-mode="note"><span>note</span></button>
-          <div class="rail-hint" id="railHint"></div>
+        <div class="workflow-rail">
+          <div class="lab"><span data-en>Review board</span><span data-zh>审稿任务板</span></div>
+          <div class="review-task" id="reviewTask" aria-live="polite">
+            <div class="review-task-head">
+              <span class="review-label" id="boardModeLabel">STYLE</span>
+              <span class="task-phase" id="taskPhase">Style</span>
+            </div>
+            <h3 id="taskTitle">Style editor</h3>
+            <p id="taskSummary">Click an element. Common style controls appear here first.</p>
+            <div class="task-status" id="taskStatus">Current element: h3.title</div>
+            <div class="board-stats" aria-label="Feedback count by type">
+              <span class="board-stat"><strong id="styleCount">0</strong><span data-en>Style</span><span data-zh>样式</span></span>
+              <span class="board-stat"><strong id="textCount">0</strong><span data-en>Text</span><span data-zh>文案</span></span>
+              <span class="board-stat"><strong id="noteCount">0</strong><span data-en>Notes</span><span data-zh>备注</span></span>
+            </div>
+          </div>
+          <div class="workflow-copy" id="workflowHint"></div>
         </div>
         <div class="canvas">
-          <span class="canvas-hint"><span data-en>select any element</span><span data-zh>选择任意元素</span></span>
+          <div class="plugin-toolbar" id="pluginToolbar" aria-label="Visual Feedback Studio tools">
+            <button type="button" class="tool-btn on" data-intent="style"><span data-en>Style</span><span data-zh>样式</span></button>
+            <button type="button" class="tool-btn" data-intent="text"><span data-en>Text</span><span data-zh>文案</span></button>
+            <button type="button" class="tool-btn" data-intent="note"><span data-en>Note</span><span data-zh>备注</span></button>
+            <button type="button" class="tool-btn" data-intent="feedback"><span data-en>Feedback</span><span data-zh>反馈</span></button>
+          </div>
+          <div class="selection-callout" id="selectionCallout"></div>
+          <span class="canvas-hint"><span data-en>click a target to choose the current element</span><span data-zh>点击目标元素，选择当前编辑对象</span></span>
           <div class="demo-card">
             <div class="media">
               <img src="assets/demo-park-bench.jpg" alt="A quiet park bench beneath a broad old tree" loading="lazy" decoding="async" />
             </div>
             <div class="pad">
               <span class="dc-badge editable" data-el="badge" data-tag=".badge" data-txt-en="FIELD NOTE" data-txt-zh="FIELD NOTE">FIELD NOTE</span>
-              <div class="dc-title editable" data-el="title" data-tag="h3.title" data-txt-en="Under the old oak" data-txt-zh="老橡树下的片刻">Under the old oak</div>
+              <div class="dc-title editable sel" data-el="title" data-tag="h3.title" data-txt-en="Under the old oak" data-txt-zh="老橡树下的片刻">Under the old oak</div>
               <div class="dc-desc editable" data-el="desc" data-tag="p.desc" data-txt-en="A quiet bench beneath summer branches, framed for an afternoon pause." data-txt-zh="树影、长椅和午后的草地，像一页安静的生活取景。">A quiet bench beneath summer branches, framed for an afternoon pause.</div>
               <div class="dc-btn editable" data-el="cta" data-tag="button.cta" data-txt-en="View story" data-txt-zh="查看故事"><span class="dc-btn-label">View story</span></div>
             </div>
+            <div class="note-marker" id="noteMarker" hidden></div>
           </div>
         </div>
         <div class="panel-col">
-          <div class="tabs" id="tabs">
-            <button type="button" data-tab="fb" class="on"><span data-en>Feedback</span><span data-zh>反馈</span> <span class="badge" id="fbCount">0</span></button>
-            <button type="button" data-tab="json">JSON</button>
-            <button type="button" data-tab="diff"><span data-en>Source diff</span><span data-zh>源码 diff</span></button>
+          <div class="plugin-tabs" id="tabs">
+            <button type="button" data-tab="style" class="on"><span data-en>Editor</span><span data-zh>编辑</span></button>
+            <button type="button" data-tab="code"><span data-en>Source clues</span><span data-zh>源码线索</span></button>
+            <button type="button" data-tab="feedback"><span data-en>Feedback</span><span data-zh>反馈</span> <span class="badge" id="fbCount">0</span></button>
           </div>
           <div class="panel-body" id="panelBody"></div>
         </div>
@@ -2717,7 +3501,7 @@
         <span class="hint" id="studioHint"></span>
         <div class="actions">
           <button type="button" class="reset-btn" id="resetBtn"><span data-en>Reset</span><span data-zh>重置</span></button>
-          <button type="button" class="save-btn" id="saveBtn" disabled><span data-en>Save &amp; map to source</span><span data-zh>保存并映射回源码</span></button>
+          <button type="button" class="save-btn" id="saveBtn"><span data-en>Save feedback</span><span data-zh>保存反馈</span></button>
         </div>
       </div>
     </div>
@@ -2827,11 +3611,11 @@
         <span class="vfs-title-line">Open browser.</span>
         <span class="vfs-title-line">Ship <span class="text-primary vfs-title-accent" style="color: #7D9E20;">source.</span></span>
       </h2>
-      <p class="cta-copy"><span data-en>One command installs the skill, starts the receiver, and prints the extension path. The rest is a visual review workflow your agent can actually understand.</span><span data-zh>一条命令安装 skill、启动 receiver、输出扩展路径。之后就是 agent 真正能理解的浏览器视觉审稿流程。</span></p>
+      <p class="cta-copy"><span data-en>One command installs the skill, starts the receiver, prints the extension path, and keeps the browser permission model store-safe. The rest is a visual review workflow your agent can actually understand.</span><span data-zh>一条命令安装 skill、启动 receiver、输出扩展路径，并保持浏览器权限模型适合商店分发。之后就是 agent 真正能理解的视觉审稿闭环。</span></p>
     </div>
     <div class="cta-stack">
       <div class="setup-command-box cta-command">
-        <code class="setup-command-code"><span class="command-prompt">$</span> python3 scripts/setup.py .</code>
+        <code class="setup-command-code"><span class="command-prompt">$</span> python3 scripts/setup.py . --channel beta</code>
         <button class="setup-copy-btn" id="copySkill2" type="button"><span data-en>copy</span><span data-zh>复制</span></button>
       </div>
       <div class="hero-actions cta-links" data-reference-structure="navbar-hero">
@@ -2868,7 +3652,7 @@
     </div>
     <div class="foot-bottom">
       <span>© <span id="year"></span> Visual Feedback Studio</span>
-      <span><span data-en>v3.2 beta · token-aware preview, verify summary</span><span data-zh>v3.2 beta · token-aware 预览与验证摘要</span></span>
+      <span><span data-en>v4.0 beta · local-first feedback to source</span><span data-zh>v4.0 beta · 本地优先，反馈到源码</span></span>
     </div>
   </div>
 </footer>
@@ -2883,7 +3667,7 @@
   var root = document.documentElement;
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
-  var CMD = "python3 scripts/setup.py .";
+  var CMD = "python3 scripts/setup.py . --channel beta";
   var GH_REPO = "Niurougan1/visual-feedback-studio";
   var GH_URL = "https://github.com/" + GH_REPO;
   var GH_API = "https://api.github.com/repos/" + GH_REPO;
@@ -3049,7 +3833,8 @@
     langBtn.textContent = next === "zh" ? "EN" : "中";
     if (state && state.feedback) {
       syncCanvasLang();
-      renderRailHint();
+      renderWorkflow();
+      renderSelectionCallout();
       renderStudioHint();
       renderPanel();
     }
@@ -3577,173 +4362,474 @@
     });
   })();
 
-  var reduceDiffMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var state = { mode: "style", agent: "codex", feedback: [], tab: "fb", saved: false, selected: null };
-  var EL_META = {
-    badge: { tag: ".badge", file: "ProductCard.tsx", line: 14 },
-    title: { tag: "h3.title", file: "ProductCard.tsx", line: 17 },
-    desc: { tag: "p.desc", file: "ProductCard.tsx", line: 21 },
-    cta: { tag: "button.cta", file: "ProductCard.tsx", line: 25 }
-  };
+	  var state = {
+	    intent: "style",
+	    lastEditorIntent: "style",
+	    agent: "codex",
+	    feedback: [],
+	    tab: "style",
+	    selected: "title",
+	    styleDrafts: {},
+	    textDrafts: {},
+	    notes: {}
+	  };
+	  var EL_META = {
+	    badge: { label: "Badge", zhLabel: "徽章", tag: ".badge", selector: ".product-card .badge", file: "ProductCard.tsx", line: 14, component: "ProductCard", token: "--color-accent", role: "metadata" },
+	    title: { label: "Title", zhLabel: "标题", tag: "h3.title", selector: ".product-card h3.title", file: "ProductCard.tsx", line: 17, component: "ProductCard", token: "--type-title", role: "headline" },
+	    desc: { label: "Description", zhLabel: "描述", tag: "p.desc", selector: ".product-card p.desc", file: "ProductCard.tsx", line: 21, component: "ProductCard", token: "--color-muted-foreground", role: "body copy" },
+	    cta: { label: "CTA", zhLabel: "按钮", tag: "button.cta", selector: ".product-card button.cta", file: "ProductCard.tsx", line: 25, component: "ProductCard", token: "--control-md", role: "action" }
+	  };
+	  var MODE_COPY = {
+	    style: {
+	      boardEn: "STYLE",
+	      boardZh: "样式",
+	      titleEn: "Style editor",
+	      titleZh: "样式编辑",
+	      summaryEn: "Click an element. Common style controls appear here first.",
+	      summaryZh: "点击元素后，常用样式控件会优先出现在这里。",
+	      hintEn: "Adjust the range controls. Nothing is saved until you choose Save feedback.",
+	      hintZh: "拖动或输入数值，保存前只会实时预览。"
+	    },
+	    text: {
+	      boardEn: "TEXT",
+	      boardZh: "文案",
+	      titleEn: "Text editor",
+	      titleZh: "文案编辑",
+	      summaryEn: "Click live text, edit in place, then leave focus to record it.",
+	      summaryZh: "点击页面文字直接修改，失焦后会记录为文案反馈。",
+	      hintEn: "Type your own copy. The card updates while you write.",
+	      hintZh: "输入自己的文案，卡片会同步更新。"
+	    },
+	    note: {
+	      boardEn: "NOTE",
+	      boardZh: "备注",
+	      titleEn: "Note editor",
+	      titleZh: "备注编辑",
+	      summaryEn: "Click any element, choose an intent if useful, then leave a note for {agent}.",
+	      summaryZh: "点击任意元素，可选择意图并为 {agent} 留下备注。",
+	      hintEn: "Choose a target, then leave a short note for the agent.",
+	      hintZh: "选择目标，然后给当前助手留一句备注。"
+	    },
+	    feedback: {
+	      boardEn: "FEEDBACK",
+	      boardZh: "反馈",
+	      titleEn: "Review board",
+	      titleZh: "审稿任务板",
+	      summaryEn: "Captured text, style, and note feedback will appear here before you save.",
+	      summaryZh: "捕获到的文案、样式和备注反馈会先汇总在这里，再保存。",
+	      hintEn: "Review saved style, text, and note feedback before handing it to Codex or Claude.",
+	      hintZh: "保存后的样式、文案、备注会在这里汇总。"
+	    }
+	  };
+	  var STYLE_LIMITS = {
+	    fontSize: { min: 16, max: 32, step: 1, css: "font-size", unit: "px", labelEn: "Size", labelZh: "字号" },
+	    fontWeight: { min: 100, max: 900, step: 50, css: "font-weight", unit: "", labelEn: "Weight", labelZh: "字重" },
+	    color: { css: "color", unit: "", labelEn: "Color", labelZh: "文字" }
+	  };
+	  var INTENT_OPTIONS = [
+	    { value: "spacing", en: "Spacing", zh: "间距" },
+	    { value: "contrast", en: "Contrast", zh: "对比" },
+	    { value: "hierarchy", en: "Hierarchy", zh: "层级" },
+	    { value: "type", en: "Type", zh: "字号" },
+	    { value: "copy", en: "Copy", zh: "文案" },
+	    { value: "action", en: "Action", zh: "交互" },
+	    { value: "other", en: "Other", zh: "其它" }
+	  ];
+	  var TEXT_LIMITS = { badge: 32, title: 64, desc: 180, cta: 32 };
 
-  function presetFor(el, mode) {
-    var L = root.lang;
-    if (mode === "style") {
-      var map = {
-        title: { prop: "font-size", from: "21px", to: "24px", apply: function (node) { node.style.fontSize = "24px"; } },
-        desc: { prop: "color", from: "muted", to: "foreground", apply: function (node) { node.style.color = "var(--foreground)"; } },
-        cta: { prop: "box-shadow", from: "none", to: "inset ring", apply: function (node) { node.style.boxShadow = "0 0 0 1px var(--regent) inset"; } },
-        badge: { prop: "letter-spacing", from: "0.02em", to: "0.12em", apply: function (node) { node.style.letterSpacing = "0.12em"; } }
-      };
-      return map[el] || map.title;
-    }
-    if (mode === "text") {
-      var tmap = {
-        title: { from: L === "zh" ? "老橡树下的片刻" : "Under the old oak", to: L === "zh" ? "橡树荫里的停顿" : "A pause beneath the oak" },
-        desc: { from: L === "zh" ? "树影、长椅和午后的草地，像一页安静的生活取景。" : "A quiet bench beneath summer branches, framed for an afternoon pause.", to: L === "zh" ? "柔和树荫、开阔草地和一张等在午后的长椅。" : "Soft shade, open grass, and a bench waiting at the edge of afternoon." },
-        cta: { from: L === "zh" ? "查看故事" : "View story", to: L === "zh" ? "打开取景" : "Open frame" },
-        badge: { from: "FIELD NOTE", to: "QUIET FRAME" }
-      };
-      return tmap[el] || tmap.title;
-    }
-    var nmap = {
-      title: { note: L === "zh" ? "标题层级再强一点。" : "Title hierarchy needs stronger emphasis.", intent: "emphasis" },
-      desc: { note: L === "zh" ? "描述和标题之间有点挤。" : "Description feels cramped under the title.", intent: "spacing" },
-      cta: { note: L === "zh" ? "按钮的可点击感再明确一点。" : "Button affordance should be clearer.", intent: "affordance" },
-      badge: { note: L === "zh" ? "徽章对比度略低。" : "Badge contrast is slightly low.", intent: "contrast" }
-    };
-    return nmap[el] || nmap.title;
-  }
+	  function nodeFor(el) { return $('.editable[data-el="' + el + '"]'); }
+	  function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+	  function langPick(en, zh) { return root.lang === "zh" ? zh : en; }
+	  function metaFor(el) { return EL_META[el] || EL_META.title; }
+	  function sourceLoc(meta) { return meta.file + ":" + meta.line; }
+	  function clamp(n, min, max) { return Math.min(max, Math.max(min, n)); }
+	  function modeCopy(intent) { return MODE_COPY[intent] || MODE_COPY.style; }
+	  function selectedText(el) {
+	    var node = nodeFor(el);
+	    if (!node) return "";
+	    return el === "cta" ? $(".dc-btn-label", node).textContent.trim() : node.textContent.trim();
+	  }
+	  function setElementText(el, value) {
+	    var node = nodeFor(el);
+	    if (!node) return;
+	    if (el === "cta") $(".dc-btn-label", node).textContent = value;
+	    else node.textContent = value;
+	  }
+	  function hasSavedText(el) {
+	    return state.feedback.some(function (f) { return f.el === el && f.type === "text_edit"; });
+	  }
+	  function hasTextDraft(el) {
+	    return !!(state.textDrafts[el] && state.textDrafts[el].touched);
+	  }
 
-  function nodeFor(el) { return $('.editable[data-el="' + el + '"]'); }
-  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+	  function syncCanvasLang(force) {
+	    $$(".editable").forEach(function (node) {
+	      var el = node.getAttribute("data-el");
+	      var txt = root.lang === "zh" ? node.getAttribute("data-txt-zh") : node.getAttribute("data-txt-en");
+	      if (!force && (hasSavedText(el) || hasTextDraft(el))) return;
+	      setElementText(el, txt);
+	      if (state.textDrafts[el] && !state.textDrafts[el].touched) {
+	        state.textDrafts[el].original = txt;
+	        state.textDrafts[el].value = txt;
+	      }
+	    });
+	  }
 
-  function syncCanvasLang(force) {
-    $$(".editable").forEach(function (node) {
-      var el = node.getAttribute("data-el");
-      if (!force && state.feedback.some(function (f) { return f.el === el && f.type === "text_edit"; })) return;
-      var txt = root.lang === "zh" ? node.getAttribute("data-txt-zh") : node.getAttribute("data-txt-en");
-      if (el === "cta") $(".dc-btn-label", node).textContent = txt;
-      else node.textContent = txt;
-    });
-  }
+	  function rgbToHex(value) {
+	    var match = String(value || "").match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+	    if (!match) return "";
+	    return "#" + [match[1], match[2], match[3]].map(function (part) {
+	      return Number(part).toString(16).padStart(2, "0");
+	    }).join("").toUpperCase();
+	  }
 
-  function renderRailHint() {
-    var L = root.lang;
-    var hints = {
-      style: { en: "Select an element; VFS records token-aware style chips before preview.", zh: "选择元素；VFS 会在预览前记录 token-aware 样式 chip。" },
-      text: { en: "Select an element; copy becomes a text_edit with source anchors.", zh: "选择元素；文案会生成带 source anchors 的 text_edit。" },
-      note: { en: "Select an element; notes become intent_guess hints for verify summary.", zh: "选择元素；备注会进入 verify summary 的 intent_guess。" }
-    };
-    $("#railHint").textContent = hints[state.mode][L];
-  }
+	  function isHexColor(value) {
+	    return /^#[0-9a-f]{6}$/i.test(String(value || "").trim());
+	  }
 
-  function renderStudioHint() {
-    var n = state.feedback.length;
-    var L = root.lang;
-    var text = n === 0
-      ? (L === "zh" ? "选一个模式，然后点击画布里的元素。" : "Pick a mode, then click an element on the canvas.")
-      : state.saved
-        ? (L === "zh" ? "已生成 apply preview 与验证摘要。切换 Codex / Claude 查看署名变化。" : "Apply preview and verification summary are ready. Switch Codex / Claude to compare attribution.")
-        : (L === "zh" ? "已收集 " + n + " 条反馈，保存后生成 apply preview。" : n + " item(s) collected. Save to generate apply preview.");
-    $("#studioHint").textContent = text;
-  }
+	  function readElementStyle(el) {
+	    var node = nodeFor(el);
+	    var computed = node ? getComputedStyle(node) : null;
+	    var rawWeight = computed ? computed.fontWeight : "400";
+	    var weight = rawWeight === "bold" ? 700 : rawWeight === "normal" ? 400 : Number(rawWeight);
+	    if (!Number.isFinite(weight)) weight = 400;
+	    var color = rgbToHex(computed && computed.color);
+	    if (!color) color = root.dataset.theme === "light" ? "#1C1D1A" : "#F4F4EE";
+	    return {
+	      fontSize: Math.round(parseFloat(computed && computed.fontSize) || 16),
+	      fontWeight: clamp(Math.round(weight / 50) * 50, 100, 900),
+	      color: color
+	    };
+	  }
 
-  function setTab(t) {
-    state.tab = t;
-    $$("#tabs button").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-tab") === t); });
-  }
+	  function ensureStyleDraft(el) {
+	    if (!state.styleDrafts[el]) {
+	      var original = readElementStyle(el);
+	      state.styleDrafts[el] = {
+	        original: original,
+	        fontSize: clamp(original.fontSize, STYLE_LIMITS.fontSize.min, STYLE_LIMITS.fontSize.max),
+	        fontWeight: clamp(original.fontWeight, STYLE_LIMITS.fontWeight.min, STYLE_LIMITS.fontWeight.max),
+	        color: original.color,
+	        touched: {}
+	      };
+	    }
+	    return state.styleDrafts[el];
+	  }
 
-  function updateSave() {
-    $("#saveBtn").disabled = state.feedback.length === 0 || state.saved;
-    renderStudioHint();
-  }
+	  function applyStyleDraft(el) {
+	    var node = nodeFor(el);
+	    var draft = state.styleDrafts[el];
+	    if (!node || !draft) return;
+	    if (draft.touched.fontSize) node.style.fontSize = draft.fontSize + "px";
+	    if (draft.touched.fontWeight) node.style.fontWeight = draft.fontWeight;
+	    if (draft.touched.color) node.style.color = draft.color;
+	  }
 
-  function applyEdit(el) {
-    var node = nodeFor(el);
-    var preset = presetFor(el, state.mode);
-    var meta = EL_META[el];
-    var item = { id: Date.now() + "-" + Math.random().toString(36).slice(2, 6), type: null, el: el, selector: meta.tag, file: meta.file, line: meta.line };
-    if (state.mode === "style") {
-      preset.apply(node);
-      item.type = "style_edit";
-      item.prop = preset.prop;
-      item.from = preset.from;
-      item.to = preset.to;
-    } else if (state.mode === "text") {
-      var target = el === "cta" ? $(".dc-btn-label", node) : node;
-      target.textContent = preset.to;
-      item.type = "text_edit";
-      item.from = preset.from;
-      item.to = preset.to;
-    } else {
-      item.type = "annotation";
-      item.note = preset.note;
-      item.intent = preset.intent;
-    }
-    var idx = state.feedback.findIndex(function (f) { return f.el === el && f.type === item.type; });
-    if (idx >= 0) state.feedback[idx] = item; else state.feedback.push(item);
-    state.saved = false;
-    setTab("fb");
-    renderPanel();
-    updateSave();
-  }
+	  function ensureTextDraft(el) {
+	    if (!state.textDrafts[el]) {
+	      var current = selectedText(el);
+	      state.textDrafts[el] = { original: current, value: current, touched: false };
+	    }
+	    return state.textDrafts[el];
+	  }
 
-  var TYPE_CLASS = { style_edit: "style", text_edit: "text", annotation: "note" };
-  function renderPanel() {
-    var body = $("#panelBody");
-    var L = root.lang;
-    $("#fbCount").textContent = state.feedback.length;
-    body.classList.toggle("is-code", state.feedback.length > 0 && state.tab === "json");
-    if (state.feedback.length === 0) {
-      body.innerHTML = '<div class="empty">' + (L === "zh" ? "点击画布里的元素，开始收集反馈。" : "Click an element on the canvas to start collecting feedback.") + "</div>";
-      return;
-    }
-    if (state.tab === "fb") {
-      body.innerHTML = state.feedback.map(function (f) {
-        var detail = "";
-        if (f.type === "style_edit") detail = '<div class="detail"><code>' + esc(f.prop) + '</code> <span>' + esc(f.from) + '</span> → <span>' + esc(f.to) + '</span></div>';
-        else if (f.type === "text_edit") detail = '<div class="detail"><span>' + esc(f.from) + '</span> → <span>' + esc(f.to) + '</span></div>';
-        else detail = '<div class="detail">"' + esc(f.note) + '" <code>intent: ' + esc(f.intent) + '</code></div>';
-        return '<div class="fb"><div class="row1"><span class="type ' + TYPE_CLASS[f.type] + '">' + f.type + '</span><span class="sel">' + esc(f.selector) + '</span></div>' + detail + '</div>';
-      }).join("");
-      return;
-    }
-    if (state.tab === "json") {
-      var session = {
-        version: "3.2-beta",
-        agent: state.agent,
-        meta: {
-          feedback_count: state.feedback.length,
-          saved: state.saved,
-          capabilities: [
-            "token_aware_style_chips",
-            "apply_preview",
-            "verification_summary"
-          ]
-        },
-        apply_preview: {
-          mode: state.saved ? "ready" : "pending_save",
-          target: "ProductCard.tsx",
-          strategy: "preview_before_patch"
-        },
-        verification_summary: {
-          status: state.saved ? "passed" : "pending",
-          checks: ["selector_match", "token_scope", "source_anchor"]
-        },
-        feedback: state.feedback.map(function (f) {
-          var o = { type: f.type, selector: f.selector, source_anchors: { sourceLoc: f.file + ":" + f.line } };
-          if (f.type === "style_edit") { o.properties = {}; o.properties[f.prop] = { original: f.from, modified: f.to }; o.token_scope = "component-local"; o.preview = "apply_preview"; o.computed_before = "snapshot"; o.computed_after = "snapshot"; }
-          else if (f.type === "text_edit") { o.original = f.from; o.modified = f.to; o.locate_confidence = "high"; }
-          else { o.note = f.note; o.intent_guess = f.intent + "_adjust"; }
-          return o;
-        })
-      };
-      body.innerHTML = '<pre class="json">' + colorJson(JSON.stringify(session, null, 2)) + '</pre>';
-      return;
-    }
-    renderDiff();
-  }
+	  function ensureNoteDraft(el) {
+	    if (!state.notes[el]) state.notes[el] = { note: "", intent: "" };
+	    return state.notes[el];
+	  }
+
+	  function countFeedback(type) {
+	    return state.feedback.filter(function (f) { return f.type === type; }).length;
+	  }
+
+	  function feedbackCounts() {
+	    return {
+	      style: countFeedback("style_edit"),
+	      text: countFeedback("text_edit"),
+	      note: countFeedback("annotation"),
+	      total: state.feedback.length
+	    };
+	  }
+
+	  function upsertFeedback(item) {
+	    var idx = state.feedback.findIndex(function (f) { return f.id === item.id; });
+	    if (idx >= 0) state.feedback[idx] = item;
+	    else state.feedback.push(item);
+	  }
+
+	  function setSelected(el, options) {
+	    state.selected = el || "title";
+	    $$(".editable").forEach(function (node) {
+	      node.classList.toggle("sel", node.getAttribute("data-el") === state.selected);
+	    });
+	    renderSelectionCallout();
+	    renderWorkflow();
+	    updateNoteMarker();
+	    if (!options || options.render !== false) renderPanel();
+	  }
+
+	  function setIntent(intent) {
+	    state.intent = intent || "style";
+	    if (state.intent !== "feedback") state.lastEditorIntent = state.intent;
+	    $$(".tool-btn").forEach(function (button) {
+	      button.classList.toggle("on", button.getAttribute("data-intent") === state.intent);
+	    });
+	    setTab(state.intent === "feedback" ? "feedback" : "style");
+	    renderWorkflow();
+	    renderStudioHint();
+	    renderPanel();
+	  }
+
+	  function setTab(t) {
+	    state.tab = t || "style";
+	    $$("#tabs button").forEach(function (b) {
+	      b.classList.toggle("on", b.getAttribute("data-tab") === state.tab);
+	    });
+	  }
+
+	  function renderSelectionCallout() {
+	    var box = $("#selectionCallout");
+	    if (!box) return;
+	    var meta = metaFor(state.selected);
+	    var copy = modeCopy(state.intent);
+	    box.textContent = meta.tag + " · " + langPick(copy.titleEn, copy.titleZh);
+	  }
+
+	  function renderWorkflow() {
+	    var meta = metaFor(state.selected);
+	    var copy = modeCopy(state.intent);
+	    var counts = feedbackCounts();
+	    var agentName = state.agent === "codex" ? "Codex" : "Claude";
+	    var title = $("#taskTitle");
+	    var summary = $("#taskSummary");
+	    var status = $("#taskStatus");
+	    var phase = $("#taskPhase");
+	    var board = $("#boardModeLabel");
+	    var hint = $("#workflowHint");
+	    if (board) board.textContent = langPick(copy.boardEn, copy.boardZh);
+	    if (phase) phase.textContent = langPick(copy.titleEn, copy.titleZh);
+	    if (title) title.textContent = langPick(copy.titleEn, copy.titleZh);
+	    if (summary) summary.textContent = langPick(copy.summaryEn, copy.summaryZh).replace("{agent}", agentName);
+	    if (status) status.textContent = langPick("Current element: " + meta.tag, "当前元素：" + meta.tag);
+	    if (hint) hint.textContent = langPick(copy.hintEn, copy.hintZh);
+	    var styleCount = $("#styleCount");
+	    var textCount = $("#textCount");
+	    var noteCount = $("#noteCount");
+	    if (styleCount) styleCount.textContent = counts.style;
+	    if (textCount) textCount.textContent = counts.text;
+	    if (noteCount) noteCount.textContent = counts.note;
+	  }
+
+	  function renderStudioHint() {
+	    var hint = $("#studioHint");
+	    if (!hint) return;
+	    var meta = metaFor(state.selected);
+	    var counts = feedbackCounts();
+	    var agentName = state.agent === "codex" ? "Codex" : "Claude";
+	    var hasAllTypes = counts.style > 0 && counts.text > 0 && counts.note > 0;
+	    if (hasAllTypes) {
+	      hint.textContent = langPick("Back in " + agentName + ", say: feedback done", "回到 " + agentName + " 说：反馈好了");
+	      return;
+	    }
+	    if (counts.total > 0) {
+	      hint.textContent = langPick("Saved " + counts.total + " item(s). Current: " + meta.tag + ".", "已保存 " + counts.total + " 条反馈。当前元素：" + meta.tag + "。");
+	      return;
+	    }
+	    var copy = modeCopy(state.intent);
+	    hint.textContent = langPick(copy.summaryEn, copy.summaryZh).replace("{agent}", agentName);
+	  }
+
+	  function updateSave() {
+	    var counts = feedbackCounts();
+	    var save = $("#saveBtn");
+	    if (save) save.disabled = false;
+	    var fbCount = $("#fbCount");
+	    if (fbCount) fbCount.textContent = counts.total;
+	    var styleCount = $("#styleCount");
+	    var textCount = $("#textCount");
+	    var noteCount = $("#noteCount");
+	    if (styleCount) styleCount.textContent = counts.style;
+	    if (textCount) textCount.textContent = counts.text;
+	    if (noteCount) noteCount.textContent = counts.note;
+	    renderStudioHint();
+	    updateNoteMarker();
+	  }
+
+	  function renderContextCard() {
+	    var meta = metaFor(state.selected);
+	    return '<div class="context-card">' +
+	      '<div class="context-head"><div><div class="context-title">' + esc(langPick(meta.label, meta.zhLabel)) + '</div><div class="context-text">' + esc(selectedText(state.selected)) + '</div></div><span class="vf-chip strong">' + esc(meta.tag) + '</span></div>' +
+	      '</div>';
+	  }
+
+	  function renderRangeField(key, value, display) {
+	    var limit = STYLE_LIMITS[key];
+	    var inputId = "style-" + key;
+	    return '<div class="demo-field">' +
+	      '<div class="value-row"><label for="' + inputId + '-range">' + esc(langPick(limit.labelEn, limit.labelZh)) + '</label><span class="current-value" data-style-value="' + key + '">' + esc(display) + '</span></div>' +
+	      '<div class="range-control">' +
+	      '<input id="' + inputId + '-range" type="range" min="' + limit.min + '" max="' + limit.max + '" step="' + limit.step + '" value="' + esc(value) + '" data-style-range="' + key + '">' +
+	      '<input id="' + inputId + '-input" type="number" min="' + limit.min + '" max="' + limit.max + '" step="' + limit.step + '" value="' + esc(value) + '" data-style-input="' + key + '">' +
+	      '<span class="unit-label">' + esc(limit.unit) + '</span>' +
+	      '</div></div>';
+	  }
+
+	  function renderStyleEditor() {
+	    var draft = ensureStyleDraft(state.selected);
+	    return renderContextCard() +
+	      '<div class="inspector-section"><h4>' + langPick("Style", "样式") + '</h4><p class="panel-note">' + langPick(MODE_COPY.style.summaryEn, MODE_COPY.style.summaryZh) + '</p></div>' +
+	      '<div class="demo-controls">' +
+	      renderRangeField("fontSize", draft.fontSize, draft.fontSize + "px") +
+	      renderRangeField("fontWeight", draft.fontWeight, String(draft.fontWeight)) +
+	      '<div class="demo-field">' +
+	      '<div class="value-row"><label for="style-color-picker">' + langPick("Color", "文字") + '</label><span class="current-value" data-style-value="color">' + esc(draft.color) + '</span></div>' +
+	      '<div class="color-control">' +
+	      '<input id="style-color-picker" type="color" value="' + esc(draft.color) + '" data-style-color="color">' +
+	      '<input id="style-color-input" type="text" value="' + esc(draft.color) + '" maxlength="7" data-style-color-text="color" aria-label="' + esc(langPick("Color value", "颜色值")) + '">' +
+	      '</div></div>' +
+	      '</div>';
+	  }
+
+	  function renderTextEditor() {
+	    var draft = ensureTextDraft(state.selected);
+	    var meta = metaFor(state.selected);
+	    return renderContextCard() +
+	      '<div class="inspector-section"><h4>' + langPick("Text", "文案") + '</h4><p class="panel-note">' + langPick(MODE_COPY.text.summaryEn, MODE_COPY.text.summaryZh) + '</p></div>' +
+	      '<div class="demo-controls">' +
+	      '<div class="demo-field"><div class="value-row"><span class="field-label">' + langPick("Original", "原文") + '</span><span class="current-value">' + esc(meta.tag) + '</span></div><div class="panel-note">' + esc(draft.original) + '</div></div>' +
+	      '<div class="demo-field"><label for="text-editor-input">' + langPick("New copy", "新文案") + '</label><textarea id="text-editor-input" maxlength="' + (TEXT_LIMITS[state.selected] || 120) + '" data-text-input>' + esc(draft.value) + '</textarea></div>' +
+	      '</div>';
+	  }
+
+	  function intentLabel(value) {
+	    var item = INTENT_OPTIONS.filter(function (x) { return x.value === value; })[0];
+	    return item ? langPick(item.en, item.zh) : "";
+	  }
+
+	  function renderNoteEditor() {
+	    var draft = ensureNoteDraft(state.selected);
+	    var chips = INTENT_OPTIONS.map(function (item) {
+	      return '<button type="button" class="intent-chip' + (draft.intent === item.value ? " is-active" : "") + '" data-note-intent="' + item.value + '">' + esc(langPick(item.en, item.zh)) + '</button>';
+	    }).join("");
+	    return renderContextCard() +
+	      '<div class="inspector-section"><h4>' + langPick("Note", "备注") + '</h4><p class="panel-note">' + langPick(MODE_COPY.note.summaryEn, MODE_COPY.note.summaryZh).replace("{agent}", state.agent === "codex" ? "Codex" : "Claude") + '</p></div>' +
+	      '<div class="demo-controls">' +
+	      '<div class="demo-field"><span class="field-label">' + langPick("Intent", "意图") + '</span><div class="intent-row">' + chips + '</div></div>' +
+	      '<div class="demo-field"><label for="note-editor-input">' + langPick("Note", "备注") + '</label><textarea id="note-editor-input" maxlength="180" data-note-input placeholder="' + esc(langPick("Write a note...", "写下你的意见...")) + '">' + esc(draft.note) + '</textarea></div>' +
+	      '</div>';
+	  }
+
+	  function renderEditorPanel() {
+	    if (state.intent === "text") return renderTextEditor();
+	    if (state.intent === "note") return renderNoteEditor();
+	    return renderStyleEditor();
+	  }
+
+	  function renderCodePanel() {
+	    var meta = metaFor(state.selected);
+	    var computed = readElementStyle(state.selected);
+	    var snapshot = {
+	      selector: meta.selector,
+	      component: meta.component,
+	      sourceLoc: sourceLoc(meta),
+	      selectedText: selectedText(state.selected),
+	      tokenScope: meta.token,
+	      computed: {
+	        fontSize: computed.fontSize + "px",
+	        fontWeight: computed.fontWeight,
+	        color: computed.color
+	      }
+	    };
+	    return renderContextCard() +
+	      '<div class="code-card"><h4>' + langPick("Selector", "选择器") + '</h4><pre class="code">' + esc(meta.selector) + '</pre></div>' +
+	      '<div class="code-card"><h4>' + langPick("Source clues", "源码线索") + '</h4><pre class="code">' + esc(meta.file + "\nline " + meta.line + "\ncomponent " + meta.component) + '</pre></div>' +
+	      '<div class="code-card"><h4>' + langPick("Computed snapshot", "计算样式快照") + '</h4><pre class="code json">' + colorJson(JSON.stringify(snapshot, null, 2)) + '</pre></div>';
+	  }
+
+	  function sessionPayload() {
+	    return {
+	      version: "4.0-beta",
+	      agent: state.agent,
+	      selected: {
+	        selector: metaFor(state.selected).selector,
+	        source_anchor: sourceLoc(metaFor(state.selected))
+	      },
+	      meta: {
+	        feedback_count: state.feedback.length,
+	        capabilities: ["style_edit", "text_edit", "annotation", "source_clues"]
+	      },
+	      feedback: state.feedback.map(function (f) {
+	        var meta = metaFor(f.el);
+	        var o = { type: f.type, selector: meta.selector, source_anchors: { sourceLoc: sourceLoc(meta) } };
+	        if (f.type === "style_edit") {
+	          o.properties = f.properties;
+	          o.token_scope = f.token || "component-local";
+	        } else if (f.type === "text_edit") {
+	          o.original = f.original;
+	          o.modified = f.modified;
+	          o.locate_confidence = "high";
+	        } else {
+	          o.note = f.note;
+	          if (f.intent) o.intent_guess = f.intent;
+	        }
+	        return o;
+	      })
+	    };
+	  }
+
+	  function renderFeedbackItem(f) {
+	    var meta = metaFor(f.el);
+	    var detail = "";
+	    if (f.type === "style_edit") {
+	      detail = Object.keys(f.properties).map(function (key) {
+	        var prop = f.properties[key];
+	        return '<code>' + esc(key) + '</code> <span>' + esc(prop.original) + '</span> -> <span>' + esc(prop.modified) + '</span>';
+	      }).join("<br>");
+	    } else if (f.type === "text_edit") {
+	      detail = '<span>' + esc(f.original) + '</span><br><strong>' + esc(f.modified) + '</strong>';
+	    } else {
+	      detail = '"' + esc(f.note) + '"' + (f.intent ? ' <code>' + esc(intentLabel(f.intent)) + '</code>' : "");
+	    }
+	    return '<div class="feedback-item">' +
+	      '<div class="feedback-item-head"><span>' + esc(langPick(meta.label, meta.zhLabel)) + '</span><span>' + esc(meta.tag) + '</span></div>' +
+	      '<div class="feedback-item-body">' + detail + '</div>' +
+	      '</div>';
+	  }
+
+	  function renderFeedbackSection(type, titleEn, titleZh, emptyEn, emptyZh) {
+	    var items = state.feedback.filter(function (f) { return f.type === type; });
+	    var body = items.length ? items.map(renderFeedbackItem).join("") : '<div class="panel-note">' + esc(langPick(emptyEn, emptyZh)) + '</div>';
+	    return '<div class="feedback-section"><div class="feedback-section-title"><strong>' + esc(langPick(titleEn, titleZh)) + '</strong><span>' + items.length + '</span></div>' + body + '</div>';
+	  }
+
+	  function renderFeedbackPanel() {
+	    if (!state.feedback.length) {
+	      return renderContextCard() +
+	        '<div class="empty">' + langPick(MODE_COPY.feedback.summaryEn, MODE_COPY.feedback.summaryZh) + '</div>';
+	    }
+	    var list = '<div class="feedback-list">' +
+	      renderFeedbackSection("text_edit", "Text", "文案", "No text feedback yet.", "暂无文案反馈。") +
+	      renderFeedbackSection("style_edit", "Style", "样式", "No style feedback yet.", "暂无样式反馈。") +
+	      renderFeedbackSection("annotation", "Notes", "备注", "No notes yet.", "暂无备注。") +
+	      '</div>';
+	    var evidence =
+	      '<details class="evidence-card"><summary>feedback.json</summary><pre class="json">' + colorJson(JSON.stringify(sessionPayload(), null, 2)) + '</pre></details>' +
+	      '<details class="evidence-card"><summary>' + langPick("Source clues", "源码线索") + '</summary>' + renderDiffMarkup() + '</details>';
+	    return renderContextCard() + list + evidence;
+	  }
+
+	  function renderPanel() {
+	    var body = $("#panelBody");
+	    var fbCount = $("#fbCount");
+	    if (fbCount) fbCount.textContent = state.feedback.length;
+	    body.classList.toggle("is-code", state.tab === "code");
+	    if (state.tab === "code") body.innerHTML = renderCodePanel();
+	    else if (state.tab === "feedback") body.innerHTML = renderFeedbackPanel();
+	    else body.innerHTML = renderEditorPanel();
+	    body.scrollTop = 0;
+	    bindPanelActions();
+	    updateNoteMarker();
+	  }
 
   function colorJson(s) {
     return esc(s).replace(
@@ -3760,68 +4846,227 @@
     );
   }
 
-  var diffTimer = null;
-  function renderDiff() {
-    var body = $("#panelBody");
-    var agentName = state.agent === "codex" ? "Codex" : "Claude";
-    if (!state.saved) {
-      body.innerHTML = '<div class="empty">' + (root.lang === "zh" ? "点击「保存并映射回源码」查看 diff。" : 'Click "Save & map to source" to see the diff.') + "</div>";
-      return;
-    }
-    var lines = [];
-    lines.push({ k: "ctx", t: "  export function ProductCard() {" });
-    lines.push({ k: "ctx", t: "    return (" });
-    state.feedback.forEach(function (f) {
-      if (f.type === "style_edit") {
-        lines.push({ k: "del", t: "-     " + f.selector + " { " + f.prop + ": " + f.from + " }" });
-        lines.push({ k: "add", t: "+     " + f.selector + " { " + f.prop + ": " + f.to + " }" });
-      } else if (f.type === "text_edit") {
-        lines.push({ k: "del", t: "-     " + f.from });
-        lines.push({ k: "add", t: "+     " + f.to });
-      } else {
-        lines.push({ k: "ctx", t: "      {/* " + agentName + ": " + f.note + " */}" });
-        lines.push({ k: "add", t: "+     /* intent: " + f.intent + "_adjust */" });
-      }
-    });
-    lines.push({ k: "ctx", t: "    )" });
-    lines.push({ k: "ctx", t: "  }" });
-    var statusTxt = root.lang === "zh" ? agentName + " 已把 " + state.feedback.length + " 条反馈映射回源码" : agentName + " mapped " + state.feedback.length + " item(s) to source";
-    body.innerHTML = '<div class="diff-status"><span id="diffStatus"></span></div><div class="diff-file">ProductCard.tsx</div><pre class="diff" id="diffPre"></pre>';
-    var pre = $("#diffPre");
-    var i = 0;
-    clearInterval(diffTimer);
-    function append(ln) {
-      var span = document.createElement("span");
-      span.className = "ln " + ln.k;
-      span.textContent = ln.t;
-      pre.appendChild(span);
-    }
-    if (reduceDiffMotion) {
-      lines.forEach(append);
-      $("#diffStatus").textContent = statusTxt;
-      return;
-    }
-    function step() {
-      if (i >= lines.length) {
-        clearInterval(diffTimer);
-        $("#diffStatus").textContent = statusTxt;
-        return;
-      }
-      append(lines[i++]);
-      $("#diffStatus").textContent = root.lang === "zh" ? agentName + " 正在回写..." : agentName + " is writing...";
-    }
-    diffTimer = setInterval(step, 120);
-    step();
-  }
+	  function diffLines() {
+	    var agentName = state.agent === "codex" ? "Codex" : "Claude";
+	    var lines = [];
+	    lines.push({ k: "ctx", t: "  export function ProductCard() {" });
+	    lines.push({ k: "ctx", t: "    return (" });
+	    state.feedback.forEach(function (f) {
+	      var meta = metaFor(f.el);
+	      if (f.type === "style_edit") {
+	        Object.keys(f.properties).forEach(function (propName) {
+	          var prop = f.properties[propName];
+	          lines.push({ k: "del", t: "-     " + meta.selector + " { " + propName + ": " + prop.original + " }" });
+	          lines.push({ k: "add", t: "+     " + meta.selector + " { " + propName + ": " + prop.modified + " }" });
+	        });
+	      } else if (f.type === "text_edit") {
+	        lines.push({ k: "del", t: "-     " + f.original });
+	        lines.push({ k: "add", t: "+     " + f.modified });
+	      } else {
+	        lines.push({ k: "ctx", t: "      {/* " + agentName + ": " + f.note + " */}" });
+	        if (f.intent) lines.push({ k: "add", t: "+     /* intent: " + f.intent + " */" });
+	      }
+	    });
+	    lines.push({ k: "ctx", t: "    )" });
+	    lines.push({ k: "ctx", t: "  }" });
+	    return lines;
+	  }
 
-  $$(".mode").forEach(function (m) {
-    m.addEventListener("click", function () {
-      $$(".mode").forEach(function (x) { x.classList.remove("on"); });
-      m.classList.add("on");
-      state.mode = m.getAttribute("data-mode");
-      renderRailHint();
-    });
-  });
+  function renderDiffMarkup() {
+    var agentName = state.agent === "codex" ? "Codex" : "Claude";
+    var statusTxt = root.lang === "zh" ? agentName + " 已把 " + state.feedback.length + " 条反馈映射回源码" : agentName + " mapped " + state.feedback.length + " item(s) to source";
+    var lines = diffLines().map(function (ln) {
+      return '<span class="ln ' + ln.k + '">' + esc(ln.t) + '</span>';
+    }).join("");
+	    return '<div class="diff-status">' + esc(statusTxt) + '</div><div class="diff-file">ProductCard.tsx</div><pre class="diff">' + lines + '</pre>';
+	  }
+
+	  function styleDisplay(key, value) {
+	    return key === "fontSize" ? value + "px" : String(value);
+	  }
+
+	  function formatOriginalStyle(key, value) {
+	    return key === "fontSize" ? value + "px" : String(value);
+	  }
+
+	  function setStyleValue(key, rawValue) {
+	    var draft = ensureStyleDraft(state.selected);
+	    if (key === "color") {
+	      var color = String(rawValue || "").trim();
+	      if (!isHexColor(color)) return;
+	      draft.color = color.toUpperCase();
+	      draft.touched.color = true;
+	    } else {
+	      var limit = STYLE_LIMITS[key];
+	      if (!limit) return;
+	      var value = Number(rawValue);
+	      if (!Number.isFinite(value)) value = draft[key];
+	      value = Math.round(value / limit.step) * limit.step;
+	      draft[key] = clamp(value, limit.min, limit.max);
+	      draft.touched[key] = true;
+	    }
+	    applyStyleDraft(state.selected);
+	    syncStyleControls(key);
+	  }
+
+	  function syncStyleControls(key) {
+	    var draft = ensureStyleDraft(state.selected);
+	    if (key === "color") {
+	      var picker = $('[data-style-color="color"]');
+	      var text = $('[data-style-color-text="color"]');
+	      var value = $('[data-style-value="color"]');
+	      if (picker) picker.value = draft.color;
+	      if (text) text.value = draft.color;
+	      if (value) value.textContent = draft.color;
+	      return;
+	    }
+	    var range = $('[data-style-range="' + key + '"]');
+	    var input = $('[data-style-input="' + key + '"]');
+	    var display = $('[data-style-value="' + key + '"]');
+	    if (range) range.value = draft[key];
+	    if (input) input.value = draft[key];
+	    if (display) display.textContent = styleDisplay(key, draft[key]);
+	  }
+
+	  function saveStyleFeedback() {
+	    var el = state.selected;
+	    var meta = metaFor(el);
+	    var draft = ensureStyleDraft(el);
+	    var properties = {};
+	    ["fontSize", "fontWeight", "color"].forEach(function (key) {
+	      if (!draft.touched[key]) return;
+	      var propName = STYLE_LIMITS[key].css;
+	      var original = formatOriginalStyle(key, draft.original[key]);
+	      var modified = formatOriginalStyle(key, draft[key]);
+	      if (original === modified) return;
+	      properties[propName] = { original: original, modified: modified };
+	    });
+	    if (!Object.keys(properties).length) {
+	      toast("还没有样式修改", "No style changes yet");
+	      return;
+	    }
+	    upsertFeedback({ id: "style-" + el, type: "style_edit", el: el, token: meta.token, properties: properties });
+	    updateSave();
+	    renderWorkflow();
+	    if (state.tab === "feedback") renderPanel();
+	    toast("样式反馈已保存", "Style feedback saved");
+	  }
+
+	  function saveTextFeedback() {
+	    var el = state.selected;
+	    var draft = ensureTextDraft(el);
+	    if (draft.value === draft.original) {
+	      toast("还没有文案修改", "No text changes yet");
+	      return;
+	    }
+	    upsertFeedback({ id: "text-" + el, type: "text_edit", el: el, original: draft.original, modified: draft.value });
+	    updateSave();
+	    renderWorkflow();
+	    if (state.tab === "feedback") renderPanel();
+	    toast("文案反馈已保存", "Text feedback saved");
+	  }
+
+	  function saveNoteFeedback() {
+	    var el = state.selected;
+	    var draft = ensureNoteDraft(el);
+	    var note = draft.note.trim();
+	    if (!note) {
+	      toast("请先填写备注", "Write a note first");
+	      return;
+	    }
+	    upsertFeedback({ id: "note-" + el, type: "annotation", el: el, note: note, intent: draft.intent });
+	    updateSave();
+	    renderWorkflow();
+	    if (state.tab === "feedback") renderPanel();
+	    toast("备注反馈已保存", "Note feedback saved");
+	  }
+
+	  function saveCurrentFeedback() {
+	    if (state.intent === "text") {
+	      saveTextFeedback();
+	      return;
+	    }
+	    if (state.intent === "note") {
+	      saveNoteFeedback();
+	      return;
+	    }
+	    if (state.intent === "feedback") {
+	      if (state.feedback.length) toast("反馈已在任务板中", "Feedback is on the board");
+	      else toast("还没有可保存的反馈", "No feedback yet");
+	      return;
+	    }
+	    saveStyleFeedback();
+	  }
+
+	  function updateNoteMarker() {
+	    var marker = $("#noteMarker");
+	    var card = $(".demo-card");
+	    var node = nodeFor(state.selected);
+	    if (!marker || !card || !node) return;
+	    var item = state.feedback.filter(function (f) {
+	      return f.type === "annotation" && f.el === state.selected;
+	    })[0];
+	    if (!item) {
+	      marker.hidden = true;
+	      return;
+	    }
+	    marker.hidden = false;
+	    marker.textContent = langPick("NOTE", "备注") + (item.intent ? " · " + intentLabel(item.intent) : "");
+	    var cardRect = card.getBoundingClientRect();
+	    var nodeRect = node.getBoundingClientRect();
+	    var left = clamp(nodeRect.right - cardRect.left + 8, 8, cardRect.width - 188);
+	    var top = clamp(nodeRect.top - cardRect.top - 4, 8, cardRect.height - 40);
+	    marker.style.left = left + "px";
+	    marker.style.top = top + "px";
+	  }
+
+	  function bindPanelActions() {
+	    $$("#panelBody [data-open-tab]").forEach(function (button) {
+	      button.addEventListener("click", function () {
+	        setTab(button.getAttribute("data-open-tab"));
+	        renderPanel();
+	      });
+	    });
+	    $$("#panelBody [data-style-range], #panelBody [data-style-input]").forEach(function (input) {
+	      input.addEventListener("input", function () {
+	        setStyleValue(input.getAttribute("data-style-range") || input.getAttribute("data-style-input"), input.value);
+	      });
+	    });
+	    $$("#panelBody [data-style-color]").forEach(function (input) {
+	      input.addEventListener("input", function () { setStyleValue("color", input.value); });
+	    });
+	    $$("#panelBody [data-style-color-text]").forEach(function (input) {
+	      input.addEventListener("input", function () { setStyleValue("color", input.value); });
+	      input.addEventListener("change", function () {
+	        if (!isHexColor(input.value)) syncStyleControls("color");
+	      });
+	    });
+	    $$("#panelBody [data-text-input]").forEach(function (input) {
+	      input.addEventListener("input", function () {
+	        var draft = ensureTextDraft(state.selected);
+	        draft.value = input.value;
+	        draft.touched = true;
+	        setElementText(state.selected, draft.value);
+	        renderSelectionCallout();
+	      });
+	    });
+	    $$("#panelBody [data-note-input]").forEach(function (input) {
+	      input.addEventListener("input", function () {
+	        var draft = ensureNoteDraft(state.selected);
+	        draft.note = input.value;
+	      });
+	    });
+	    $$("#panelBody [data-note-intent]").forEach(function (button) {
+	      button.addEventListener("click", function () {
+	        var draft = ensureNoteDraft(state.selected);
+	        var value = button.getAttribute("data-note-intent");
+	        draft.intent = draft.intent === value ? "" : value;
+	        $$("#panelBody [data-note-intent]").forEach(function (chip) {
+	          chip.classList.toggle("is-active", chip.getAttribute("data-note-intent") === draft.intent);
+	        });
+	      });
+	    });
+	  }
 
   var schemaItems = $$(".schema[data-schema-item]");
   var schemaHover = window.matchMedia ? window.matchMedia("(hover: hover) and (pointer: fine)") : null;
@@ -3865,46 +5110,72 @@
       $$("#agentSwitch button").forEach(function (x) { x.classList.remove("on"); });
       b.classList.add("on");
       state.agent = b.getAttribute("data-agent");
-      if (state.tab === "diff") renderPanel();
+      if (state.tab === "feedback") renderPanel();
+      renderStudioHint();
     });
   });
 
-  $$(".editable").forEach(function (node) {
+  $$(".tool-btn").forEach(function (button) {
+    button.addEventListener("click", function () {
+      setIntent(button.getAttribute("data-intent"));
+    });
+  });
+
+	  $$(".editable").forEach(function (node) {
+	    node.addEventListener("focus", function () {
+	      setSelected(node.getAttribute("data-el"));
+	    });
     node.addEventListener("click", function () {
-      $$(".editable").forEach(function (x) { x.classList.remove("sel"); });
-      node.classList.add("sel");
-      state.selected = node.getAttribute("data-el");
-      applyEdit(state.selected);
+      setSelected(node.getAttribute("data-el"));
+    });
+    node.setAttribute("tabindex", "0");
+    node.addEventListener("keydown", function (event) {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      setSelected(node.getAttribute("data-el"));
     });
   });
 
-  $$("#tabs button").forEach(function (b) {
-    b.addEventListener("click", function () {
-      setTab(b.getAttribute("data-tab"));
-      renderPanel();
-    });
-  });
+	  $$("#tabs button").forEach(function (b) {
+	    b.addEventListener("click", function () {
+	      var tab = b.getAttribute("data-tab");
+	      if (tab === "feedback") {
+	        setIntent("feedback");
+	        return;
+	      }
+	      if (tab === "style" && state.intent === "feedback") {
+	        setIntent(state.lastEditorIntent || "style");
+	        return;
+	      }
+	      setTab(tab);
+	      renderPanel();
+	    });
+	  });
 
-  $("#saveBtn").addEventListener("click", function () {
-    if (state.feedback.length === 0) return;
-    state.saved = true;
-    setTab("diff");
-    renderPanel();
-    updateSave();
-    toast("已保存并映射回源码", "Saved and mapped to source");
-  });
+	  $("#saveBtn").addEventListener("click", function () {
+	    saveCurrentFeedback();
+	  });
 
-  $("#resetBtn").addEventListener("click", function () {
-    state.feedback = [];
-    state.saved = false;
-    state.selected = null;
-    clearInterval(diffTimer);
-    $$(".editable").forEach(function (x) { x.classList.remove("sel"); x.removeAttribute("style"); });
-    syncCanvasLang(true);
-    setTab("fb");
-    renderPanel();
-    updateSave();
-  });
+	  $("#resetBtn").addEventListener("click", function () {
+	    state.feedback = [];
+	    state.styleDrafts = {};
+	    state.textDrafts = {};
+	    state.notes = {};
+	    state.intent = "style";
+	    state.lastEditorIntent = "style";
+	    $$(".editable").forEach(function (x) { x.classList.remove("sel"); x.removeAttribute("style"); });
+	    syncCanvasLang(true);
+	    setTab("style");
+	    $$(".tool-btn").forEach(function (button) {
+	      button.classList.toggle("on", button.getAttribute("data-intent") === state.intent);
+	    });
+	    var marker = $("#noteMarker");
+	    if (marker) marker.hidden = true;
+	    setSelected("title", { render: false });
+	    renderWorkflow();
+	    renderPanel();
+	    updateSave();
+	  });
 
   if ("IntersectionObserver" in window) {
     var io = new IntersectionObserver(function (entries) {
@@ -3920,7 +5191,14 @@
     $$(".reveal").forEach(function (el) { el.classList.add("in"); });
   }
 
-  renderRailHint();
+	  syncCanvasLang(true);
+	  setSelected("title", { render: false });
+  state.intent = "style";
+  $$(".tool-btn").forEach(function (button) {
+    button.classList.toggle("on", button.getAttribute("data-intent") === state.intent);
+  });
+  renderSelectionCallout();
+  renderWorkflow();
   renderStudioHint();
   renderPanel();
 })();
