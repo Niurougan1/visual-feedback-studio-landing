@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Visual Feedback Studio - Browser edits. Agent ships source.</title>
-<meta name="description" content="A browser visual-review workspace for Codex and Claude. Style, copy, and notes mapped back to real source." />
+<meta name="description" content="A browser visual-review workspace for Codex and Claude. Style, copy, notes, and measurement evidence mapped back to real source." />
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
 <link rel="shortcut icon" href="assets/favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="assets/favicon.svg" />
@@ -1422,7 +1422,7 @@
   }
 
   .studio::after {
-    content: "style -> text -> note -> feedback";
+    content: "style -> text -> note -> measure -> feedback";
     position: absolute;
 	    left: var(--space-4);
 	    bottom: calc(var(--space-5) * -1);
@@ -1694,7 +1694,7 @@
 
   .board-stats {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--space-1);
   }
 
@@ -2335,6 +2335,119 @@
 
   .note-marker[hidden] {
     display: none;
+  }
+
+  .measure-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    pointer-events: none;
+  }
+
+  .measure-frame {
+    position: absolute;
+    border: 1px solid #2E9BFF;
+    box-shadow: 0 0 0 1px color-mix(in srgb, #2E9BFF 24%, transparent);
+  }
+
+  .measure-frame::before,
+  .measure-frame::after,
+  .measure-frame span::before,
+  .measure-frame span::after {
+    content: "";
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: #2E9BFF;
+  }
+
+  .measure-frame::before { left: -3px; top: -3px; }
+  .measure-frame::after { right: -3px; top: -3px; }
+  .measure-frame span::before { left: -3px; bottom: -3px; }
+  .measure-frame span::after { right: -3px; bottom: -3px; }
+
+  .measure-target {
+    position: absolute;
+    border: 1px solid #FF4B2E;
+    background: color-mix(in srgb, #FF4B2E 7%, transparent);
+  }
+
+  .measure-line {
+    position: absolute;
+    background: #FF4B2E;
+  }
+
+  .measure-line.v {
+    width: 1px;
+  }
+
+  .measure-line.h {
+    height: 1px;
+  }
+
+  .measure-tick {
+    position: absolute;
+    background: #FF4B2E;
+  }
+
+  .measure-tick.h {
+    width: 10px;
+    height: 1px;
+  }
+
+  .measure-tick.v {
+    width: 1px;
+    height: 10px;
+  }
+
+  .measure-pill,
+  .measure-label {
+    position: absolute;
+    min-height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--space-2);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: var(--type-meta);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    transform: translate(-50%, -50%);
+  }
+
+  .measure-pill {
+    background: #2E9BFF;
+  }
+
+  .measure-label {
+    background: #FF4B2E;
+  }
+
+  .measure-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  .measure-stat {
+    min-height: 58px;
+    display: grid;
+    align-content: center;
+    gap: var(--space-1);
+    padding: var(--space-2);
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--foreground) 4%, transparent);
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: var(--type-meta);
+  }
+
+  .measure-stat strong {
+    color: var(--foreground);
+    font-family: var(--mono);
+    font-size: var(--type-ui-sm);
   }
 
 	  .feedback-list {
@@ -3403,7 +3516,7 @@
       </div>
       <div class="vfs-stats">
         <dl class="vfs-stats-grid">
-          <div class="vfs-stat-cell"><dt class="sr-only">edit modes</dt><dd class="vfs-stat-number">3</dd><span class="vfs-stat-title"><span data-en>Edit modes</span><span data-zh>编辑模式</span></span><span class="vfs-stat-detail"><span data-en>Style · Copy · Notes</span><span data-zh>样式 · 文案 · 备注</span></span></div>
+          <div class="vfs-stat-cell"><dt class="sr-only">review modes</dt><dd class="vfs-stat-number">4</dd><span class="vfs-stat-title"><span data-en>Review modes</span><span data-zh>审稿模式</span></span><span class="vfs-stat-detail"><span data-en>Style · Copy · Notes · Measure</span><span data-zh>样式 · 文案 · 备注 · 测量</span></span></div>
           <div class="vfs-stat-cell"><dt class="sr-only">frameworks</dt><dd class="vfs-stat-number">7<span class="vfs-stat-plus">+</span></dd><span class="vfs-stat-title"><span data-en>Frameworks</span><span data-zh>支持框架</span></span><span class="vfs-stat-detail">HTML → Astro</span></div>
           <div class="vfs-stat-cell"><dt class="sr-only">agents</dt><dd class="vfs-stat-number">2</dd><span class="vfs-stat-title">Agents</span><span class="vfs-stat-detail">Codex · Claude</span></div>
           <div class="vfs-stat-cell"><dt class="sr-only">codebase</dt><dd class="vfs-stat-number">1</dd><span class="vfs-stat-title"><span data-en>Codebase</span><span data-zh>代码库</span></span><span class="vfs-stat-detail"><span data-en>One source</span><span data-zh>单一源</span></span></div>
@@ -3430,10 +3543,10 @@
           <span class="vfs-title-line"><span class="text-primary vfs-title-accent" style="color: #7D9E20;">Source</span> intent.</span>
         </h2>
       </div>
-      <p><span data-en>Click an element, adjust style, edit copy, or leave a note. The review board keeps each change ready for Codex or Claude.</span><span data-zh>点击元素，调整样式、修改文案或添加备注。审稿任务板会把每一条反馈留给 Codex 或 Claude。</span></p>
+      <p><span data-en>Click an element, adjust style, edit copy, leave a note, or inspect Figma-like spacing evidence. The review board keeps each change ready for Codex or Claude.</span><span data-zh>点击元素，调整样式、修改文案、添加备注，或查看接近 Figma 的间距测量证据。审稿任务板会把每一条反馈留给 Codex 或 Claude。</span></p>
     </div>
-    <div class="setup-command-box section-command reveal" data-copy-command="style + text + note -> feedback.json">
-      <code class="setup-command-code"><span class="command-prompt">$</span> <span data-en>style + text + note -> feedback.json</span><span data-zh>样式 + 文案 + 备注 -> feedback.json</span></code>
+    <div class="setup-command-box section-command reveal" data-copy-command="style + text + note + measure -> feedback.json">
+      <code class="setup-command-code"><span class="command-prompt">$</span> <span data-en>style + text + note + measure -> feedback.json</span><span data-zh>样式 + 文案 + 备注 + 测量 -> feedback.json</span></code>
       <button class="setup-copy-btn" type="button" aria-label="Copy live workspace command"><span>loop</span></button>
     </div>
     <div class="studio reveal">
@@ -3462,6 +3575,7 @@
               <span class="board-stat"><strong id="styleCount">0</strong><span data-en>Style</span><span data-zh>样式</span></span>
               <span class="board-stat"><strong id="textCount">0</strong><span data-en>Text</span><span data-zh>文案</span></span>
               <span class="board-stat"><strong id="noteCount">0</strong><span data-en>Notes</span><span data-zh>备注</span></span>
+              <span class="board-stat"><strong id="measureCount">0</strong><span data-en>Measure</span><span data-zh>测量</span></span>
             </div>
           </div>
           <div class="workflow-copy" id="workflowHint"></div>
@@ -3471,6 +3585,7 @@
             <button type="button" class="tool-btn on" data-intent="style"><span data-en>Style</span><span data-zh>样式</span></button>
             <button type="button" class="tool-btn" data-intent="text"><span data-en>Text</span><span data-zh>文案</span></button>
             <button type="button" class="tool-btn" data-intent="note"><span data-en>Note</span><span data-zh>备注</span></button>
+            <button type="button" class="tool-btn" data-intent="measure"><span data-en>Measure</span><span data-zh>测量</span></button>
             <button type="button" class="tool-btn" data-intent="feedback"><span data-en>Feedback</span><span data-zh>反馈</span></button>
           </div>
           <div class="selection-callout" id="selectionCallout"></div>
@@ -3486,6 +3601,7 @@
               <div class="dc-btn editable" data-el="cta" data-tag="button.cta" data-txt-en="View story" data-txt-zh="查看故事"><span class="dc-btn-label">View story</span></div>
             </div>
             <div class="note-marker" id="noteMarker" hidden></div>
+            <div class="measure-layer" id="measureLayer" hidden></div>
           </div>
         </div>
         <div class="panel-col">
@@ -4410,15 +4526,25 @@
 	      hintEn: "Choose a target, then leave a short note for the agent.",
 	      hintZh: "选择目标，然后给当前助手留一句备注。"
 	    },
+	    measure: {
+	      boardEn: "MEASURE",
+	      boardZh: "测量",
+	      titleEn: "Measure evidence",
+	      titleZh: "测量证据",
+	      summaryEn: "Select a visual block to inspect bounds, spacing, tokens, and evidence-only action candidates.",
+	      summaryZh: "选择视觉块，查看边界、间距、token 与只作为证据的行动候选。",
+	      hintEn: "Hold Option or Alt in the real extension to show Figma-like edge-to-edge guides.",
+	      hintZh: "真实插件里按住 Option / Alt，会显示接近 Figma 的 edge-to-edge 测距线。"
+	    },
 	    feedback: {
 	      boardEn: "FEEDBACK",
 	      boardZh: "反馈",
 	      titleEn: "Review board",
 	      titleZh: "审稿任务板",
-	      summaryEn: "Captured text, style, and note feedback will appear here before you save.",
-	      summaryZh: "捕获到的文案、样式和备注反馈会先汇总在这里，再保存。",
-	      hintEn: "Review saved style, text, and note feedback before handing it to Codex or Claude.",
-	      hintZh: "保存后的样式、文案、备注会在这里汇总。"
+	      summaryEn: "Captured text, style, note, and measurement feedback will appear here before you save.",
+	      summaryZh: "捕获到的文案、样式、备注和测量反馈会先汇总在这里，再保存。",
+	      hintEn: "Review saved style, text, note, and measurement evidence before handing it to Codex or Claude.",
+	      hintZh: "保存后的样式、文案、备注和测量证据会在这里汇总。"
 	    }
 	  };
 	  var STYLE_LIMITS = {
@@ -4547,6 +4673,7 @@
 	      style: countFeedback("style_edit"),
 	      text: countFeedback("text_edit"),
 	      note: countFeedback("annotation"),
+	      measure: countFeedback("measurement"),
 	      total: state.feedback.length
 	    };
 	  }
@@ -4565,6 +4692,7 @@
 	    renderSelectionCallout();
 	    renderWorkflow();
 	    updateNoteMarker();
+	    updateMeasureOverlay();
 	    if (!options || options.render !== false) renderPanel();
 	  }
 
@@ -4578,6 +4706,7 @@
 	    renderWorkflow();
 	    renderStudioHint();
 	    renderPanel();
+	    updateMeasureOverlay();
 	  }
 
 	  function setTab(t) {
@@ -4615,9 +4744,11 @@
 	    var styleCount = $("#styleCount");
 	    var textCount = $("#textCount");
 	    var noteCount = $("#noteCount");
+	    var measureCount = $("#measureCount");
 	    if (styleCount) styleCount.textContent = counts.style;
 	    if (textCount) textCount.textContent = counts.text;
 	    if (noteCount) noteCount.textContent = counts.note;
+	    if (measureCount) measureCount.textContent = counts.measure;
 	  }
 
 	  function renderStudioHint() {
@@ -4626,7 +4757,7 @@
 	    var meta = metaFor(state.selected);
 	    var counts = feedbackCounts();
 	    var agentName = state.agent === "codex" ? "Codex" : "Claude";
-	    var hasAllTypes = counts.style > 0 && counts.text > 0 && counts.note > 0;
+	    var hasAllTypes = counts.style > 0 && counts.text > 0 && counts.note > 0 && counts.measure > 0;
 	    if (hasAllTypes) {
 	      hint.textContent = langPick("Back in " + agentName + ", say: feedback done", "回到 " + agentName + " 说：反馈好了");
 	      return;
@@ -4648,11 +4779,14 @@
 	    var styleCount = $("#styleCount");
 	    var textCount = $("#textCount");
 	    var noteCount = $("#noteCount");
+	    var measureCount = $("#measureCount");
 	    if (styleCount) styleCount.textContent = counts.style;
 	    if (textCount) textCount.textContent = counts.text;
 	    if (noteCount) noteCount.textContent = counts.note;
+	    if (measureCount) measureCount.textContent = counts.measure;
 	    renderStudioHint();
 	    updateNoteMarker();
+	    updateMeasureOverlay();
 	  }
 
 	  function renderContextCard() {
@@ -4719,9 +4853,56 @@
 	      '</div>';
 	  }
 
+	  function measureEvidence(el) {
+	    var node = nodeFor(el);
+	    var card = $(".demo-card");
+	    if (!node || !card) {
+	      return {
+	        width: 0,
+	        height: 0,
+	        gap: 0,
+	        target: "",
+	        token: "--space-6",
+	        confidence: "medium"
+	      };
+	    }
+	    var rect = node.getBoundingClientRect();
+	    var cardRect = card.getBoundingClientRect();
+	    var next = el === "cta" ? null : node.nextElementSibling;
+	    while (next && !next.classList.contains("editable")) next = next.nextElementSibling;
+	    var gap = next ? Math.max(0, Math.round(next.getBoundingClientRect().top - rect.bottom)) : Math.max(0, Math.round(cardRect.bottom - rect.bottom));
+	    var target = next ? next.getAttribute("data-tag") || next.getAttribute("data-el") || "next block" : ".product-card";
+	    var token = gap <= 8 ? "--space-2" : gap <= 12 ? "--space-3" : gap <= 16 ? "--space-4" : gap <= 24 ? "--space-5" : "--space-6";
+	    return {
+	      width: Math.round(rect.width),
+	      height: Math.round(rect.height),
+	      gap: gap,
+	      target: target,
+	      token: token,
+	      confidence: "high"
+	    };
+	  }
+
+	  function renderMeasureEditor() {
+	    var meta = metaFor(state.selected);
+	    var evidence = measureEvidence(state.selected);
+	    return renderContextCard() +
+	      '<div class="inspector-section"><h4>' + langPick("Measure", "测量") + '</h4><p class="panel-note">' + langPick(MODE_COPY.measure.summaryEn, MODE_COPY.measure.summaryZh) + '</p></div>' +
+	      '<div class="measure-strip">' +
+	      '<div class="measure-stat"><span>' + langPick("Bounds", "边界") + '</span><strong>' + esc(evidence.width + " x " + evidence.height) + '</strong></div>' +
+	      '<div class="measure-stat"><span>' + langPick("Nearest gap", "邻近间距") + '</span><strong>' + esc(evidence.gap + "px") + '</strong></div>' +
+	      '<div class="measure-stat"><span>' + langPick("Token", "Token") + '</span><strong>' + esc(evidence.token) + '</strong></div>' +
+	      '</div>' +
+	      '<div class="demo-controls" style="margin-top: var(--space-3);">' +
+	      '<div class="demo-field"><div class="value-row"><span class="field-label">' + langPick("Figma-like guide", "Figma 式测距线") + '</span><span class="current-value">Option / Alt</span></div><div class="panel-note">' + esc(langPick("Selected " + meta.tag + " is measured against " + evidence.target + ". The real extension only shows distance guides while Option / Alt is held.", "当前 " + meta.tag + " 正在测到 " + evidence.target + "。真实插件只会在按住 Option / Alt 时显示测距线。")) + '</div></div>' +
+	      '<div class="demo-field"><div class="value-row"><span class="field-label">' + langPick("Action candidate", "行动候选") + '</span><span class="current-value">' + esc(evidence.confidence) + '</span></div><div class="panel-note">' + langPick("Evidence only. The agent can use this to reason about spacing, but it will not auto-apply source edits.", "仅作为证据。Agent 可以用它理解间距，但不会自动扩大源码修改。") + '</div></div>' +
+	      '</div>';
+	  }
+
 	  function renderEditorPanel() {
 	    if (state.intent === "text") return renderTextEditor();
 	    if (state.intent === "note") return renderNoteEditor();
+	    if (state.intent === "measure") return renderMeasureEditor();
 	    return renderStyleEditor();
 	  }
 
@@ -4756,7 +4937,7 @@
 	      },
 	      meta: {
 	        feedback_count: state.feedback.length,
-	        capabilities: ["style_edit", "text_edit", "annotation", "source_clues"]
+	        capabilities: ["style_edit", "text_edit", "annotation", "measurement", "source_clues"]
 	      },
 	      feedback: state.feedback.map(function (f) {
 	        var meta = metaFor(f.el);
@@ -4767,6 +4948,12 @@
 	        } else if (f.type === "text_edit") {
 	          o.original = f.original;
 	          o.modified = f.modified;
+	          o.locate_confidence = "high";
+	        } else if (f.type === "measurement") {
+	          o.rect = f.rect;
+	          o.measurements = f.measurements;
+	          o.distance_measurements = f.distance_measurements;
+	          o.measurement_context = f.measurement_context;
 	          o.locate_confidence = "high";
 	        } else {
 	          o.note = f.note;
@@ -4787,6 +4974,10 @@
 	      }).join("<br>");
 	    } else if (f.type === "text_edit") {
 	      detail = '<span>' + esc(f.original) + '</span><br><strong>' + esc(f.modified) + '</strong>';
+	    } else if (f.type === "measurement") {
+	      var firstDistance = f.distance_measurements && f.distance_measurements[0];
+	      detail = '<code>' + esc((f.rect && f.rect.width) + " x " + (f.rect && f.rect.height)) + '</code><br>' +
+	        '<span>' + esc(firstDistance ? firstDistance.property + " · " + firstDistance.value + " · " + firstDistance.nearest_token.name : "bounds captured") + '</span>';
 	    } else {
 	      detail = '"' + esc(f.note) + '"' + (f.intent ? ' <code>' + esc(intentLabel(f.intent)) + '</code>' : "");
 	    }
@@ -4811,6 +5002,7 @@
 	      renderFeedbackSection("text_edit", "Text", "文案", "No text feedback yet.", "暂无文案反馈。") +
 	      renderFeedbackSection("style_edit", "Style", "样式", "No style feedback yet.", "暂无样式反馈。") +
 	      renderFeedbackSection("annotation", "Notes", "备注", "No notes yet.", "暂无备注。") +
+	      renderFeedbackSection("measurement", "Measure", "测量", "No measurement evidence yet.", "暂无测量证据。") +
 	      '</div>';
 	    var evidence =
 	      '<details class="evidence-card"><summary>feedback.json</summary><pre class="json">' + colorJson(JSON.stringify(sessionPayload(), null, 2)) + '</pre></details>' +
@@ -4829,6 +5021,7 @@
 	    body.scrollTop = 0;
 	    bindPanelActions();
 	    updateNoteMarker();
+	    updateMeasureOverlay();
 	  }
 
   function colorJson(s) {
@@ -4981,6 +5174,41 @@
 	    toast("备注反馈已保存", "Note feedback saved");
 	  }
 
+	  function saveMeasurementFeedback() {
+	    var el = state.selected;
+	    var meta = metaFor(el);
+	    var evidence = measureEvidence(el);
+	    upsertFeedback({
+	      id: "measure-" + el,
+	      type: "measurement",
+	      el: el,
+	      rect: {
+	        width: evidence.width,
+	        height: evidence.height
+	      },
+	      measurements: [
+	        { property: "width", value: evidence.width + "px", kind: "spacing", nearest_token: { name: "--component-width", value: evidence.width + "px", type: "spacing", distance: 0 } },
+	        { property: "height", value: evidence.height + "px", kind: "spacing", nearest_token: { name: "--component-height", value: evidence.height + "px", type: "spacing", distance: 0 } }
+	      ],
+	      distance_measurements: [
+	        { property: "distance-bottom", value: evidence.gap + "px", kind: "spacing", nearest_token: { name: evidence.token, value: evidence.gap + "px", type: "spacing", distance: 0 } }
+	      ],
+	      measurement_context: {
+	        mode: "adjacent",
+	        modifier: "option_alt",
+	        box_model: "visual_box_v1",
+	        target_model: "visual_block",
+	        reference: "demo_card",
+	        hover_selector: meta.selector,
+	        guide_confidence: evidence.confidence
+	      }
+	    });
+	    updateSave();
+	    renderWorkflow();
+	    if (state.tab === "feedback") renderPanel();
+	    toast("测量已保存", "Measurement saved");
+	  }
+
 	  function saveCurrentFeedback() {
 	    if (state.intent === "text") {
 	      saveTextFeedback();
@@ -4988,6 +5216,10 @@
 	    }
 	    if (state.intent === "note") {
 	      saveNoteFeedback();
+	      return;
+	    }
+	    if (state.intent === "measure") {
+	      saveMeasurementFeedback();
 	      return;
 	    }
 	    if (state.intent === "feedback") {
@@ -5018,6 +5250,56 @@
 	    var top = clamp(nodeRect.top - cardRect.top - 4, 8, cardRect.height - 40);
 	    marker.style.left = left + "px";
 	    marker.style.top = top + "px";
+	  }
+
+	  function updateMeasureOverlay() {
+	    var layer = $("#measureLayer");
+	    var card = $(".demo-card");
+	    var node = nodeFor(state.selected);
+	    if (!layer || !card || !node) return;
+	    if (state.intent !== "measure") {
+	      layer.hidden = true;
+	      layer.innerHTML = "";
+	      return;
+	    }
+	    var cardRect = card.getBoundingClientRect();
+	    var rect = node.getBoundingClientRect();
+	    var next = state.selected === "cta" ? null : node.nextElementSibling;
+	    while (next && !next.classList.contains("editable")) next = next.nextElementSibling;
+	    var targetRect = next ? next.getBoundingClientRect() : cardRect;
+	    var selectedLeft = rect.left - cardRect.left;
+	    var selectedTop = rect.top - cardRect.top;
+	    var selectedWidth = rect.width;
+	    var selectedHeight = rect.height;
+	    var targetLeft = targetRect.left - cardRect.left;
+	    var targetTop = targetRect.top - cardRect.top;
+	    var targetWidth = targetRect.width;
+	    var targetHeight = targetRect.height;
+	    var gap = Math.max(0, Math.round(targetRect.top - rect.bottom));
+	    if (!next) {
+	      gap = Math.max(0, Math.round(cardRect.bottom - rect.bottom));
+	      targetLeft = 0;
+	      targetTop = cardRect.height - 1;
+	      targetWidth = cardRect.width;
+	      targetHeight = 1;
+	    }
+	    var x = clamp((Math.max(selectedLeft, targetLeft) + Math.min(selectedLeft + selectedWidth, targetLeft + targetWidth)) / 2, 24, cardRect.width - 24);
+	    var y1 = selectedTop + selectedHeight;
+	    var y2 = targetTop;
+	    var lineTop = Math.min(y1, y2);
+	    var lineHeight = Math.max(1, Math.abs(y2 - y1));
+	    var pillX = clamp(selectedLeft + selectedWidth / 2, 42, cardRect.width - 42);
+	    var pillY = selectedTop > 22 ? selectedTop - 14 : selectedTop + selectedHeight + 16;
+	    var labelY = lineTop + lineHeight / 2;
+	    layer.hidden = false;
+	    layer.innerHTML =
+	      '<div class="measure-frame" style="left:' + Math.round(selectedLeft) + 'px;top:' + Math.round(selectedTop) + 'px;width:' + Math.round(selectedWidth) + 'px;height:' + Math.round(selectedHeight) + 'px;"><span></span></div>' +
+	      (next ? '<div class="measure-target" style="left:' + Math.round(targetLeft) + 'px;top:' + Math.round(targetTop) + 'px;width:' + Math.round(targetWidth) + 'px;height:' + Math.round(targetHeight) + 'px;"></div>' : '') +
+	      '<div class="measure-pill" style="left:' + Math.round(pillX) + 'px;top:' + Math.round(pillY) + 'px;">' + Math.round(selectedWidth) + ' x ' + Math.round(selectedHeight) + '</div>' +
+	      '<div class="measure-line v" style="left:' + Math.round(x) + 'px;top:' + Math.round(lineTop) + 'px;height:' + Math.round(lineHeight) + 'px;"></div>' +
+	      '<div class="measure-tick h" style="left:' + Math.round(x - 5) + 'px;top:' + Math.round(y1) + 'px;"></div>' +
+	      '<div class="measure-tick h" style="left:' + Math.round(x - 5) + 'px;top:' + Math.round(y2) + 'px;"></div>' +
+	      '<div class="measure-label" style="left:' + Math.round(x + 16) + 'px;top:' + Math.round(labelY) + 'px;">' + gap + 'px</div>';
 	  }
 
 	  function bindPanelActions() {
@@ -5176,6 +5458,8 @@
 	    renderPanel();
 	    updateSave();
 	  });
+
+	  window.addEventListener("resize", updateMeasureOverlay);
 
   if ("IntersectionObserver" in window) {
     var io = new IntersectionObserver(function (entries) {
