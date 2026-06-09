@@ -2972,7 +2972,7 @@
   #cta .wrap {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) minmax(20rem, 34rem);
     align-items: end;
 	    gap: var(--space-7);
     border-block: 1px solid var(--border);
@@ -3007,11 +3007,12 @@
   }
 
   .cta-stack {
-    min-width: min(100%, 34rem);
+    width: min(100%, 34rem);
+    min-width: 0;
   }
 
   .cta-command {
-    width: min(100%, 34rem);
+    width: 100%;
 	    margin: 0 0 var(--space-4);
   }
 
