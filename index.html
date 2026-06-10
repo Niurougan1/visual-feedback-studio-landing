@@ -3500,7 +3500,7 @@
         <span data-zh>面向 <strong>Codex 与 Claude</strong> 的本地优先视觉审稿工作台。最小权限、当前站点授权，并把反馈结构化映射回<strong>真实源码</strong>。</span>
       </p>
       <div class="setup-command-box">
-        <code class="setup-command-code"><span class="command-prompt">$</span> if test -d ~/visual-feedback-studio/.git; then git -C ~/visual-feedback-studio pull --ff-only; else git clone https://github.com/Niurougan1/visual-feedback-studio.git ~/visual-feedback-studio; fi &amp;&amp; python3 ~/visual-feedback-studio/scripts/setup.py . --channel beta --port ${VFS_PORT:-3456}</code>
+        <code class="setup-command-code"><span class="command-prompt">$</span> curl -fsSL https://raw.githubusercontent.com/Niurougan1/visual-feedback-studio/main/scripts/install.sh | bash</code>
         <button data-slot="button" data-variant="ghost" data-size="default" class="setup-copy-btn group/button inline-flex shrink-0 items-center justify-center border bg-clip-padding text-xs font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-1 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 w-full touch-manipulation rounded-none border-primary/30 border-t bg-primary/10 text-primary hover:bg-primary/20 sm:w-auto sm:border-l-2" id="copySkill" type="button" aria-label="Copy setup command">
           <div style="opacity:1;transform:none">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="hugeicons hugeicons-copy-02 size-4" aria-hidden="true">
@@ -3728,11 +3728,11 @@
         <span class="vfs-title-line">Open browser.</span>
         <span class="vfs-title-line">Ship <span class="text-primary vfs-title-accent" style="color: #7D9E20;">source.</span></span>
       </h2>
-      <p class="cta-copy"><span data-en>Clone the public repo once, then run setup from the project root you want to review. It installs the skill, starts the receiver, prints the extension path, and keeps the browser permission model store-safe.</span><span data-zh>先克隆一次公开仓，再在你要审稿的项目根目录运行 setup。它会安装 skill、启动 receiver、输出扩展路径，并保持浏览器权限模型适合商店分发。</span></p>
+      <p class="cta-copy"><span data-en>Run one command from the project root you want to review. It pulls the public repo, installs the skill, starts the receiver, prints the extension path, and keeps the browser permission model store-safe.</span><span data-zh>在你要审稿的项目根目录运行一条命令。它会拉取公开仓、安装 skill、启动 receiver、输出扩展路径，并保持浏览器权限模型适合商店分发。</span></p>
     </div>
     <div class="cta-stack">
       <div class="setup-command-box cta-command">
-        <code class="setup-command-code"><span class="command-prompt">$</span> if test -d ~/visual-feedback-studio/.git; then git -C ~/visual-feedback-studio pull --ff-only; else git clone https://github.com/Niurougan1/visual-feedback-studio.git ~/visual-feedback-studio; fi &amp;&amp; python3 ~/visual-feedback-studio/scripts/setup.py . --channel beta --port ${VFS_PORT:-3456}</code>
+        <code class="setup-command-code"><span class="command-prompt">$</span> curl -fsSL https://raw.githubusercontent.com/Niurougan1/visual-feedback-studio/main/scripts/install.sh | bash</code>
         <button class="setup-copy-btn" id="copySkill2" type="button"><span data-en>copy</span><span data-zh>复制</span></button>
       </div>
       <div class="hero-actions cta-links" data-reference-structure="navbar-hero">
@@ -3784,7 +3784,7 @@
   var root = document.documentElement;
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
-  var CMD = "if test -d ~/visual-feedback-studio/.git; then git -C ~/visual-feedback-studio pull --ff-only; else git clone https://github.com/Niurougan1/visual-feedback-studio.git ~/visual-feedback-studio; fi && python3 ~/visual-feedback-studio/scripts/setup.py . --channel beta --port ${VFS_PORT:-3456}";
+  var CMD = "curl -fsSL https://raw.githubusercontent.com/Niurougan1/visual-feedback-studio/main/scripts/install.sh | bash";
   var GH_REPO = "Niurougan1/visual-feedback-studio";
   var GH_URL = "https://github.com/" + GH_REPO;
   var GH_API = "https://api.github.com/repos/" + GH_REPO;
