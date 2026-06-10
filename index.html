@@ -4248,7 +4248,7 @@
         <span class="brand-version">v4.0 beta · Store-Safe Loop</span>
       </a>
       <div class="nav-right">
-        <a class="github-link" id="ghLink" href="https://github.com/Niurougan1/visual-feedback-studio" target="_blank" rel="noopener">
+        <a class="github-link" id="ghLink" href="https://github.com/Niurougan1/visual-feedback-studio" target="_blank" rel="noopener noreferrer">
           <span class="github-logo" aria-hidden="true">
             <svg viewBox="0 0 16 16" width="16" height="16" focusable="false">
               <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59c.4.07.55-.17.55-.38c0-.19-.01-.82-.01-1.49c-2.01.37-2.53-.49-2.69-.94c-.09-.23-.48-.94-.82-1.13c-.28-.15-.68-.52-.01-.53c.63-.01 1.08.58 1.23.82c.72 1.21 1.87.87 2.33.66c.07-.52.28-.87.51-1.07c-1.78-.2-3.64-.89-3.64-3.95c0-.87.31-1.59.82-2.15c-.08-.2-.36-1.02.08-2.12c0 0 .67-.21 2.2.82c.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82c.44 1.1.16 1.92.08 2.12c.51.56.82 1.27.82 2.15c0 3.07-1.87 3.75-3.65 3.95c.29.25.54.73.54 1.48c0 1.07-.01 1.93-.01 2.2c0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
@@ -4619,8 +4619,8 @@
         <button class="setup-copy-btn" id="copySkill2" type="button"><span data-en>copy</span><span data-zh>复制</span></button>
       </div>
       <div class="hero-actions cta-links" data-reference-structure="navbar-hero">
-        <a class="hero-btn hero-btn-primary" href="https://github.com/Niurougan1/visual-feedback-studio" target="_blank" rel="noopener">GitHub</a>
-        <a class="hero-btn hero-btn-outline" href="https://github.com/Niurougan1/visual-feedback-studio/blob/main/README.md" target="_blank" rel="noopener"><span data-en>Read docs</span><span data-zh>读文档</span></a>
+        <a class="hero-btn hero-btn-primary" href="https://github.com/Niurougan1/visual-feedback-studio" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="hero-btn hero-btn-outline" href="https://github.com/Niurougan1/visual-feedback-studio/blob/main/README.md" target="_blank" rel="noopener noreferrer"><span data-en>Read docs</span><span data-zh>读文档</span></a>
       </div>
     </div>
   </div>
@@ -4637,10 +4637,10 @@
       <div class="foot-cols">
         <div class="foot-col">
           <h4><span data-en>Resources</span><span data-zh>资源</span></h4>
-          <a href="https://github.com/Niurougan1/visual-feedback-studio/blob/main/README.md" target="_blank" rel="noopener">README</a>
-          <a href="https://github.com/Niurougan1/visual-feedback-studio/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG</a>
-          <a href="https://github.com/Niurougan1/visual-feedback-studio/blob/main/SKILL.md" target="_blank" rel="noopener">SKILL.md</a>
-          <a href="https://github.com/Niurougan1/visual-feedback-studio/blob/main/docs/strategy/optimization-roadmap.md" target="_blank" rel="noopener"><span data-en>Roadmap</span><span data-zh>优化路线图</span></a>
+          <a href="https://github.com/Niurougan1/visual-feedback-studio/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a>
+          <a href="https://github.com/Niurougan1/visual-feedback-studio/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">CHANGELOG</a>
+          <a href="https://github.com/Niurougan1/visual-feedback-studio/blob/main/SKILL.md" target="_blank" rel="noopener noreferrer">SKILL.md</a>
+          <a href="https://github.com/Niurougan1/visual-feedback-studio/blob/main/docs/public-roadmap.md" target="_blank" rel="noopener noreferrer"><span data-en>Roadmap</span><span data-zh>优化路线图</span></a>
         </div>
         <div class="foot-col">
           <h4><span data-en>Capabilities</span><span data-zh>能力</span></h4>
@@ -5091,7 +5091,6 @@
   var GH_REPO = "Niurougan1/visual-feedback-studio";
   var GH_URL = "https://github.com/" + GH_REPO;
   var GH_API = "https://api.github.com/repos/" + GH_REPO;
-  var GH_SHIELDS_API = "https://img.shields.io/github/stars/" + GH_REPO + ".json?cacheSeconds=1800";
   var GH_STAR_CACHE_KEY = "vfs-gh-stars:" + GH_REPO;
   var GH_STAR_CACHE_TTL = 30 * 60 * 1000;
   var ghLink = $("#ghLink");
@@ -5109,17 +5108,6 @@
     if (count < 10000) return (count / 1000).toFixed(1).replace(/\.0$/, "") + "k";
     if (count < 1000000) return Math.round(count / 1000) + "k";
     return (count / 1000000).toFixed(1).replace(/\.0$/, "") + "m";
-  }
-
-  function parseStarCount(value) {
-    if (typeof value === "number") return value;
-    var text = String(value || "").trim().toLowerCase().replace(/,/g, "");
-    var match = text.match(/^(\d+(?:\.\d+)?)([km])?$/);
-    if (!match) return NaN;
-    var count = Number(match[1]);
-    if (match[2] === "k") count *= 1000;
-    if (match[2] === "m") count *= 1000000;
-    return Math.round(count);
   }
 
   function syncGitHubMeta() {
@@ -5175,10 +5163,6 @@
 
     fetchJson(GH_API, { Accept: "application/vnd.github+json" }).then(function (repo) {
       return Number(repo && repo.stargazers_count);
-    }).catch(function () {
-      return fetchJson(GH_SHIELDS_API, { Accept: "application/json" }).then(function (badge) {
-        return parseStarCount((badge && (badge.value || badge.message)) || "");
-      });
     }).then(function (count) {
       if (!Number.isFinite(count)) throw new Error("Missing stargazers_count");
       try {
