@@ -3131,6 +3131,786 @@
     filter: blur(0);
   }
 
+  /* ===== Preview vs Review module: confirmed standalone module, scoped for landing page ===== */
+  #preview-review,
+  #preview-review * {
+    box-sizing: border-box;
+  }
+
+  #preview-review {
+    --pvr-background: var(--background);
+    --pvr-foreground: var(--foreground);
+    --pvr-card: var(--card);
+    --pvr-primary: var(--primary);
+    --pvr-regent: var(--regent);
+    --pvr-danger: var(--danger);
+    --pvr-muted: var(--muted-foreground);
+    --pvr-muted-2: color-mix(in srgb, var(--foreground) 42%, transparent);
+    --pvr-border: var(--border);
+    --pvr-border-soft: color-mix(in srgb, var(--foreground) 8%, transparent);
+    --pvr-bg-95: color-mix(in srgb, var(--background) 95%, transparent);
+    --pvr-bg-90: color-mix(in srgb, var(--background) 90%, transparent);
+    --pvr-bg-72: color-mix(in srgb, var(--background) 72%, transparent);
+    --pvr-fg-08: color-mix(in srgb, var(--foreground) 8%, transparent);
+    --pvr-fg-12: color-mix(in srgb, var(--foreground) 12%, transparent);
+    --pvr-fg-16: color-mix(in srgb, var(--foreground) 16%, transparent);
+    --pvr-fg-30: color-mix(in srgb, var(--foreground) 30%, transparent);
+    --pvr-fg-35: color-mix(in srgb, var(--foreground) 35%, transparent);
+    --pvr-fg-36: color-mix(in srgb, var(--foreground) 36%, transparent);
+    --pvr-fg-40: color-mix(in srgb, var(--foreground) 40%, transparent);
+    --pvr-fg-42: color-mix(in srgb, var(--foreground) 42%, transparent);
+    --pvr-fg-45: color-mix(in srgb, var(--foreground) 45%, transparent);
+    --pvr-fg-48: color-mix(in srgb, var(--foreground) 48%, transparent);
+    --pvr-fg-55: color-mix(in srgb, var(--foreground) 55%, transparent);
+    --pvr-fg-60: color-mix(in srgb, var(--foreground) 60%, transparent);
+    --pvr-fg-64: color-mix(in srgb, var(--foreground) 64%, transparent);
+    --pvr-fg-80: color-mix(in srgb, var(--foreground) 80%, transparent);
+    --pvr-primary-07: color-mix(in srgb, var(--primary) 7%, transparent);
+    --pvr-primary-08: color-mix(in srgb, var(--primary) 8%, transparent);
+    --pvr-primary-10: color-mix(in srgb, var(--primary) 10%, transparent);
+    --pvr-primary-14: color-mix(in srgb, var(--primary) 14%, transparent);
+    --pvr-primary-16: color-mix(in srgb, var(--primary) 16%, transparent);
+    --pvr-primary-18: color-mix(in srgb, var(--primary) 18%, transparent);
+    --pvr-primary-26: color-mix(in srgb, var(--primary) 26%, transparent);
+    --pvr-primary-32: color-mix(in srgb, var(--primary) 32%, transparent);
+    --pvr-primary-42: color-mix(in srgb, var(--primary) 42%, transparent);
+    --pvr-primary-50: color-mix(in srgb, var(--primary) 50%, transparent);
+    --pvr-regent-05: color-mix(in srgb, var(--regent) 5%, transparent);
+    --pvr-regent-07: color-mix(in srgb, var(--regent) 7%, transparent);
+    --pvr-regent-10: color-mix(in srgb, var(--regent) 10%, transparent);
+    --pvr-regent-16: color-mix(in srgb, var(--regent) 16%, transparent);
+    --pvr-regent-30: color-mix(in srgb, var(--regent) 30%, transparent);
+    --pvr-regent-35: color-mix(in srgb, var(--regent) 35%, transparent);
+    --pvr-regent-40: color-mix(in srgb, var(--regent) 40%, transparent);
+    --pvr-regent-45: color-mix(in srgb, var(--regent) 45%, transparent);
+    --pvr-danger-07: color-mix(in srgb, var(--danger) 7%, transparent);
+    --pvr-danger-45: color-mix(in srgb, var(--danger) 45%, transparent);
+    --pvr-danger-50: color-mix(in srgb, var(--danger) 50%, transparent);
+    --pvr-shadow: color-mix(in srgb, var(--background) 45%, transparent);
+    --pvr-cursor-text: #090908;
+    position: relative;
+    border-top: 1px solid var(--border);
+    background: var(--background);
+    overflow: hidden;
+  }
+
+  html[data-theme="light"] #preview-review {
+    --pvr-shadow: color-mix(in srgb, var(--foreground) 14%, transparent);
+  }
+
+  #preview-review [data-zh],
+  #preview-review [data-en] {
+    display: none !important;
+  }
+
+  html[lang="zh"] #preview-review [data-zh],
+  html[lang="en"] #preview-review [data-en] {
+    display: contents !important;
+  }
+
+  #preview-review::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--primary) 18%, transparent) 0 1px, transparent 1px 100%),
+      linear-gradient(to right, color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px);
+    background-size: 18px 18px, 40px 40px, 40px 40px;
+    mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+    opacity: .5;
+  }
+
+  #preview-review .prototype-shell {
+    position: relative;
+    z-index: 1;
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding: clamp(16px, 2.4vw, 32px);
+    overflow: hidden;
+  }
+
+  #preview-review .module {
+    position: relative;
+    width: min(100%, 1460px);
+    min-height: min(800px, calc(100svh - 64px));
+    overflow: hidden;
+    border-block: 1px solid var(--pvr-border);
+    background:
+      radial-gradient(circle at 12% 10%, var(--pvr-primary-14), transparent 32%),
+      radial-gradient(circle at 96% 78%, var(--pvr-regent-07), transparent 36%),
+      var(--pvr-background);
+    isolation: isolate;
+  }
+
+  #preview-review .module-inner {
+    position: relative;
+    z-index: 1;
+    min-height: inherit;
+    display: grid;
+    grid-template-columns: minmax(380px, .44fr) minmax(540px, 1fr);
+    align-items: center;
+    column-gap: clamp(48px, 6vw, 110px);
+    padding: clamp(28px, 3.8vw, 52px);
+  }
+
+  @keyframes preview-review-rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  #preview-review .reveal {
+    opacity: 0;
+    filter: none;
+    transform: none;
+    transition: none;
+    animation: preview-review-rise .9s var(--ease) forwards;
+  }
+
+  #preview-review .copy { max-width: 500px; }
+
+  #preview-review .kicker {
+    display: inline-flex;
+    margin-bottom: 22px;
+    border: 1px solid var(--pvr-primary-42);
+    background: var(--pvr-primary-08);
+    color: var(--pvr-primary);
+    padding: 9px 12px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  #preview-review .kicker::before { content: "[ "; }
+  #preview-review .kicker::after { content: " ]"; }
+
+  #preview-review .module-title {
+    margin: 0;
+    color: var(--pvr-foreground);
+    font-family: var(--pixel);
+    font-size: clamp(38px, 3.4vw, 56px);
+    line-height: .98;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+
+  #preview-review .module-title .line { display: block; white-space: nowrap; }
+  #preview-review .module-title .accent { color: var(--pvr-foreground) !important; }
+
+  #preview-review .copy > p {
+    max-width: 28rem;
+    margin: 20px 0 0;
+    color: var(--pvr-muted);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  #preview-review .ledger {
+    margin-top: 28px;
+    border-top: 1px solid var(--pvr-border);
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  #preview-review .ledger-row {
+    display: grid;
+    grid-template-columns: 58px minmax(0, .92fr) 20px minmax(0, 1.08fr);
+    align-items: center;
+    gap: 12px;
+    min-height: 54px;
+    border-bottom: 1px solid var(--pvr-border-soft);
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+
+  #preview-review .l-label { color: var(--pvr-fg-36); font-size: 11px; letter-spacing: .04em; }
+  #preview-review .l-old { color: var(--pvr-fg-48); }
+
+  #preview-review .l-arrow {
+    color: var(--pvr-primary);
+    text-align: center;
+    animation: preview-review-nudge 2.2s var(--ease) infinite;
+  }
+
+  @keyframes preview-review-nudge {
+    0%, 100% { transform: translateX(0); opacity: .6; }
+    50% { transform: translateX(4px); opacity: 1; }
+  }
+
+  #preview-review .l-new { color: var(--pvr-primary); }
+
+  #preview-review .l-new .soon {
+    display: inline-block;
+    margin-left: 6px;
+    border: 1px solid var(--pvr-regent-40);
+    color: var(--pvr-regent);
+    padding: 2px 5px;
+    font-size: 9px;
+    line-height: 1;
+    vertical-align: 1px;
+  }
+
+  #preview-review .demo {
+    position: relative;
+    align-self: center;
+    border: 1px solid var(--pvr-border);
+    background: color-mix(in srgb, var(--pvr-card) 86%, var(--pvr-background));
+    box-shadow: inset 0 0 0 1px var(--pvr-primary-07), 0 24px 60px var(--pvr-shadow);
+  }
+
+  #preview-review .demo-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 46px;
+    padding: 0 14px;
+    border-bottom: 1px solid var(--pvr-border);
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  #preview-review .dots { display: inline-flex; gap: 6px; }
+  #preview-review .dots i {
+    width: 9px;
+    height: 9px;
+    border: 1px solid var(--pvr-border);
+    border-radius: 0;
+    background: var(--pvr-fg-08);
+  }
+
+  #preview-review .demo-bar .url { color: var(--pvr-fg-45); }
+
+  #preview-review .mode-switch {
+    margin-left: auto;
+    display: inline-flex;
+    border: 1px solid var(--pvr-border);
+    padding: 2px;
+    gap: 2px;
+  }
+
+  #preview-review .mode-switch button {
+    appearance: none;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--pvr-fg-55);
+    padding: 6px 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all .25s var(--ease);
+  }
+
+  #preview-review .mode-switch button.on {
+    border-color: var(--pvr-primary-50);
+    background: var(--pvr-primary-14);
+    color: var(--pvr-primary);
+  }
+
+  #preview-review .demo[data-mode="preview"] .mode-switch button.on {
+    border-color: var(--pvr-regent-45);
+    background: var(--pvr-regent-10);
+    color: var(--pvr-regent);
+  }
+
+  #preview-review .demo-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 264px;
+  }
+
+  #preview-review .canvas {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 470px;
+    padding: 40px 28px 34px;
+    background:
+      linear-gradient(to right, color-mix(in srgb, var(--foreground) 3.5%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--foreground) 3.5%, transparent) 1px, transparent 1px);
+    background-size: 28px 28px;
+    overflow: hidden;
+  }
+
+  #preview-review .canvas::after,
+  #preview-review .demo-card::before,
+  #preview-review .demo-card .media::before,
+  #preview-review .demo-card .media::after {
+    content: none;
+    display: none;
+  }
+
+  #preview-review .canvas-hint {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--pvr-fg-30);
+    font-family: var(--mono);
+    font-size: 10px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  #preview-review .demo[data-mode="vfs"] .canvas-hint .ch-preview,
+  #preview-review .demo[data-mode="preview"] .canvas-hint .ch-vfs { display: none; }
+
+  #preview-review .toast {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    bottom: auto;
+    transform: translate(-50%, -6px);
+    z-index: 20;
+    border: 1px solid var(--pvr-border);
+    background: var(--pvr-bg-95);
+    color: var(--pvr-fg-80);
+    padding: 8px 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .35s var(--ease), transform .35s var(--ease);
+    white-space: nowrap;
+  }
+
+  #preview-review .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  #preview-review .toast.ok { border-color: var(--pvr-primary-50); color: var(--pvr-primary); }
+  #preview-review .toast.ctx { border-color: var(--pvr-regent-40); color: var(--pvr-regent); }
+
+  #preview-review .demo-card {
+    position: relative;
+    z-index: auto;
+    width: min(100%, 310px);
+    border: 1px solid var(--pvr-border);
+    background: var(--pvr-card);
+    box-shadow: none;
+  }
+
+  #preview-review .demo-card .media {
+    height: 128px;
+    border-bottom: 1px solid var(--pvr-border-soft);
+    background:
+      repeating-linear-gradient(0deg, transparent 0 7px, color-mix(in srgb, var(--background) 32%, transparent) 7px 8px),
+      radial-gradient(circle at 28% 38%, color-mix(in srgb, var(--primary) 55%, transparent), transparent 52%),
+      radial-gradient(circle at 75% 70%, color-mix(in srgb, var(--regent) 30%, transparent), transparent 46%),
+      linear-gradient(160deg, color-mix(in srgb, var(--primary) 18%, var(--background)), color-mix(in srgb, var(--regent) 12%, var(--background)));
+  }
+
+  #preview-review .demo-card .pad { display: grid; gap: 10px; padding: 16px; }
+
+  #preview-review .pvr-editable {
+    position: relative;
+    cursor: pointer;
+    transition: color .25s var(--ease), background .25s var(--ease), border-color .25s var(--ease);
+  }
+
+  #preview-review .dc-badge {
+    justify-self: start;
+    border: 1px solid var(--pvr-border);
+    color: var(--pvr-fg-60);
+    padding: 5px 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: .08em;
+  }
+
+  #preview-review .dc-title { font-family: var(--pixel); font-size: 22px; line-height: 1.05; }
+  #preview-review .dc-desc { color: var(--pvr-muted-2); font-size: 12.5px; line-height: 1.55; }
+
+  #preview-review .dc-btn {
+    justify-self: start;
+    appearance: none;
+    border: 1px solid var(--pvr-border);
+    background: var(--pvr-fg-08);
+    color: var(--pvr-foreground);
+    padding: 8px 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  #preview-review .demo[data-mode="preview"] .pvr-editable:hover { outline: 1px dashed var(--pvr-regent-45); outline-offset: 3px; }
+  #preview-review .demo[data-mode="vfs"] .pvr-editable:hover { outline: 1px dashed color-mix(in srgb, var(--primary) 60%, transparent); outline-offset: 3px; }
+  #preview-review .pvr-editable.pinned { outline: 1px solid var(--pvr-regent-45); outline-offset: 3px; }
+
+  #preview-review .pin {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    z-index: 5;
+    width: 17px;
+    height: 17px;
+    display: grid;
+    place-items: center;
+    background: var(--pvr-regent);
+    color: var(--pvr-cursor-text);
+    font-family: var(--mono);
+    font-size: 10px;
+    line-height: 1;
+    animation: preview-review-rise .35s var(--ease);
+  }
+
+  #preview-review .pvr-editable.sel-you { outline: 1px solid var(--pvr-primary); outline-offset: 3px; }
+  #preview-review .pvr-editable.sel-mia { outline: 1px solid var(--pvr-regent); outline-offset: 3px; }
+  #preview-review .pvr-editable.sel-leo { box-shadow: 0 0 0 6px var(--pvr-background), 0 0 0 7px var(--pvr-danger); }
+
+  #preview-review .sel-tag {
+    position: absolute;
+    z-index: 6;
+    padding: 3px 6px;
+    font-family: var(--mono);
+    font-size: 10px;
+    line-height: 1;
+    color: var(--pvr-cursor-text);
+    animation: preview-review-rise .35s var(--ease);
+    white-space: nowrap;
+  }
+
+  #preview-review .sel-tag.u-you { top: -21px; left: -2px; background: var(--pvr-primary); }
+  #preview-review .sel-tag.u-mia { top: -21px; left: -2px; background: var(--pvr-regent); }
+  #preview-review .sel-tag.u-leo { bottom: -25px; right: -2px; background: var(--pvr-danger); }
+  #preview-review .sel-tag.fade { transition: opacity .45s var(--ease); opacity: 0; }
+
+  #preview-review .cursor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 30;
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 1.05s cubic-bezier(.22, 1, .36, 1), opacity .5s var(--ease);
+  }
+
+  #preview-review .cursor i {
+    width: 13px;
+    height: 13px;
+    clip-path: polygon(0 0, 100% 42%, 52% 56%, 42% 100%);
+    transition: scale .2s var(--ease);
+  }
+
+  #preview-review .cursor span {
+    margin: 11px 0 0 -2px;
+    padding: 3px 6px;
+    font-family: var(--mono);
+    font-size: 10px;
+    line-height: 1;
+    color: var(--pvr-cursor-text);
+    white-space: nowrap;
+  }
+
+  #preview-review .cursor.c-you i,
+  #preview-review .cursor.c-you span { background: var(--pvr-primary); }
+  #preview-review .cursor.c-mia i,
+  #preview-review .cursor.c-mia span { background: var(--pvr-regent); }
+  #preview-review .cursor.c-leo i,
+  #preview-review .cursor.c-leo span { background: var(--pvr-danger); }
+  #preview-review .cursor.live { opacity: 1; }
+  #preview-review .cursor.tap i { animation: preview-review-tap .4s var(--ease); }
+
+  @keyframes preview-review-tap {
+    0%, 100% { scale: 1; }
+    50% { scale: .5; }
+  }
+
+  #preview-review .board {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    border-left: 1px solid var(--pvr-border);
+    background: var(--pvr-bg-72);
+    font-family: var(--mono);
+  }
+
+  #preview-review .board-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 12px;
+    border-bottom: 1px solid var(--pvr-border-soft);
+    color: var(--pvr-primary);
+    font-size: 11px;
+    letter-spacing: .04em;
+    white-space: nowrap;
+  }
+
+  #preview-review .board-head > * { flex: none; }
+  #preview-review .demo[data-mode="preview"] .bl-vfs,
+  #preview-review .demo[data-mode="vfs"] .bl-preview { display: none; }
+
+  #preview-review .board-head::before {
+    content: "";
+    flex: none;
+    width: 7px;
+    height: 7px;
+    background: var(--pvr-primary);
+    animation: preview-review-blink 1.6s steps(2) infinite;
+  }
+
+  #preview-review .demo[data-mode="preview"] .board-head { color: var(--pvr-regent); }
+  #preview-review .demo[data-mode="preview"] .board-head::before { background: var(--pvr-regent); }
+
+  @keyframes preview-review-blink { 50% { opacity: .25; } }
+
+  #preview-review .bh-soon {
+    display: none;
+    border: 1px solid var(--pvr-regent-40);
+    color: var(--pvr-regent);
+    padding: 3px 5px;
+    font-size: 9px;
+    line-height: 1;
+    letter-spacing: 0;
+  }
+
+  #preview-review .bh-soon.show { display: inline-block; animation: preview-review-rise .4s var(--ease); }
+
+  #preview-review .team-btn {
+    margin-left: auto;
+    appearance: none;
+    border: 1px solid var(--pvr-regent-35);
+    background: var(--pvr-regent-07);
+    color: var(--pvr-regent);
+    padding: 5px 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .2s var(--ease);
+  }
+
+  #preview-review .team-btn:hover { background: var(--pvr-regent-16); }
+  #preview-review .demo[data-mode="preview"] .team-btn { display: none; }
+
+  #preview-review .board-body {
+    display: grid;
+    align-content: start;
+    gap: 9px;
+    padding: 12px;
+    overflow: hidden;
+  }
+
+  #preview-review .board-empty {
+    color: var(--pvr-fg-35);
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  #preview-review .demo[data-mode="vfs"] .board-empty .em-preview,
+  #preview-review .demo[data-mode="preview"] .board-empty .em-vfs { display: none; }
+
+  #preview-review .record {
+    border: 1px solid var(--pvr-primary-32);
+    border-left-width: 2px;
+    background: var(--pvr-primary-07);
+    padding: 10px 11px;
+    display: grid;
+    gap: 7px;
+    animation: preview-review-rise .5s var(--ease);
+  }
+
+  #preview-review .record.u-mia { border-color: var(--pvr-regent-30); border-left-color: var(--pvr-regent); background: var(--pvr-regent-05); }
+  #preview-review .record.u-you { border-left-color: var(--pvr-primary); }
+  #preview-review .record.ctx { border-color: color-mix(in srgb, var(--regent) 28%, transparent); border-left-width: 1px; background: var(--pvr-regent-05); }
+  #preview-review .record.conflict { border-color: var(--pvr-danger-50); border-left-color: var(--pvr-danger); background: var(--pvr-danger-07); }
+  #preview-review .record.merge-out { animation: preview-review-merge-out .5s var(--ease) forwards; }
+
+  @keyframes preview-review-merge-out {
+    to { opacity: 0; transform: translateY(-8px) scale(.96); }
+  }
+
+  #preview-review .record .r-author { font-size: 10px; line-height: 1; color: var(--pvr-fg-42); }
+  #preview-review .record.u-you .r-author { color: var(--pvr-primary); }
+  #preview-review .record.u-mia .r-author { color: var(--pvr-regent); }
+  #preview-review .record.conflict .r-author { color: var(--pvr-danger); }
+
+  #preview-review .record .r-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 11px;
+  }
+
+  #preview-review .record .r-type { color: var(--pvr-primary); }
+  #preview-review .record.ctx .r-type { color: var(--pvr-regent); }
+  #preview-review .record.conflict .r-type { color: var(--pvr-danger); }
+  #preview-review .record .r-sel { color: var(--pvr-fg-80); font-size: 12px; }
+  #preview-review .record.ctx .r-sel { color: var(--pvr-fg-60); font-size: 11px; line-height: 1.5; }
+  #preview-review .record .r-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  #preview-review .record .r-chips span {
+    border: 1px solid var(--pvr-border-soft);
+    background: var(--pvr-bg-72);
+    color: var(--pvr-fg-60);
+    padding: 3px 5px;
+    font-size: 9px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  #preview-review .record.ctx .r-chips span { color: color-mix(in srgb, var(--regent) 60%, transparent); }
+  #preview-review .record .r-chips .hot { border-color: var(--pvr-primary-42); background: var(--pvr-primary-10); color: var(--pvr-primary); }
+  #preview-review .record .r-chips .warn { border-color: var(--pvr-danger-45); color: var(--pvr-danger); }
+  #preview-review .record .r-check { color: var(--pvr-primary); font-size: 11px; display: none; }
+  #preview-review .record.verified .r-check { display: inline; animation: preview-review-rise .3s var(--ease); }
+
+  #preview-review .signoff {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--pvr-fg-12);
+    animation: preview-review-rise .5s var(--ease);
+  }
+
+  #preview-review .signoff span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 30px;
+    background: var(--pvr-background);
+    color: var(--pvr-fg-40);
+    font-size: 10px;
+    transition: color .3s var(--ease);
+  }
+
+  #preview-review .signoff span.ok { color: var(--pvr-primary); }
+  #preview-review .signoff span.ok::after { content: "✓"; }
+
+  #preview-review .final {
+    border: 1px solid var(--pvr-primary-50);
+    background: var(--pvr-primary-10);
+    color: var(--pvr-primary);
+    text-align: center;
+    padding: 9px;
+    font-size: 10px;
+    letter-spacing: .07em;
+    line-height: 1;
+    animation: preview-review-rise .5s var(--ease);
+  }
+
+  #preview-review .board-foot {
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+    border-top: 1px solid var(--pvr-border-soft);
+  }
+
+  #preview-review .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--pvr-fg-12);
+    transition: opacity .35s var(--ease);
+  }
+
+  #preview-review .demo[data-mode="preview"] .steps { opacity: .28; }
+
+  #preview-review .steps span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    background: var(--pvr-background);
+    color: var(--pvr-fg-40);
+    font-size: 10px;
+    transition: all .3s var(--ease);
+  }
+
+  #preview-review .steps span.on {
+    background: var(--pvr-primary-16);
+    color: var(--pvr-primary);
+  }
+
+  #preview-review .apply-btn {
+    appearance: none;
+    border: 1px solid var(--pvr-primary-50);
+    background: var(--pvr-primary-14);
+    color: var(--pvr-primary);
+    padding: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all .25s var(--ease);
+  }
+
+  #preview-review .apply-btn:hover:not(:disabled) { background: var(--pvr-primary-26); }
+  #preview-review .apply-btn:disabled { opacity: .4; cursor: default; }
+
+  #preview-review .demo[data-mode="preview"] .apply-btn {
+    border-color: var(--pvr-regent-30);
+    background: var(--pvr-regent-07);
+    color: color-mix(in srgb, var(--regent) 70%, transparent);
+  }
+
+  #preview-review .demo[data-mode="preview"] .ab-vfs { display: none; }
+  #preview-review .demo[data-mode="vfs"] .ab-preview { display: none; }
+
+  @media (max-width: 1180px) {
+    #preview-review .module { min-height: 0; }
+
+    #preview-review .module-inner {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    #preview-review .copy { max-width: 760px; }
+    #preview-review .module-title { font-size: clamp(40px, 6.8vw, 58px); }
+  }
+
+  @media (max-width: 900px) {
+    #preview-review .demo-body { grid-template-columns: 1fr; }
+    #preview-review .board { border-left: 0; border-top: 1px solid var(--pvr-border); }
+    #preview-review .canvas { min-height: 380px; }
+  }
+
+  @media (max-width: 760px) {
+    #preview-review .prototype-shell { padding: 0; }
+    #preview-review .module { width: 100%; border-block: 0; }
+    #preview-review .module-inner { padding: 64px 18px 26px; gap: 26px; }
+    #preview-review .kicker { max-width: 100%; font-size: 11px; white-space: normal; }
+    #preview-review .module-title { font-size: clamp(36px, 10vw, 50px); }
+    #preview-review .module-title .line { white-space: normal; }
+    #preview-review .copy > p { font-size: 14.5px; }
+
+    #preview-review .ledger-row {
+      grid-template-columns: 50px 1fr 16px 1.15fr;
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    #preview-review .demo-bar { flex-wrap: wrap; padding: 10px 12px; gap: 10px; }
+    #preview-review .demo-bar .url { display: none; }
+    #preview-review .canvas-hint { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #preview-review .reveal,
+    #preview-review .l-arrow,
+    #preview-review .board-head::before,
+    #preview-review .pin,
+    #preview-review .sel-tag,
+    #preview-review .cursor.tap i,
+    #preview-review .record,
+    #preview-review .record.merge-out,
+    #preview-review .record.verified .r-check,
+    #preview-review .signoff,
+    #preview-review .final {
+      animation: none;
+    }
+
+    #preview-review .reveal {
+      opacity: 1;
+    }
+  }
+
   @keyframes try-me-arrow-cycle {
     0%, 8% { opacity: 0; stroke-dashoffset: 190; filter: blur(3px); }
     20%, 66% { opacity: 1; stroke-dashoffset: 0; filter: blur(0); }
@@ -3546,8 +4326,8 @@
       </div>
       <p><span data-en>Click an element, adjust style, edit copy, leave a note, or inspect Figma-like spacing evidence. The review board keeps each change ready for Codex or Claude.</span><span data-zh>点击元素，调整样式、修改文案、添加备注，或查看接近 Figma 的间距测量证据。审稿任务板会把每一条反馈留给 Codex 或 Claude。</span></p>
     </div>
-    <div class="setup-command-box section-command reveal" data-copy-command="style + text + note + measure -> feedback.json">
-      <code class="setup-command-code"><span class="command-prompt">$</span> <span data-en>style + text + note + measure -> feedback.json</span><span data-zh>样式 + 文案 + 备注 + 测量 -> feedback.json</span></code>
+    <div class="setup-command-box section-command reveal" data-copy-command="curl -fsSL https://raw.githubusercontent.com/Niurougan1/visual-feedback-studio/main/scripts/install.sh | bash">
+      <code class="setup-command-code"><span class="command-prompt">$</span> curl -fsSL https://raw.githubusercontent.com/Niurougan1/visual-feedback-studio/main/scripts/install.sh | bash</code>
       <button class="setup-copy-btn" type="button" aria-label="Copy live workspace command"><span>loop</span></button>
     </div>
     <div class="studio reveal">
@@ -3625,6 +4405,109 @@
   </div>
 </section>
 
+<section id="preview-review" aria-labelledby="preview-review-title">
+  <div class="prototype-shell">
+    <div class="module">
+      <div class="module-inner">
+        <header class="copy">
+          <div class="kicker reveal" style="animation-delay:.05s">Codex Preview vs Visual Feedback Studio</div>
+          <h2 class="module-title" id="preview-review-title">
+            <span class="line reveal" style="animation-delay:.12s">Preview views.</span>
+            <span class="line accent reveal" style="animation-delay:.22s">VFS reviews.</span>
+          </h2>
+          <p class="reveal" style="animation-delay:.32s">
+            <span data-zh>Codex 内置浏览器可以圈选元素、留下评论，回到对话里让 Codex 处理。VFS 把同样的动作升级为结构化审稿记录，并让整个团队同时走查同一页面。</span>
+            <span data-en>Codex's in-app browser lets you select elements and leave comments, then ask Codex in the thread. VFS upgrades that gesture into structured review records — and lets the whole team walk the same page together.</span>
+          </p>
+          <div class="ledger reveal" style="animation-delay:.42s">
+            <div class="ledger-row">
+              <span class="l-label"><span data-zh>采集</span><span data-en>CAPTURE</span></span>
+              <span class="l-old"><span data-zh>评论 → 线程</span><span data-en>comment → thread</span></span>
+              <span class="l-arrow">-&gt;</span>
+              <span class="l-new">feedback.json</span>
+            </div>
+            <div class="ledger-row">
+              <span class="l-label"><span data-zh>证据</span><span data-en>EVIDENCE</span></span>
+              <span class="l-old"><span data-zh>文字 + 截图</span><span data-en>text + screenshot</span></span>
+              <span class="l-arrow">-&gt;</span>
+              <span class="l-new">DOM · source_hint</span>
+            </div>
+            <div class="ledger-row">
+              <span class="l-label"><span data-zh>产出</span><span data-en>OUTCOME</span></span>
+              <span class="l-old"><span data-zh>线程里继续聊</span><span data-en>talk in thread</span></span>
+              <span class="l-arrow">-&gt;</span>
+              <span class="l-new"><span data-zh>规划 → 落地 → 验证</span><span data-en>plan → apply → verify</span></span>
+            </div>
+            <div class="ledger-row">
+              <span class="l-label"><span data-zh>走查</span><span data-en>REVIEW</span></span>
+              <span class="l-old"><span data-zh>单人</span><span data-en>solo</span></span>
+              <span class="l-arrow">-&gt;</span>
+              <span class="l-new"><span data-zh>多人 · 0 冲突</span><span data-en>multiplayer · 0 conflicts</span><span class="soon">SOON</span></span>
+            </div>
+          </div>
+        </header>
+
+        <div class="demo reveal" id="pvr-demo" data-mode="preview" style="animation-delay:.2s">
+          <div class="demo-bar">
+            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="url">localhost:5173 · ProductCard.tsx</span>
+            <div class="mode-switch" id="pvr-mode-switch">
+              <button type="button" data-mode="preview" class="on" id="pvr-preview-tab">Codex Preview</button>
+              <button type="button" data-mode="vfs" id="pvr-vfs-tab"><span data-zh>VFS 审稿</span><span data-en>VFS Review</span></button>
+            </div>
+          </div>
+          <div class="demo-body">
+            <div class="canvas" id="pvr-canvas">
+              <div class="toast" id="pvr-toast"></div>
+              <div class="demo-card" id="pvr-demo-card">
+                <div class="media"></div>
+                <div class="pad">
+                  <span class="dc-badge pvr-editable" data-el="badge" data-tag=".badge" data-type="style_edit">FIELD NOTE</span>
+                  <div class="dc-title pvr-editable" data-el="title" data-tag="h3.title" data-type="text_edit" id="pvr-dc-title">Under the old oak</div>
+                  <div class="dc-desc pvr-editable" data-el="desc" data-tag="p.desc" data-type="text_edit">A quiet bench beneath summer branches.</div>
+                  <button class="dc-btn pvr-editable" type="button" data-el="cta" data-tag="button.cta" data-type="style_edit">View story</button>
+                </div>
+              </div>
+              <span class="canvas-hint">
+                <span class="ch-preview"><span data-zh>评论模式 · Shift 圈选区域 · Cmd 点击直接发送</span><span data-en>comment mode · shift-click selects an area · cmd-click sends</span></span>
+                <span class="ch-vfs"><span data-zh>多人同页走查 · 点击元素生成审稿记录</span><span data-en>multiplayer walkthrough · click an element to record</span></span>
+              </span>
+            </div>
+            <aside class="board">
+              <div class="board-head">
+                <span class="bl-preview"><span data-zh>对话线程</span><span data-en>THREAD</span></span>
+                <span class="bl-vfs"><span data-zh>审稿任务板</span><span data-en>REVIEW BOARD</span></span>
+                <span class="bh-soon" id="pvr-bh-soon"><span data-zh>即将上线</span><span data-en>SOON</span></span>
+                <button class="team-btn" type="button" id="pvr-team-btn">▶ <span data-zh>重放</span><span data-en>replay</span></button>
+              </div>
+              <div class="board-body" id="pvr-board-body">
+                <div class="board-empty" id="pvr-board-empty">
+                  <span class="em-preview"><span data-zh>Codex Preview：点击元素留下评论，评论附在元素上，回线程让 Codex 处理。</span><span data-en>Codex Preview: click an element to attach a comment, then ask Codex in the thread.</span></span>
+                  <span class="em-vfs"><span data-zh>VFS 团队走查：多人同时圈选同一页面，反馈汇成一份无冲突定稿清单。</span><span data-en>VFS team walkthrough: everyone selects on the same page; feedback becomes one zero-conflict final list.</span></span>
+                </div>
+              </div>
+              <div class="board-foot">
+                <div class="steps" id="pvr-steps">
+                  <span data-step="plan"><span data-zh>规划</span><span data-en>plan</span></span>
+                  <span data-step="apply"><span data-zh>落地</span><span data-en>apply</span></span>
+                  <span data-step="verify"><span data-zh>验证</span><span data-en>verify</span></span>
+                </div>
+                <button class="apply-btn" type="button" id="pvr-apply-btn" disabled>
+                  <span class="ab-vfs"><span data-zh>应用 →</span><span data-en>apply →</span></span>
+                  <span class="ab-preview"><span data-zh>评论已入线程 · 由 Codex 处理</span><span data-en>comments in thread · Codex handles</span></span>
+                </button>
+              </div>
+            </aside>
+          </div>
+          <div class="cursor c-you" id="pvr-cur-you"><i></i><span><span data-zh>你</span><span data-en>you</span></span></div>
+          <div class="cursor c-mia" id="pvr-cur-mia"><i></i><span>Mia</span></div>
+          <div class="cursor c-leo" id="pvr-cur-leo"><i></i><span>Leo</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="section" id="principles">
   <div class="wrap">
     <div class="section-head reveal">
@@ -3664,8 +4547,8 @@
       </h2>
       <p class="lead"><span data-en>Design has comments. Code has pull requests.</span><span data-zh>设计稿有评论，代码有 PR。</span></p>
       <p><span data-en>The broken part is the running page: seeing what feels wrong, adjusting it in context, and getting that intent back into source without screenshots, vague chat messages, or manual transcription.</span><span data-zh>断掉的是跑起来的页面：看到哪里不对，在真实上下文里调整，然后把意图回到源码，而不是截图、群聊描述、手动整理。</span></p>
-      <div class="setup-command-box section-command" data-copy-command="source_anchors + locate_confidence + intent_guess">
-        <code class="setup-command-code"><span class="command-prompt">$</span> source_anchors + locate_confidence + intent_guess</code>
+      <div class="setup-command-box section-command" data-copy-command="curl -fsSL https://raw.githubusercontent.com/Niurougan1/visual-feedback-studio/main/scripts/install.sh | bash">
+        <code class="setup-command-code"><span class="command-prompt">$</span> curl -fsSL https://raw.githubusercontent.com/Niurougan1/visual-feedback-studio/main/scripts/install.sh | bash</code>
         <button class="setup-copy-btn" type="button" aria-label="Copy schema command"><span>schema</span></button>
       </div>
     </div>
@@ -3776,6 +4659,426 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var root = document.documentElement;
+  var scope = document.getElementById("preview-review");
+  if (!scope) return;
+
+  var $ = function (s, r) { return (r || scope).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || scope).querySelectorAll(s)); };
+  var demo = $("#pvr-demo");
+  var toast = $("#pvr-toast");
+  var card = $("#pvr-demo-card");
+  var dcTitle = $("#pvr-dc-title");
+  var boardBody = $("#pvr-board-body");
+  var boardEmpty = $("#pvr-board-empty");
+  var bhSoon = $("#pvr-bh-soon");
+  var teamBtn = $("#pvr-team-btn");
+  var applyBtn = $("#pvr-apply-btn");
+  var steps = $("#pvr-steps");
+  var modeSwitch = $("#pvr-mode-switch");
+  if (!demo || !toast || !card || !dcTitle || !boardBody || !boardEmpty || !bhSoon || !teamBtn || !applyBtn || !steps || !modeSwitch) return;
+
+  var editables = $$(".pvr-editable", card);
+  var cursors = {
+    you: $("#pvr-cur-you"),
+    mia: $("#pvr-cur-mia"),
+    leo: $("#pvr-cur-leo")
+  };
+
+  function t(zh, en) {
+    return root.lang === "zh" ? zh : en;
+  }
+
+  function nameOf(user) {
+    return { you: t("你", "you"), mia: "Mia", leo: "Leo" }[user];
+  }
+
+  function authorLabel(user) {
+    return {
+      you: t("你 · 前端", "you · frontend"),
+      mia: t("Mia · 设计", "Mia · design"),
+      leo: t("Leo · 产品", "Leo · product")
+    }[user];
+  }
+
+  function commentOf(el) {
+    return {
+      title: t("标题里提一下那棵老树。", "Mention the old tree in the title."),
+      badge: t("徽标颜色改成品牌主色。", "Make this badge match the brand accent."),
+      desc: t("这段文案压缩成一行。", "Tighten this copy to one line."),
+      cta: t("按钮文字改成句首大写。", "Button label should be sentence case.")
+    }[el.dataset.el] || t("调整这个元素。", "Adjust this element.");
+  }
+
+  var ORIGINAL_TITLE = "Under the old oak";
+  var APPLIED_TITLE = "Under the old oak tree";
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var autoplay = !reduced;
+  var toastTimer = null;
+  var applying = false;
+  var teamPlaying = false;
+  var pinSeq = 0;
+
+  function sleep(ms) {
+    return new Promise(function (resolve) { setTimeout(resolve, ms); });
+  }
+
+  function showToast(msg, kind, ms) {
+    toast.textContent = msg;
+    toast.classList.toggle("ok", kind === "ok");
+    toast.classList.toggle("ctx", kind === "ctx");
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove("show"); }, ms || 2200);
+  }
+
+  function showCursor(name) {
+    if (cursors[name]) cursors[name].classList.add("live");
+  }
+
+  function hideCursor(name) {
+    if (cursors[name]) cursors[name].classList.remove("live");
+  }
+
+  function hideAllCursors() {
+    Object.keys(cursors).forEach(hideCursor);
+  }
+
+  function moveCursor(name, el, ox, oy) {
+    if (!cursors[name] || !el) return;
+    var d = demo.getBoundingClientRect();
+    var r = el.getBoundingClientRect();
+    var x = r.left - d.left + r.width / 2 + (ox || 0);
+    var y = r.top - d.top + r.height / 2 + (oy || 0);
+    cursors[name].style.transform = "translate(" + x + "px," + y + "px)";
+  }
+
+  function parkCursor(name, x, y) {
+    if (cursors[name]) cursors[name].style.transform = "translate(" + x + "px," + y + "px)";
+  }
+
+  function tapCursor(name) {
+    var cursor = cursors[name];
+    if (!cursor) return;
+    cursor.classList.remove("tap");
+    void cursor.offsetWidth;
+    cursor.classList.add("tap");
+  }
+
+  function markSel(el, user) {
+    el.classList.add("sel-" + user);
+    if (!el.querySelector(".sel-tag.u-" + user)) {
+      var tag = document.createElement("span");
+      tag.className = "sel-tag u-" + user;
+      tag.textContent = nameOf(user);
+      el.appendChild(tag);
+    }
+  }
+
+  function unmarkSel(el, user) {
+    el.classList.remove("sel-" + user);
+    var tag = el.querySelector(".sel-tag.u-" + user);
+    if (tag) {
+      tag.classList.add("fade");
+      setTimeout(function () { tag.remove(); }, 480);
+    }
+  }
+
+  function clearMarks() {
+    editables.forEach(function (el) {
+      el.classList.remove("sel-you", "sel-mia", "sel-leo", "pinned");
+      el.querySelectorAll(".sel-tag, .pin").forEach(function (node) { node.remove(); });
+    });
+    pinSeq = 0;
+  }
+
+  function hideEmpty() {
+    boardEmpty.style.display = "none";
+  }
+
+  function clearBoard() {
+    boardBody.querySelectorAll(".record, .signoff, .final").forEach(function (record) { record.remove(); });
+    boardEmpty.style.display = "";
+    applyBtn.disabled = true;
+  }
+
+  function clearSteps() {
+    $$("span", steps).forEach(function (step) { step.classList.remove("on"); });
+  }
+
+  function resetCard() {
+    dcTitle.textContent = ORIGINAL_TITLE;
+    editables.forEach(function (el) { el.classList.remove("applied"); });
+  }
+
+  function resetStage() {
+    clearMarks();
+    clearBoard();
+    clearSteps();
+    resetCard();
+    hideAllCursors();
+    bhSoon.classList.remove("show");
+  }
+
+  function setMode(mode) {
+    demo.dataset.mode = mode;
+    $$("button", modeSwitch).forEach(function (button) {
+      button.classList.toggle("on", button.dataset.mode === mode);
+    });
+    resetStage();
+  }
+
+  function vfsRecordCount() {
+    return boardBody.querySelectorAll(".record:not(.ctx)").length;
+  }
+
+  function addComment(el) {
+    if (el.querySelector(".pin")) return;
+    pinSeq += 1;
+    el.classList.add("pinned");
+    var pin = document.createElement("span");
+    pin.className = "pin";
+    pin.textContent = pinSeq;
+    el.appendChild(pin);
+
+    hideEmpty();
+    var rec = document.createElement("div");
+    rec.className = "record ctx";
+    rec.innerHTML =
+      '<span class="r-author">' + t("你 · 浏览器评论 #", "you · browser comment #") + pinSeq + "</span>" +
+      '<span class="r-sel">&ldquo;' + commentOf(el) + '&rdquo;</span>' +
+      '<div class="r-chips"><span>' + el.dataset.tag + '</span><span>' + t("样式预览", "style preview") + '</span><span>' + t("→ 线程", "→ thread") + "</span></div>";
+    boardBody.appendChild(rec);
+    showToast(t("评论已附在元素上 · 回线程让 Codex 处理", "Comment attached · ask Codex in the thread"), "ctx", 2600);
+  }
+
+  function addVfsRecord(el, user, conflict) {
+    hideEmpty();
+    var rec = document.createElement("div");
+    rec.className = "record u-" + user + (conflict ? " conflict" : "");
+    rec.dataset.for = el.dataset.el;
+    rec.innerHTML =
+      '<span class="r-author">' + authorLabel(user) + "</span>" +
+      '<div class="r-head"><span class="r-type">' + el.dataset.type + '</span>' +
+      '<span class="r-check">' + t("验证 ✓", "verify ✓") + '</span></div>' +
+      '<span class="r-sel">' + el.dataset.tag + '</span>' +
+      (conflict
+        ? '<div class="r-chips"><span class="warn">' + t("冲突", "conflict") + "</span><span>" + t("同一元素", "same element") + "</span></div>"
+        : '<div class="r-chips"><span>DOM path</span><span>source_hint</span><span>computed</span></div>');
+    boardBody.appendChild(rec);
+    if (!conflict) applyBtn.disabled = false;
+    return rec;
+  }
+
+  function runApply() {
+    if (applying || vfsRecordCount() === 0 || demo.dataset.mode !== "vfs") return Promise.resolve();
+    applying = true;
+    applyBtn.disabled = true;
+    clearSteps();
+    var plan = steps.querySelector('[data-step="plan"]');
+    var apply = steps.querySelector('[data-step="apply"]');
+    var verify = steps.querySelector('[data-step="verify"]');
+
+    return sleep(200)
+      .then(function () { plan.classList.add("on"); return sleep(950); })
+      .then(function () {
+        apply.classList.add("on");
+        boardBody.querySelectorAll(".record:not(.ctx):not(.conflict)").forEach(function (rec) {
+          var el = card.querySelector('[data-el="' + rec.dataset.for + '"]');
+          if (!el) return;
+          if (el.dataset.el === "title") dcTitle.textContent = APPLIED_TITLE;
+          el.classList.add("applied");
+        });
+        return sleep(1050);
+      })
+      .then(function () {
+        verify.classList.add("on");
+        boardBody.querySelectorAll(".record:not(.ctx):not(.conflict)").forEach(function (rec) { rec.classList.add("verified"); });
+        applying = false;
+        applyBtn.disabled = vfsRecordCount() === 0;
+      });
+  }
+
+  function playTeam(withCursor) {
+    if (teamPlaying || applying) return Promise.resolve();
+    teamPlaying = true;
+    setMode("vfs");
+    bhSoon.classList.add("show");
+    hideEmpty();
+
+    if (!cursors.mia.classList.contains("live")) {
+      parkCursor("mia", demo.offsetWidth - 320, 70);
+      parkCursor("leo", 90, demo.offsetHeight - 90);
+    }
+    if (!cursors.you.classList.contains("live")) parkCursor("you", 70, 70);
+
+    var badgeEl = card.querySelector('[data-el="badge"]');
+    var mine;
+    var leoRec;
+    var signoff;
+
+    return sleep(400)
+      .then(function () {
+        showToast(t("3 人加入走查 · 同一预览页", "3 reviewers joined · same preview page"), "ctx", 2400);
+        showCursor("you"); showCursor("mia"); showCursor("leo");
+        moveCursor("you", dcTitle, -56, -26);
+        moveCursor("mia", badgeEl, 64, -18);
+        moveCursor("leo", card.querySelector('[data-el="desc"]'), 70, 26);
+        return sleep(1500);
+      })
+      .then(function () {
+        moveCursor("you", dcTitle, 30, 4);
+        moveCursor("mia", badgeEl, 14, 2);
+        return sleep(1200);
+      })
+      .then(function () {
+        tapCursor("you");
+        markSel(dcTitle, "you");
+        mine = addVfsRecord(dcTitle, "you");
+        return sleep(900);
+      })
+      .then(function () {
+        tapCursor("mia");
+        markSel(badgeEl, "mia");
+        addVfsRecord(badgeEl, "mia");
+        return sleep(1600);
+      })
+      .then(function () {
+        moveCursor("leo", dcTitle, 64, 14);
+        return sleep(1250);
+      })
+      .then(function () {
+        tapCursor("leo");
+        markSel(dcTitle, "leo");
+        leoRec = addVfsRecord(dcTitle, "leo", true);
+        showToast(t("冲突：leo 与 you 圈选了同一元素", "Conflict: leo and you picked the same element"), null, 2400);
+        return sleep(2100);
+      })
+      .then(function () {
+        leoRec.classList.add("merge-out");
+        unmarkSel(dcTitle, "leo");
+        moveCursor("leo", card, 150, 120);
+        return sleep(560);
+      })
+      .then(function () {
+        leoRec.remove();
+        var merged = document.createElement("span");
+        merged.className = "hot";
+        merged.textContent = t("归并 ×2", "merged ×2");
+        mine.querySelector(".r-chips").appendChild(merged);
+        showToast(t("同元素反馈已归并 · 冲突清零", "Same-element feedback merged · zero conflicts"), "ok", 2400);
+        return sleep(1600);
+      })
+      .then(function () {
+        signoff = document.createElement("div");
+        signoff.className = "signoff";
+        signoff.innerHTML = t(
+          "<span>设计</span><span>产品</span><span>前端</span>",
+          "<span>design</span><span>product</span><span>frontend</span>"
+        );
+        boardBody.appendChild(signoff);
+        return sleep(600);
+      })
+      .then(function () { signoff.children[0].classList.add("ok"); return sleep(480); })
+      .then(function () { signoff.children[1].classList.add("ok"); return sleep(480); })
+      .then(function () { signoff.children[2].classList.add("ok"); return sleep(1100); })
+      .then(function () {
+        var fin = document.createElement("div");
+        fin.className = "final";
+        fin.textContent = t("定稿清单 · 0 冲突", "FINAL LIST · 0 CONFLICTS");
+        boardBody.appendChild(fin);
+        return sleep(1100);
+      })
+      .then(function () {
+        if (withCursor) { moveCursor("you", applyBtn, 0, 0); return sleep(1150); }
+        return sleep(150);
+      })
+      .then(function () {
+        if (withCursor) tapCursor("you");
+        teamPlaying = false;
+        return runApply();
+      })
+      .then(function () {
+        showToast(t("定稿清单已落地源码 ✓", "Final list applied to source ✓"), "ok", 2600);
+        hideCursor("mia"); hideCursor("leo");
+      })
+      .catch(function () { teamPlaying = false; });
+  }
+
+  editables.forEach(function (el) {
+    el.addEventListener("click", function (event) {
+      event.preventDefault();
+      if (teamPlaying) return;
+      if (demo.dataset.mode === "vfs") {
+        editables.forEach(function (item) { if (item !== el) unmarkSel(item, "you"); });
+        markSel(el, "you");
+        if (!boardBody.querySelector('.record:not(.ctx)[data-for="' + el.dataset.el + '"]')) addVfsRecord(el, "you");
+      } else {
+        addComment(el);
+      }
+    });
+  });
+
+  modeSwitch.addEventListener("click", function (event) {
+    var btn = event.target.closest("button");
+    if (btn && !teamPlaying) setMode(btn.dataset.mode);
+  });
+
+  applyBtn.addEventListener("click", function () { runApply(); });
+  teamBtn.addEventListener("click", function () { playTeam(false); });
+
+  demo.addEventListener("pointerdown", function () {
+    autoplay = false;
+    if (!teamPlaying) hideAllCursors();
+  });
+
+  if (window.MutationObserver) {
+    var lastLang = root.lang;
+    new MutationObserver(function () {
+      if (root.lang === lastLang) return;
+      lastLang = root.lang;
+      if (!teamPlaying && !applying) resetStage();
+    }).observe(root, { attributes: true, attributeFilter: ["lang"] });
+  }
+
+  function step(fn, wait) {
+    return function () {
+      if (!autoplay) throw 0;
+      fn();
+      return sleep(wait);
+    };
+  }
+
+  function loop() {
+    if (!autoplay) return;
+    var previewTab = $("#pvr-preview-tab");
+    var vfsTab = $("#pvr-vfs-tab");
+
+    parkCursor("you", 60, 60);
+    parkCursor("mia", 540, 90);
+    parkCursor("leo", 120, 430);
+
+    Promise.resolve()
+      .then(step(function () { setMode("preview"); showCursor("you"); moveCursor("you", previewTab); }, 1100))
+      .then(step(function () { moveCursor("you", dcTitle, 24, 2); }, 1100))
+      .then(step(function () { tapCursor("you"); addComment(dcTitle); }, 2700))
+      .then(step(function () { moveCursor("you", vfsTab); }, 1100))
+      .then(step(function () { tapCursor("you"); }, 350))
+      .then(function () { if (!autoplay) throw 0; return playTeam(true); })
+      .then(function () { if (!autoplay) throw 0; return sleep(3600); })
+      .then(step(function () { hideAllCursors(); setMode("preview"); }, 1000))
+      .then(function () { if (autoplay) loop(); })
+      .catch(function () {});
+  }
+
+  if (autoplay) setTimeout(loop, 1500);
+})();
+</script>
 
 <script>
 (function () {
