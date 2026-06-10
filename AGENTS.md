@@ -27,3 +27,41 @@ If port `3456` is occupied, docs may mention:
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Niurougan1/visual-feedback-studio/main/scripts/install.sh | VFS_PORT=3463 bash
 ```
+
+## Landing Sync Push Workflow
+
+Use this workflow when the user asks to update the landing page, homepage, marketing copy, CTA, or copyable setup command.
+
+1. Scope rules:
+   - Landing page UI, copy, CTA buttons, analytics, and assets belong here.
+   - Core product implementation belongs in the private repo.
+   - Public install docs and public-safe runnable code belong in the public repo.
+
+2. If the setup command changes:
+   - Update the visible command blocks.
+   - Update the JavaScript copy command value.
+   - Confirm the command remains one line and copyable.
+   - Push and verify the public repo first if the command depends on `scripts/install.sh` or public docs.
+
+3. Before committing:
+
+```bash
+git status --short --branch
+git fetch origin
+git rebase origin/main
+```
+
+Then verify the command text:
+
+```bash
+rg -n "curl -fsSL|var CMD|git clone|scripts/setup.py" index.html
+```
+
+4. Push and verify:
+
+```bash
+git push origin main
+git ls-remote --heads origin main
+```
+
+If push is rejected because the remote is ahead, fetch and rebase, then retry. Do not overwrite remote landing-page changes from another thread.
