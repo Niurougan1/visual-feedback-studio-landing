@@ -29,6 +29,7 @@
       var want = zh ? "demo-site/index.zh.html" : "demo-site/index.html";
       if (f.getAttribute("src") !== want) f.setAttribute("src", want);
     }
+    if (window.__loopLabel) window.__loopLabel();
   }
   var st = null, sl = null;
   try { st = localStorage.getItem("vfs2-theme"); sl = localStorage.getItem("vfs2-lang"); } catch (_) {}
@@ -426,13 +427,37 @@
     var steps = $$(".loop-step", grid);
     var total = steps.length, idx = -1;
     var stickyOk = window.matchMedia ? window.matchMedia("(min-width: 1001px) and (min-height: 640px)") : { matches: true };
+    var stepBar = $("#frameStep");
+    var labelTimer = null;
+    function updateLabel(instant) {
+      if (!stepBar || idx < 0) return;
+      var zh = root.lang.indexOf("zh") === 0;
+      var t = steps[idx] && steps[idx].querySelector(".t [data-" + (zh ? "zh" : "en") + "]");
+      if (!t) t = steps[idx] && steps[idx].querySelector(".t");
+      var text = "0" + (idx + 1) + " · " + (t ? t.textContent.trim() : "");
+      if (instant || reduce) { stepBar.textContent = text; return; }
+      stepBar.classList.add("swap");
+      if (labelTimer) clearTimeout(labelTimer);
+      labelTimer = setTimeout(function () {
+        stepBar.textContent = text;
+        stepBar.classList.remove("swap");
+      }, 180);
+    }
+    window.__loopLabel = function () { updateLabel(true); };
     function setK(k) {
       k = Math.max(0, Math.min(total - 1, k));
       if (k === idx) return;
+      var first = idx < 0;
       idx = k;
       frame.setAttribute("data-k", String(k));
       steps.forEach(function (s, i) { s.classList.toggle("on", i === k); });
       grid.classList.toggle("done", k === total - 1);
+      updateLabel(first);
+      if (!first && !reduce) {
+        frame.classList.remove("kick");
+        void frame.offsetWidth;
+        frame.classList.add("kick");
+      }
     }
     var tick = false;
     function onScroll() {
