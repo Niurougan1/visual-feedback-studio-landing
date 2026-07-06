@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Visual Feedback Studio Docs — Product guide</title>
+<meta name="description" content="A compact guide to the Visual Feedback Studio review loop, surfaces, handoff, and trust boundaries." />
+<link rel="canonical" href="https://visualfeedbackstudio.com/docs/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Visual Feedback Studio" />
+<meta property="og:title" content="Visual Feedback Studio Docs — Product guide" />
+<meta property="og:description" content="A compact guide to the Visual Feedback Studio review loop, surfaces, handoff, and trust boundaries." />
+<meta property="og:url" content="https://visualfeedbackstudio.com/docs/" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Visual Feedback Studio Docs — Product guide" />
+<meta name="twitter:description" content="A compact guide to the Visual Feedback Studio review loop, surfaces, handoff, and trust boundaries." />
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+<link rel="shortcut icon" href="/assets/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/assets/favicon.svg" />
+<link rel="stylesheet" href="/assets/site.css" />
+<script type="importmap">
+{
+  "imports": {
+    "@vercel/analytics": "/assets/vercel-analytics.js"
+  }
+}
+</script>
+<script type="module">
+  import { inject } from "@vercel/analytics";
+  if (!/^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/.test(window.location.hostname)) {
+    inject();
+  }
+</script>
+</head>
+<body data-title-en="Visual Feedback Studio Docs — Product guide" data-title-zh="Visual Feedback Studio 文档 — 产品指南">
+<canvas id="fluid" aria-hidden="true"></canvas>
+<canvas id="trail" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="cur-dot" aria-hidden="true"></div>
+<div class="cur-ring" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"><i id="spBar"></i></div>
+<div class="page sub-main">
+<nav class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="/" data-mag>
+      <svg viewBox="0 0 64 64" width="24" height="24" aria-hidden="true">
+        <rect width="64" height="64" rx="15" fill="#20260F"/>
+        <rect x="10.5" y="10.5" width="43" height="43" rx="11.5" fill="none" stroke="#5C7036" stroke-width="2.4"/>
+        <rect x="18" y="18" width="13" height="13" rx="3.6" fill="#B7D869"/>
+        <rect x="33" y="18" width="13" height="13" rx="3.6" fill="#93AF52"/>
+        <rect x="18" y="33" width="13" height="13" rx="3.6" fill="#8AA54C"/>
+        <rect x="33" y="33" width="13" height="13" rx="3.6" fill="#6B8140"/>
+      </svg>
+      <span>Visual Feedback Studio</span>
+    </a>
+    <div class="nav-links">
+      <a href="/#surfaces"><span data-en>Product</span><span data-zh>产品</span></a>
+      <a href="/#loop"><span data-en>Loop</span><span data-zh>闭环</span></a>
+      <a href="/install/"><span data-en>Install</span><span data-zh>安装</span></a>
+      <a href="/docs/" aria-current="page"><span data-en>Docs</span><span data-zh>文档</span></a>
+      <a href="/changelog/"><span data-en>Changelog</span><span data-zh>更新</span></a>
+    </div>
+    <div class="nav-ctl">
+      <button class="ictl" id="langBtn" type="button" aria-label="Switch language">EN</button>
+      <button class="ictl" id="themeBtn" type="button" aria-label="Switch theme">◐</button>
+      <a class="nav-cta" href="https://app.visualfeedbackstudio.com/" data-mag><span data-en>Open Studio</span><span data-zh>打开工作台</span></a>
+    </div>
+  </div>
+</nav>
+<main>
+  <header class="sub-hero">
+    <div class="wrap">
+      <div class="rv">
+        <span class="tag"><b>Docs</b><span data-en>Product guide</span><span data-zh>产品指南</span></span>
+        <h1><span data-en>Review signal in. <em>Source context out.</em></span><span data-zh>审稿信号进入，<em>源码上下文输出。</em></span></h1>
+      </div>
+      <div class="sub-aside rv" style="--d:.08s">
+        <p><span data-en>A compact guide to the Visual Feedback Studio loop: where feedback is captured, how decisions are made, and what reaches the agent.</span><span data-zh>一份紧凑指南：视觉反馈在哪里被捕捉，决策如何形成，什么内容会交给 agent。</span></p>
+        <div class="micro-panel"><b>Boundary</b><span data-en>VFS is a visual review tool for implemented interfaces, not an automatic taste replacement.</span><span data-zh>VFS 是面向已实现界面的视觉审稿工具，不是自动替代审美判断的工具。</span></div>
+      </div>
+    </div>
+  </header>
+  <section class="sub-section">
+    <div class="wrap docs-layout">
+      <aside class="docs-index rv">
+        <span class="tag"><b>Index</b><span data-en>Start here</span><span data-zh>从这里开始</span></span>
+        <p><span data-en>Read top to bottom for the model, or jump straight to the setup and handoff sections.</span><span data-zh>可以顺序理解模型，也可以直接跳到安装与交接部分。</span></p>
+        <nav aria-label="Docs sections">
+          <a href="#overview"><span data-en>Overview</span><span data-zh>概览</span></a>
+          <a href="#quickstart"><span data-en>Quickstart</span><span data-zh>快速开始</span></a>
+          <a href="#object"><span data-en>Review object</span><span data-zh>审稿对象</span></a>
+          <a href="#surfaces-doc"><span data-en>Surfaces</span><span data-zh>入口</span></a>
+          <a href="#handoff-doc"><span data-en>Handoff</span><span data-zh>交接</span></a>
+          <a href="#trust-doc"><span data-en>Trust</span><span data-zh>边界</span></a>
+          <a href="#faq-doc">FAQ</a>
+        </nav>
+      </aside>
+      <div class="docs-content">
+        <section class="docs-block rv" id="overview">
+          <div><span class="tag"><b>01</b><span data-en>Overview</span><span data-zh>概览</span></span><h2><span data-en>Visual review for implemented interfaces.</span><span data-zh>面向已实现界面的视觉审稿。</span></h2></div>
+          <div class="docs-body">
+            <p><span data-en>Visual Feedback Studio keeps the page target, reviewer intent, decision state, and source clues in one review object. It is built for the moment when an interface is close, but still needs precise human judgment before an agent edits source.</span><span data-zh>Visual Feedback Studio 把页面目标、审稿意图、裁决状态和源码线索保存在同一个 review object 里。它服务的是界面已经接近正确，但还需要人的精准判断，agent 才能修改源码的时刻。</span></p>
+            <div class="docs-note"><b><span data-en>Core rule:</span><span data-zh>核心规则：</span></b> <span data-en>feedback does not become implementation context until a human accepts it.</span><span data-zh>反馈只有被人接受后，才会变成实现上下文。</span></div>
+          </div>
+        </section>
+        <section class="docs-block rv" id="quickstart">
+          <div><span class="tag"><b>02</b><span data-en>Quickstart</span><span data-zh>快速开始</span></span><h2><span data-en>Start local, then use Studio when the round needs shared state.</span><span data-zh>先本地开始，需要共享状态时再进入 Studio。</span></h2></div>
+          <div class="docs-body">
+            <div class="docs-steps">
+              <div class="docs-step"><i>01</i><div><h3><span data-en>Install Free Local</span><span data-zh>安装 Free Local</span></h3><p><span data-en>Run the receiver for localhost and solo review loops.</span><span data-zh>运行 receiver，用于 localhost 和个人审稿闭环。</span></p></div></div>
+              <div class="docs-step"><i>02</i><div><h3><span data-en>Open the page</span><span data-zh>打开页面</span></h3><p><span data-en>Review the real tab: local preview, staging, production, or an authenticated internal page.</span><span data-zh>审查真实标签页：本地预览、staging、production，或已登录的内部页面。</span></p></div></div>
+              <div class="docs-step"><i>03</i><div><h3><span data-en>Capture and accept</span><span data-zh>捕捉并接受</span></h3><p><span data-en>Select the exact visual target, write the intent, and accept only the feedback that should move forward.</span><span data-zh>选择准确视觉目标，写下意图，只接受应该进入下一步的反馈。</span></p></div></div>
+            </div>
+            <div class="docs-command"><code>curl -fsSL https://raw.githubusercontent.com/Niurougan1/visual-feedback-studio/main/scripts/install.sh | bash</code></div>
+            <div class="hero-cta" style="margin-top:2px;"><a class="btn btn-ghost" href="/install/" data-mag><span data-en>Install guide</span><span data-zh>安装指南</span></a></div>
+          </div>
+        </section>
+        <section class="docs-block rv" id="object">
+          <div><span class="tag"><b>03</b><span data-en>Review object</span><span data-zh>审稿对象</span></span><h2><span data-en>One object holds what screenshots and chat lose.</span><span data-zh>一个对象保存截图和聊天会丢掉的信息。</span></h2></div>
+          <div class="docs-body">
+            <div class="docs-kv">
+              <div><dt>Target</dt><dd><span data-en>The element, region, selector, or screen location where the issue exists.</span><span data-zh>问题所在的元素、区域、选择器或屏幕位置。</span></dd></div>
+              <div><dt>Intent</dt><dd><span data-en>The reviewer’s desired change, written beside the thing being reviewed.</span><span data-zh>审稿人希望发生的改动，和被审对象一起保存。</span></dd></div>
+              <div><dt>Decision</dt><dd><span data-en>Accepted, deferred, rejected, merged, or unresolved before handoff.</span><span data-zh>交接前的接受、暂缓、拒绝、合并或未决状态。</span></dd></div>
+              <div><dt>Source clues</dt><dd><span data-en>Available DOM, selector, copy, style, measurement, and source hints.</span><span data-zh>可用的 DOM、选择器、文案、样式、测量和源码线索。</span></dd></div>
+            </div>
+          </div>
+        </section>
+        <section class="docs-block rv" id="surfaces-doc">
+          <div><span class="tag"><b>04</b><span data-en>Surfaces</span><span data-zh>入口</span></span><h2><span data-en>Three surfaces, one review loop.</span><span data-zh>三个表面，一条审稿闭环。</span></h2></div>
+          <div class="docs-body">
+            <div class="docs-matrix">
+              <div class="docs-cell"><em>Local</em><h3>Free Local</h3><p><span data-en>No account. Runs on your machine for solo review and localhost pages.</span><span data-zh>无需账号，跑在本机，适合个人审稿与 localhost 页面。</span></p></div>
+              <div class="docs-cell"><em>Browser</em><h3><span data-en>Companion</span><span data-zh>浏览器 companion</span></h3><p><span data-en>Captures selection, note, measure, copy, and style intent on the running page.</span><span data-zh>在运行页面上捕捉选择、备注、测量、文案和样式意图。</span></p></div>
+              <div class="docs-cell"><em>Hosted</em><h3>Studio App</h3><p><span data-en>Shared rounds, decisions, grouping, reports, and team preview flows.</span><span data-zh>共享轮次、裁决、分组、报告和 Team Preview 流程。</span></p></div>
+            </div>
+          </div>
+        </section>
+        <section class="docs-block rv" id="handoff-doc">
+          <div><span class="tag"><b>05</b><span data-en>Handoff</span><span data-zh>交接</span></span><h2><span data-en>Your eyes decide. The agent receives usable context.</span><span data-zh>你的眼睛做判断，agent 拿到可执行上下文。</span></h2></div>
+          <div class="docs-body">
+            <div class="docs-steps">
+              <div class="docs-step"><i>H</i><div><h3><span data-en>Human</span><span data-zh>人</span></h3><p><span data-en>Notices mismatch, names the intended change, resolves conflicts, and accepts what should move forward.</span><span data-zh>发现不协调，命名修改意图，处理冲突，并接受应该进入下一步的反馈。</span></p></div></div>
+              <div class="docs-step"><i>A</i><div><h3><span data-en>Agent</span><span data-zh>Agent</span></h3><p><span data-en>Receives target context, accepted actions, source clues, and a review trail instead of guessing from a screenshot.</span><span data-zh>接收目标上下文、已接受动作、源码线索和审稿轨迹，而不是从截图里猜。</span></p></div></div>
+              <div class="docs-step"><i>V</i><div><h3><span data-en>Verify</span><span data-zh>验证</span></h3><p><span data-en>The result returns to the original page so the fix can be checked against the feedback.</span><span data-zh>结果回到原页面，对照原始反馈检查修复是否成立。</span></p></div></div>
+            </div>
+          </div>
+        </section>
+        <section class="docs-block rv" id="trust-doc">
+          <div><span class="tag"><b>06</b><span data-en>Trust</span><span data-zh>边界</span></span><h2><span data-en>Control what leaves the page.</span><span data-zh>控制什么离开页面。</span></h2></div>
+          <div class="docs-body">
+            <p><span data-en>Free Local keeps the review loop on your machine. Team Preview is for shared review context and accepted decisions. Source code, receiver tokens, local paths, and environment variables should not sync.</span><span data-zh>Free Local 将审稿闭环留在你的机器上。Team Preview 面向共享审稿上下文与已接受决策。源码、receiver token、本地路径和环境变量不应同步。</span></p>
+            <div class="docs-note"><b><span data-en>Important:</span><span data-zh>重要：</span></b> <span data-en>Visual Feedback Studio captures review intent. It is not the execution gate and does not automatically edit every issue it sees.</span><span data-zh>Visual Feedback Studio 捕捉审稿意图。它不是执行闸门，也不会自动修改它看到的所有问题。</span></div>
+          </div>
+        </section>
+        <section class="docs-block rv" id="faq-doc">
+          <div><span class="tag"><b>FAQ</b><span data-en>Setup questions</span><span data-zh>接入问题</span></span><h2><span data-en>Short answers before the first round.</span><span data-zh>第一轮之前的短答案。</span></h2></div>
+          <div class="mini-faq docs-body">
+            <details open><summary><span data-en>Does it work with localhost?</span><span data-zh>支持 localhost 吗？</span></summary><div><span data-en>Yes. The local workflow is designed for pages running on your machine or preview server.</span><span data-zh>支持。本地工作流就是为本机页面或预览服务器设计的。</span></div></details>
+            <details><summary><span data-en>Does VFS edit source code?</span><span data-zh>VFS 会编辑源码吗？</span></summary><div><span data-en>No. It captures review intent. Your agent applies accepted context, and you verify the result.</span><span data-zh>不会。它捕捉审稿意图。你的 agent 应用已接受上下文，然后你验证结果。</span></div></details>
+            <details><summary><span data-en>What gets sent to the agent?</span><span data-zh>会发送什么给 agent？</span></summary><div><span data-en>Accepted feedback, target context, source clues when available, and the review trail needed for a safer change.</span><span data-zh>已接受反馈、目标上下文、可用源码线索，以及安全修改所需的审稿轨迹。</span></div></details>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+  <section class="sec cta-sec" id="cta"><div class="wrap"><span class="tag rv"><b>Start</b><span data-en>Choose a surface</span><span data-zh>选择入口</span></span><h2 class="rv" style="--d:.06s"><span data-en>Open the studio or install locally.</span><span data-zh>打开 Studio，或本地安装。</span></h2><p class="rv" style="--d:.12s"><span data-en>Use the hosted workspace for team rounds, or Free Local for one-person review loops.</span><span data-zh>团队轮次使用 hosted workspace；个人审稿闭环使用 Free Local。</span></p><div class="hero-cta rv" style="--d:.18s"><a class="btn btn-solid" href="https://app.visualfeedbackstudio.com/" data-mag><span data-en>Open Studio</span><span data-zh>打开工作台</span><span class="ar">→</span></a><a class="btn btn-ghost" href="/install/" data-mag><span data-en>Install locally</span><span data-zh>本地安装</span></a></div></div></section>
+</main>
+<footer>
+  <div class="wrap foot-in">
+    <a class="brand" href="/" style="font-size:12.5px;">
+      <svg viewBox="0 0 64 64" width="20" height="20" aria-hidden="true">
+        <rect width="64" height="64" rx="15" fill="#20260F"/>
+        <rect x="10.5" y="10.5" width="43" height="43" rx="11.5" fill="none" stroke="#5C7036" stroke-width="2.4"/>
+        <rect x="18" y="18" width="13" height="13" rx="3.6" fill="#B7D869"/>
+        <rect x="33" y="18" width="13" height="13" rx="3.6" fill="#93AF52"/>
+        <rect x="18" y="33" width="13" height="13" rx="3.6" fill="#8AA54C"/>
+        <rect x="33" y="33" width="13" height="13" rx="3.6" fill="#6B8140"/>
+      </svg>
+      <span>Visual Feedback Studio</span>
+    </a>
+    <div class="foot-links">
+      <a href="https://app.visualfeedbackstudio.com/"><span data-en>Open Studio</span><span data-zh>打开工作台</span></a>
+      <a href="/privacy/"><span data-en>Privacy</span><span data-zh>隐私政策</span></a>
+      <a href="/terms/"><span data-en>Terms</span><span data-zh>服务条款</span></a>
+    </div>
+    <span class="foot-c">© <span id="year"></span> Visual Feedback Studio</span>
+  </div>
+</footer>
+</div>
+<script src="/assets/site.js" defer></script>
+</body>
+</html>
